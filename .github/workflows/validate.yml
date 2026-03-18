@@ -1,0 +1,62 @@
+name: Validate Examples
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-validate:
+    name: Lint & syntax check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Syntax check all scripts
+        run: |
+          echo "Checking Python syntax..."
+          for f in scripts/*.py; do
+            python -m py_compile "$f" && echo "  ✓ $f" || exit 1
+          done
+
+      - name: Check for hardcoded credentials
+        run: |
+          echo "Scanning for hardcoded secrets..."
+          # Fail if any script contains hardcoded API keys or passwords
+          if grep -rn "sk-ant-\|sk-\|AIza\|password\s*=\s*['\"][^'\"]\+['\"]" scripts/ --include="*.py"; then
+            echo "FAIL: Potential hardcoded credentials detected"
+            exit 1
+          fi
+          echo "  ✓ No hardcoded credentials found"
+
+      - name: Verify .env.example completeness
+        run: |
+          echo "Checking .env.example..."
+          required=("MAO_BASE_URL" "MAO_USERNAME" "MAO_PASSWORD")
+          for key in "${required[@]}"; do
+            if grep -q "^$key=" .env.example; then
+              echo "  ✓ $key"
+            else
+              echo "  FAIL: Missing $key in .env.example"
+              exit 1
+            fi
+          done
+
+      - name: Check for .env files accidentally committed
+        run: |
+          if find . -name ".env" -not -name ".env.example" | grep -q .; then
+            echo "FAIL: .env file found in repository — should not be committed"
+            exit 1
+          fi
+          echo "  ✓ No .env files committed"
