@@ -283,5 +283,96 @@ document.getElementById('brs').addEventListener('click',()=>location.reload());
 document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();document.getElementById('bpp').click();}if(e.code==='KeyM')document.getElementById('bmt').click();if(e.code==='KeyS')document.getElementById('bsc').click();if(e.code==='KeyR')document.getElementById('brs').click();});
 window.addEventListener('load',()=>{window.speechSynthesis.getVoices();setTimeout(runDemo,1000);});
 </script>
+
+<!-- ===== NARRATION IMPROVEMENTS (v2.1) ===== -->
+<style>
+#narration-bar { transition: height 0.2s ease, opacity 0.2s ease; overflow: hidden; }
+#narration-bar.narr-hidden { height: 0 !important; opacity: 0; border-top: none; }
+body.narr-collapsed #app-wrapper { bottom: var(--demo-bar-h) !important; }
+#narr-toggle-btn {
+  background: none; border: 1px solid rgba(34,211,238,.3);
+  color: #22d3ee; font-size: 11px; padding: 3px 9px;
+  border-radius: 12px; cursor: pointer; white-space: nowrap;
+  transition: background .15s; margin-right: 4px;
+}
+#narr-toggle-btn:hover { background: rgba(34,211,238,.12); }
+</style>
+<script>
+(function() {
+  var _synth = window.speechSynthesis;
+  var VOICE_PREF = [
+    function(v) { return v.name === "Google UK English Female"; },
+    function(v) { return v.name.indexOf("Aria Online") > -1 && v.name.indexOf("Natural") > -1; },
+    function(v) { return v.name.indexOf("Jenny Online") > -1; },
+    function(v) { return v.name === "Samantha"; },
+    function(v) { return v.name.indexOf("Natural") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.name === "Google US English"; },
+    function(v) { return v.name.indexOf("Google") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en-US") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en") === 0; }
+  ];
+  function pickVoice() {
+    var voices = _synth.getVoices();
+    for (var i = 0; i < VOICE_PREF.length; i++) {
+      for (var j = 0; j < voices.length; j++) {
+        if (VOICE_PREF[i](voices[j])) return voices[j];
+      }
+    }
+    return voices[0] || null;
+  }
+  function speakNatural(text, rm) {
+    if (!text) return;
+    _synth.cancel();
+    rm = rm || 1.0;
+    var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    var idx = 0;
+    function next() {
+      if (idx >= sentences.length) return;
+      var s = sentences[idx++].trim();
+      if (!s) { next(); return; }
+      var u = new SpeechSynthesisUtterance(s);
+      u.rate = 0.87 * rm;
+      u.pitch = 0.96;
+      u.volume = 1.0;
+      var v = pickVoice();
+      if (v) u.voice = v;
+      u.onend = function() { setTimeout(next, 100); };
+      _synth.speak(u);
+    }
+    next();
+  }
+  if (typeof window.speak === "function") {
+    window.speak = function(text, rate) {
+      var isMuted = (typeof muted !== "undefined" && muted);
+      var isDisabled = (typeof speechEnabled !== "undefined" && !speechEnabled);
+      if (isMuted || isDisabled) return;
+      var sm = (typeof speedMultiplier !== "undefined" ? speedMultiplier : 1.0);
+      speakNatural(text, (rate || 1.0) * sm);
+    };
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    var bar = document.getElementById("narration-bar");
+    var demoBar = document.getElementById("demo-bar");
+    var narr_visible = false;
+    if (bar) bar.classList.add("narr-hidden");
+    document.body.classList.add("narr-collapsed");
+    var btn = document.createElement("button");
+    btn.id = "narr-toggle-btn";
+    btn.title = "Show/hide narration captions";
+    btn.textContent = "Captions: Off";
+    btn.onclick = function() {
+      narr_visible = !narr_visible;
+      if (bar) bar.classList.toggle("narr-hidden", !narr_visible);
+      document.body.classList.toggle("narr-collapsed", !narr_visible);
+      btn.textContent = narr_visible ? "Captions: On" : "Captions: Off";
+    };
+    if (demoBar) {
+      var muteBtn = demoBar.querySelector("#mute-btn");
+      if (muteBtn) { demoBar.insertBefore(btn, muteBtn); }
+      else { demoBar.appendChild(btn); }
+    }
+  });
+})();
+</script>
 </body>
 </html>
