@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Inflexis — Riding the Sweet Spot: Why AI Timing Is Everything</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    body { overflow-y: auto; overflow-x: hidden; }
+
+    /* --- Hero --- */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 60px 40px;
+      background: radial-gradient(ellipse at 50% 30%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                  var(--qp-void);
+    }
+    .hero-badge {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+      color: var(--qp-cyan); padding: 6px 16px;
+      border: 1px solid rgba(34,211,238,0.3); border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 48px; font-weight: 800; line-height: 1.15;
+      max-width: 750px; margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 30%, var(--qp-cyan) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px; color: var(--qp-muted); max-width: 600px;
+      line-height: 1.7; margin-bottom: 40px;
+    }
+    .hero-stats {
+      display: flex; gap: 48px;
+    }
+    .hero-stat .stat-value {
+      font-size: 42px; font-weight: 800; font-family: 'Courier New', monospace;
+    }
+    .hero-stat .stat-label {
+      font-size: 13px; color: var(--qp-muted); margin-top: 4px;
+    }
+    .stat-blue { color: var(--qp-blue); }
+    .stat-cyan { color: var(--qp-cyan); }
+    .stat-green { color: var(--qp-green); }
+    .stat-amber { color: var(--qp-amber); }
+
+    /* --- Sections --- */
+    .section {
+      padding: 80px 40px; max-width: 1000px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 11px; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--qp-cyan); margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: 32px; font-weight: 700; color: var(--qp-text);
+      margin-bottom: 16px; line-height: 1.3;
+    }
+    .section .lead {
+      font-size: 16px; color: var(--qp-muted); line-height: 1.7;
+      max-width: 700px; margin-bottom: 40px;
+    }
+
+    /* --- Timeline --- */
+    .timeline {
+      position: relative; padding-left: 40px;
+    }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 15px; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--qp-blue), var(--qp-cyan), var(--qp-purple));
+    }
+    .tl-item {
+      position: relative; margin-bottom: 32px;
+      padding: 16px 20px;
+      background: var(--qp-panel); border: 1px solid var(--qp-border);
+      border-radius: 10px;
+    }
+    .tl-item::before {
+      content: ''; position: absolute;
+      left: -33px; top: 20px;
+      width: 12px; height: 12px;
+      border-radius: 50%; border: 2px solid var(--qp-cyan);
+      background: var(--qp-void);
+    }
+    .tl-date {
+      font-size: 11px; color: var(--qp-cyan); font-family: monospace;
+      font-weight: 700; margin-bottom: 4px;
+    }
+    .tl-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .tl-desc { font-size: 13px; color: var(--qp-muted); line-height: 1.6; }
+    .tl-unlock {
+      display: inline-block; margin-top: 6px;
+      font-size: 11px; padding: 3px 10px; border-radius: 4px;
+      font-weight: 600;
+    }
+    .unlock-reasoning { background: rgba(59,130,246,0.15); color: var(--qp-blue); border: 1px solid rgba(59,130,246,0.3); }
+    .unlock-multimodal { background: rgba(168,85,247,0.15); color: var(--qp-purple); border: 1px solid rgba(168,85,247,0.3); }
+    .unlock-context { background: rgba(34,211,238,0.15); color: var(--qp-cyan); border: 1px solid rgba(34,211,238,0.3); }
+    .unlock-cost { background: rgba(16,185,129,0.15); color: var(--qp-green); border: 1px solid rgba(16,185,129,0.3); }
+
+    /* --- Cost chart --- */
+    .cost-chart {
+      display: flex; align-items: flex-end; gap: 32px;
+      height: 260px; padding: 20px 0;
+    }
+    .cost-bar-group {
+      display: flex; flex-direction: column; align-items: center; flex: 1;
+    }
+    .cost-bar {
+      width: 80px; border-radius: 8px 8px 0 0;
+      transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .cost-bar .bar-value {
+      position: absolute; top: -28px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px; font-weight: 700; font-family: monospace;
+      white-space: nowrap;
+    }
+    .cost-bar-label {
+      font-size: 13px; color: var(--qp-muted); margin-top: 10px;
+      font-weight: 600;
+    }
+    .bar-2023 { background: linear-gradient(to top, #dc2626, #f87171); }
+    .bar-2024 { background: linear-gradient(to top, #f59e0b, #fbbf24); }
+    .bar-2025 { background: linear-gradient(to top, #3b82f6, #60a5fa); }
+    .bar-2026 { background: linear-gradient(to top, #10b981, #34d399); }
+
+    /* --- Capability grid --- */
+    .cap-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .cap-card {
+      padding: 20px; background: var(--qp-panel);
+      border: 1px solid var(--qp-border); border-radius: 10px;
+    }
+    .cap-card .cap-icon { font-size: 24px; margin-bottom: 8px; }
+    .cap-card .cap-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .cap-card .cap-before {
+      font-size: 12px; color: var(--qp-red); margin-bottom: 2px;
+    }
+    .cap-card .cap-after {
+      font-size: 12px; color: var(--qp-green); font-weight: 600;
+    }
+
+    /* --- Advantage section --- */
+    .adv-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .adv-card {
+      padding: 24px; background: var(--qp-panel);
+      border: 1px solid var(--qp-border); border-radius: 12px;
+    }
+    .adv-card .adv-icon { font-size: 28px; margin-bottom: 10px; }
+    .adv-card .adv-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 6px;
+      color: var(--qp-text);
+    }
+    .adv-card .adv-desc {
+      font-size: 13px; color: var(--qp-muted); line-height: 1.6;
+    }
+
+    /* --- Window CTA --- */
+    .window-section {
+      text-align: center; padding: 80px 40px;
+      background: radial-gradient(ellipse at 50% 50%, rgba(168,85,247,0.06) 0%, transparent 60%);
+    }
+    .window-section h2 {
+      font-size: 36px; font-weight: 800; margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--qp-amber), var(--qp-red));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .window-section p {
+      font-size: 18px; color: var(--qp-muted); max-width: 600px;
+      margin: 0 auto 32px; line-height: 1.7;
+    }
+    .window-quote {
+      font-size: 22px; font-weight: 600; color: var(--qp-text);
+      max-width: 600px; margin: 0 auto;
+      padding: 24px 32px;
+      border-left: 3px solid var(--qp-cyan);
+      text-align: left; line-height: 1.6;
+    }
+
+    /* --- Footer --- */
+    .footer {
+      text-align: center; padding: 40px;
+      border-top: 1px solid var(--qp-border);
+    }
+    .footer img { height: 36px; border-radius: 6px; margin-bottom: 12px; }
+    .footer .tagline {
+      font-size: 14px; color: var(--qp-muted);
+    }
+    .footer .tagline strong { color: var(--qp-cyan); }
+
+    /* --- Scroll animations --- */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1; transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-bar">
+    <img src="img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">Inflexis &mdash; AIXaaS</span>
+    <span class="subtitle">Investor Brief &bull; March 2026</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">Investor Intelligence Brief &bull; Q1 2026</div>
+    <h1>Riding the Sweet Spot: Why AI Timing Is Everything</h1>
+    <p>The AI landscape is accelerating faster than any technology wave in history. Enterprises without a managed platform aren't just falling behind &mdash; they're falling off the curve entirely.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="stat-value stat-blue" id="stat-models">0</div>
+        <div class="stat-label">Major Model Releases<br>in Last 12 Months</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value stat-green" id="stat-cost">0</div>
+        <div class="stat-label">Cost Reduction<br>Per Million Tokens</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value stat-cyan" id="stat-context">0</div>
+        <div class="stat-label">Context Window<br>Growth (Tokens)</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value stat-amber" id="stat-adopt">0</div>
+        <div class="stat-label">Enterprise AI<br>Adoption Rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Timeline -->
+  <div class="section reveal">
+    <div class="section-label">The 2026 Model Acceleration</div>
+    <h2>12 Months That Changed Everything</h2>
+    <p class="lead">Every quarter brings capabilities that were research projects the quarter before. The gap between early adopters and laggards widens with each release.</p>
+
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-date">Q2 2025</div>
+        <div class="tl-title">Claude 3.5 Sonnet &rarr; Claude 4 Series (Anthropic)</div>
+        <div class="tl-desc">Enterprise reasoning leaps forward. 200K context window. Native tool use. Constitutional AI governance built into the model layer. The first AI that can explain its own reasoning chain.</div>
+        <span class="tl-unlock unlock-reasoning">Unlocked: Enterprise Reasoning</span>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-date">Q3 2025</div>
+        <div class="tl-title">GPT-5 Series (OpenAI)</div>
+        <div class="tl-desc">True multi-modal intelligence. Native image, audio, and video understanding. Tool use becomes standard, not experimental. The cost floor drops by another 60%.</div>
+        <span class="tl-unlock unlock-multimodal">Unlocked: Multi-Modal Native</span>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-date">Q4 2025</div>
+        <div class="tl-title">Gemini 2.5 &rarr; 3.x Series (Google)</div>
+        <div class="tl-desc">Million-token context windows become production-ready. Entire codebases, annual reports, regulatory libraries &mdash; processed in a single pass. Image generation reaches photorealistic quality.</div>
+        <span class="tl-unlock unlock-context">Unlocked: Million-Token Context</span>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-date">Q1 2026</div>
+        <div class="tl-title">Open-Source Surge: Llama 4, Mistral Large, DeepSeek V3</div>
+        <div class="tl-desc">Open-source models reach 90% of frontier performance at 10% of the cost. Enterprise adoption accelerates as the "buy vs. build" equation flips. Cost pressure forces every vendor to innovate or die.</div>
+        <span class="tl-unlock unlock-cost">Unlocked: Cost Democratization</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Cost Collapse -->
+  <div class="section reveal">
+    <div class="section-label">The Cost Collapse</div>
+    <h2>Your Competitors Are Getting Smarter AI for Less Every Quarter</h2>
+    <p class="lead">The cost per million tokens has fallen 20x in two years. Every quarter you wait, the competitive advantage of early adoption grows exponentially.</p>
+
+    <div class="cost-chart" id="cost-chart">
+      <div class="cost-bar-group">
+        <div class="cost-bar bar-2023" id="bar-2023" style="height:0px;">
+          <div class="bar-value" style="color:#f87171;">$120</div>
+        </div>
+        <div class="cost-bar-label">2023</div>
+      </div>
+      <div class="cost-bar-group">
+        <div class="cost-bar bar-2024" id="bar-2024" style="height:0px;">
+          <div class="bar-value" style="color:#fbbf24;">$60</div>
+        </div>
+        <div class="cost-bar-label">2024</div>
+      </div>
+      <div class="cost-bar-group">
+        <div class="cost-bar bar-2025" id="bar-2025" style="height:0px;">
+          <div class="bar-value" style="color:#60a5fa;">$15</div>
+        </div>
+        <div class="cost-bar-label">2025</div>
+      </div>
+      <div class="cost-bar-group">
+        <div class="cost-bar bar-2026" id="bar-2026" style="height:0px;">
+          <div class="bar-value" style="color:#34d399;">$3</div>
+        </div>
+        <div class="cost-bar-label">2026</div>
+      </div>
+    </div>
+    <p style="text-align:center; font-size:13px; color:var(--qp-dim);">Average cost per 1M output tokens (frontier models) &bull; Source: Anthropic, OpenAI, Google pricing</p>
+  </div>
+
+  <!-- SECTION 3: Capability Curve -->
+  <div class="section reveal">
+    <div class="section-label">The Capability Curve</div>
+    <h2>What Was Science Fiction 12 Months Ago Is Standard Today</h2>
+    <p class="lead">The pace of capability expansion means the platform you build today will be dramatically more powerful in 6 months &mdash; if it's architected to absorb new models.</p>
+
+    <div class="cap-grid">
+      <div class="cap-card reveal">
+        <div class="cap-icon">&#129302;</div>
+        <div class="cap-title">Multi-Agent Orchestration</div>
+        <div class="cap-before">12 months ago: Academic research paper</div>
+        <div class="cap-after">Today: Production-grade with governance</div>
+      </div>
+      <div class="cap-card reveal">
+        <div class="cap-icon">&#128295;</div>
+        <div class="cap-title">Native Tool Use</div>
+        <div class="cap-before">12 months ago: Experimental, brittle</div>
+        <div class="cap-after">Today: Standard across all frontier models</div>
+      </div>
+      <div class="cap-card reveal">
+        <div class="cap-icon">&#128218;</div>
+        <div class="cap-title">1M+ Context Windows</div>
+        <div class="cap-before">12 months ago: Demo-only, unreliable</div>
+        <div class="cap-after">Today: Production default, sub-second</div>
+      </div>
+      <div class="cap-card reveal">
+        <div class="cap-icon">&#9989;</div>
+        <div class="cap-title">Zero-Token Compliance</div>
+        <div class="cap-before">12 months ago: Didn't exist</div>
+        <div class="cap-after">Today: 23 frameworks, 12ms, $0 per scan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Inflexis Advantage -->
+  <div class="section reveal">
+    <div class="section-label">Why Managed Matters</div>
+    <h2>The Inflexis Advantage: Riding the Wave, Not Drowning In It</h2>
+    <p class="lead">The AI wave rewards those who ride it with a governed platform. It punishes those who try to build their own surfboard mid-wave.</p>
+
+    <div class="adv-grid">
+      <div class="adv-card reveal">
+        <div class="adv-icon">&#128260;</div>
+        <div class="adv-title">Model-Agnostic Architecture</div>
+        <div class="adv-desc">When a better model launches &mdash; and one launches every quarter &mdash; we swap it in without changing a single line of client code. Your platform gets smarter automatically.</div>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">&#128737;&#65039;</div>
+        <div class="adv-title">Compliance Stays Constant</div>
+        <div class="adv-desc">23 regulatory frameworks. Zero-token detection. Models change quarterly; compliance requirements don't. Our governance layer is the constant in an accelerating equation.</div>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">&#128176;</div>
+        <div class="adv-title">Automatic Cost Optimization</div>
+        <div class="adv-desc">Model router, budget gates, semantic caching, zero-token paths. Every query takes the most cost-efficient route without sacrificing quality. As costs fall, margins expand.</div>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">&#128209;</div>
+        <div class="adv-title">Enterprise Governance</div>
+        <div class="adv-desc">ADR audit trails, 8-role RBAC, PII masking, tenant isolation. This is the layer that makes AI insurable, auditable, and boardroom-ready. The layer competitors don't have.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: The Window -->
+  <div class="window-section reveal">
+    <h2>The Window Is Open. It Won't Stay Open.</h2>
+    <p>Enterprises adopting governed AI today capture compound advantages that widen every quarter. Those waiting six months lose ground they can never recover. Every model release makes the leaders stronger and the laggards more irrelevant.</p>
+    <div class="window-quote">
+      "The cost of waiting is not standing still &mdash; it's falling behind at an accelerating rate. The enterprises that move now will own the intelligence layer. Everyone else will rent it."
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <img src="img/aixaas-badge.png" alt="AIXaaS"><br>
+    <div class="tagline"><strong>Inflexis</strong> &mdash; Your data. Your rules. Our orchestration.</div>
+    <div style="font-size:12px; color:var(--qp-dim); margin-top:8px;">inflexis.ai &bull; app.inflexis.ai &bull; Confidential</div>
+  </div>
+
+  <script>
+    // Scroll-triggered reveals
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Hero counter animations
+    function animateValue(id, start, end, suffix, duration) {
+      const el = document.getElementById(id);
+      const startTime = performance.now();
+      function update() {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (end - start) * eased);
+        el.textContent = current.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Start hero counters after page load
+    setTimeout(() => {
+      animateValue('stat-models', 0, 47, '+', 2000);
+      animateValue('stat-cost', 0, 20, 'x', 2200);
+      animateValue('stat-context', 0, 1, 'M+', 1800);
+      animateValue('stat-adopt', 0, 72, '%', 2400);
+    }, 800);
+
+    // Animate cost bars when section scrolls into view
+    const chartObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.getElementById('bar-2023').style.height = '220px';
+          document.getElementById('bar-2024').style.height = '110px';
+          document.getElementById('bar-2025').style.height = '28px';
+          document.getElementById('bar-2026').style.height = '6px';
+          chartObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    chartObserver.observe(document.getElementById('cost-chart'));
+  </script>
+</body>
+</html>
