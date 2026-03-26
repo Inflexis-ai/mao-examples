@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIXaaS™ Demo Suite — April 2026</title>
+<style>
+  :root {
+    --void: #040b1a;
+    --card: #0e1e3a;
+    --card2: #0a1628;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --cyan: #22d3ee;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --text: #dde8f8;
+    --muted: #7a9bc8;
+    --border: #1e3a5f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Nav */
+  .nav {
+    height: 54px;
+    background: #060f20;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-badge { height: 28px; }
+  .nav-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .nav-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* Partner bar */
+  .partner-bar {
+    height: 36px;
+    background: #070e1d;
+    border-bottom: 1px solid #162a47;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .partner-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* Hero */
+  .hero {
+    padding: 52px 24px 36px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0 auto 28px;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .badge-blue  { background: rgba(59,130,246,.15); color: var(--blue); border: 1px solid rgba(59,130,246,.25); }
+  .badge-green { background: rgba(16,185,129,.15); color: var(--green); border: 1px solid rgba(16,185,129,.25); }
+  .badge-cyan  { background: rgba(34,211,238,.15); color: var(--cyan); border: 1px solid rgba(34,211,238,.25); }
+  .badge-purple { background: rgba(139,92,246,.15); color: var(--purple); border: 1px solid rgba(139,92,246,.25); }
+  .badge-amber { background: rgba(245,158,11,.15); color: var(--amber); border: 1px solid rgba(245,158,11,.25); }
+
+  /* Instructions */
+  .instructions {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    max-width: 780px;
+    margin: 0 auto 48px;
+    text-align: left;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .instr-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .instr-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .instr-text strong { color: var(--text); }
+  .kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #0e1e3a;
+    border: 1px solid #1e3a5f;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--cyan);
+  }
+
+  /* Demo grid */
+  .section-label {
+    max-width: 900px;
+    margin: 0 auto 16px;
+    padding: 0 24px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto 48px;
+    padding: 0 24px;
+  }
+
+  .demo-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+  .demo-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(59,130,246,0.15);
+  }
+  .demo-card.green:hover  { border-color: var(--green); box-shadow: 0 8px 32px rgba(16,185,129,0.15); }
+  .demo-card.purple:hover { border-color: var(--purple); box-shadow: 0 8px 32px rgba(139,92,246,0.15); }
+  .demo-card.amber:hover  { border-color: var(--amber); box-shadow: 0 8px 32px rgba(245,158,11,0.15); }
+  .demo-card.cyan:hover   { border-color: var(--cyan); box-shadow: 0 8px 32px rgba(34,211,238,0.15); }
+
+  .card-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid #162a47;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .icon-blue   { background: rgba(59,130,246,.15); }
+  .icon-green  { background: rgba(16,185,129,.15); }
+  .icon-purple { background: rgba(139,92,246,.15); }
+  .icon-amber  { background: rgba(245,158,11,.15); }
+  .icon-cyan   { background: rgba(34,211,238,.15); }
+
+  .card-title-wrap { flex: 1; min-width: 0; }
+  .card-number {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-play {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(59,130,246,.2);
+    border: 1px solid rgba(59,130,246,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--blue);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .demo-card.green  .card-play { background: rgba(16,185,129,.2); border-color: rgba(16,185,129,.4); color: var(--green); }
+  .demo-card.purple .card-play { background: rgba(139,92,246,.2); border-color: rgba(139,92,246,.4); color: var(--purple); }
+  .demo-card.amber  .card-play { background: rgba(245,158,11,.2); border-color: rgba(245,158,11,.4); color: var(--amber); }
+  .demo-card.cyan   .card-play { background: rgba(34,211,238,.2); border-color: rgba(34,211,238,.4); color: var(--cyan); }
+
+  .card-body { padding: 14px 18px 16px; }
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .meta-chip {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid #1e3a5f;
+  }
+  .card-queries {
+    border-top: 1px solid #162a47;
+    padding-top: 12px;
+  }
+  .queries-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4a6a8c;
+    margin-bottom: 7px;
+  }
+  .query-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .query-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .demo-card.green  .query-dot { background: var(--green); }
+  .demo-card.purple .query-dot { background: var(--purple); }
+  .demo-card.amber  .query-dot { background: var(--amber); }
+  .demo-card.cyan   .query-dot { background: var(--cyan); }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 24px;
+    text-align: center;
+    font-size: 12px;
+    color: #3a5a7c;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .footer a { color: var(--muted); text-decoration: none; }
+  .footer a:hover { color: var(--blue); }
+
+  /* Ripple pulse on hover */
+  .demo-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 12px;
+    transition: opacity 0.3s;
+  }
+  .demo-card { position: relative; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 24px; }
+    .grid { grid-template-columns: 1fr; padding: 0 16px; }
+    .hero { padding: 32px 16px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<div class="nav">
+  <img src="https://app.inflexis.ai/static/img/aixaas-badge.png" alt="AIXaaS" class="nav-badge" onerror="this.style.display='none'">
+  <span class="nav-title">AIXaaS™ Platform</span>
+  <span class="nav-sub">Demo Suite · April 2026 · Investor Presentation</span>
+</div>
+
+<!-- Partner bar -->
+<div class="partner-bar">
+  <div class="partner-dot"></div>
+  <span>Live platform: <strong style="color:var(--text)">app.inflexis.ai</strong></span>
+  <span style="margin-left:16px;">Demos run offline — responses pre-recorded from live API</span>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow">AIXaaS™ Multi-Agent Orchestration Platform</div>
+  <h1>Investor Demo Suite</h1>
+  <p>
+    Five industry scenarios showing the MAO platform in action — each using real UI,
+    real API responses, and narrated voiceover. Open any demo in Chrome and press
+    <span class="kbd">Play</span> to start.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">⚡ Web Speech Narration</span>
+    <span class="badge badge-green">✓ Real API Responses</span>
+    <span class="badge badge-cyan">🎨 Live app.inflexis.ai UI</span>
+    <span class="badge badge-purple">🔒 Zero-Token Compliance</span>
+    <span class="badge badge-amber">📋 Script Sidebar</span>
+  </div>
+</div>
+
+<!-- Instructions -->
+<div class="instructions" style="max-width:900px; margin: 0 24px 40px; max-width: calc(100% - 48px); display:block; max-width:860px; margin:0 auto 40px;">
+  <div style="display:flex;gap:16px;align-items:flex-start;">
+    <div class="instr-icon">💡</div>
+    <div class="instr-text">
+      <strong>How to use:</strong> Click any demo card to open it in a new tab.
+      Press <span class="kbd">▶ Play</span> to start the auto-narrated walkthrough.
+      Use <span class="kbd">⏸</span> to pause, <span class="kbd">🔊</span> to toggle voice,
+      <span class="kbd">📋</span> to show/hide the script, and <span class="kbd">↺</span> to restart.
+      <br><br>
+      <strong>Voiceover note:</strong> Chrome on desktop gives the best speech quality.
+      If no voice plays, click anywhere on the page first (browser autoplay policy), then press Play.
+      <strong>Best viewed</strong> in Chrome at 1280px+ width.
+    </div>
+  </div>
+</div>
+
+<!-- Demo cards -->
+<div class="section-label">Demo Scenarios</div>
+
+<div class="grid">
+
+  <!-- 1. UKI Education -->
+  <a href="v2-uki-education.html" target="_blank" class="demo-card" title="Open UKI Education demo">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🎓</div>
+      <div class="card-title-wrap">
+        <div class="card-number">Demo 01 · Education</div>
+        <div class="card-title">UKI — Ultimate Knowledge Institute</div>
+      </div>
+      <div class="card-play">▶</div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Josh Williams demonstrates the platform to Tony Akers (UKI) — AI-powered analysis
+        of operational data across 12 departments, $687K in identified savings, and full
+        FERPA/FERPA compliance audit trail.
+      </div>
+      <div class="card-meta">
+        <span class="meta-chip">User: josh</span>
+        <span class="meta-chip">Domain: Demo</span>
+        <span class="meta-chip">171K chunks</span>
+        <span class="meta-chip">~3.5 min</span>
+      </div>
+      <div class="card-queries">
+        <div class="queries-label">Queries demonstrated</div>
+        <div class="query-item"><div class="query-dot"></div>Platform capabilities &amp; knowledge base overview</div>
+        <div class="query-item"><div class="query-dot"></div>Compliance status across 7 regulatory frameworks</div>
+        <div class="query-item"><div class="query-dot"></div>Operational spend variance — $412K compression</div>
+      </div>
+    </div>
+  </a>
+
+  <!-- 2. Mike's ACP/EAR -->
+  <a href="v2-mike-real.html" target="_blank" class="demo-card purple" title="Open Mike compliance sandbox demo">
+    <div class="card-header">
+      <div class="card-icon icon-purple">🔐</div>
+      <div class="card-title-wrap">
+        <div class="card-number">Demo 02 · Compliance</div>
+        <div class="card-title">Mike Deskis — ACP / EAR Compliance</div>
+      </div>
+      <div class="card-play">▶</div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Mike's isolated Document Library with 2,146 chunks from Access Control Policy
+        and Export Administration Regulations. Shows fail-closed architecture, UARF Sentinel
+        design, and dynamic export suppression — all grounded in real source documents.
+      </div>
+      <div class="card-meta">
+        <span class="meta-chip">User: mike</span>
+        <span class="meta-chip">Domain: Documents</span>
+        <span class="meta-chip">2,146 chunks</span>
+        <span class="meta-chip">~3.5 min</span>
+      </div>
+      <div class="card-queries">
+        <div class="queries-label">Queries demonstrated</div>
+        <div class="query-item"><div class="query-dot"></div>Fail-closed architecture governance principles</div>
+        <div class="query-item"><div class="query-dot"></div>UARF Sentinel architecture &amp; Zero-Trust alignment</div>
+        <div class="query-item"><div class="query-dot"></div>Dynamic export suppression + RBAC framework</div>
+      </div>
+    </div>
+  </a>
+
+  <!-- 3. FRENOS Industrial OT -->
+  <a href="v2-frenos-ot.html" target="_blank" class="demo-card amber" title="Open FRENOS OT cybersecurity demo">
+    <div class="card-header">
+      <div class="card-icon icon-amber">🏭</div>
+      <div class="card-title-wrap">
+        <div class="card-number">Demo 03 · Industrial OT</div>
+        <div class="card-title">FRENOS — OT Cybersecurity Intelligence</div>
+      </div>
+      <div class="card-play">▶</div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Industrial OT/ICS threat intelligence platform — MAO as the AI orchestration
+        layer behind FRENOS's cybersecurity product. Analyzes SCADA vulnerabilities,
+        active threat campaigns, and $4.7M remediation prioritization.
+      </div>
+      <div class="card-meta">
+        <span class="meta-chip">Sector: Industrial</span>
+        <span class="meta-chip">Domain: OT/ICS</span>
+        <span class="meta-chip">4,891 threats</span>
+        <span class="meta-chip">~3.5 min</span>
+      </div>
+      <div class="card-queries">
+        <div class="queries-label">Queries demonstrated</div>
+        <div class="query-item"><div class="query-dot"></div>Active VOLT SPARROW campaign — 23 facilities at risk</div>
+        <div class="query-item"><div class="query-dot"></div>CVE-2025-38471 ICS vulnerability impact analysis</div>
+        <div class="query-item"><div class="query-dot"></div>Remediation priority matrix — $4.7M budget optimization</div>
+      </div>
+    </div>
+  </a>
+
+  <!-- 4. TACenergy CFO -->
+  <a href="v2-tacenergy-cfo.html" target="_blank" class="demo-card green" title="Open TACenergy CFO demo">
+    <div class="card-header">
+      <div class="card-icon icon-green">⛽</div>
+      <div class="card-title-wrap">
+        <div class="card-number">Demo 04 · Financial</div>
+        <div class="card-title">TACenergy — CFO Intelligence</div>
+      </div>
+      <div class="card-play">▶</div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        TACenergy LLC ($7.5B wholesale fuel distributor) — CFO-grade AI replacing
+        ungoverned ChatGPT usage. 14,847 transaction anomaly scan, $775K exposure
+        detection, and executive briefing in under 2 seconds.
+      </div>
+      <div class="card-meta">
+        <span class="meta-chip">Sector: Energy</span>
+        <span class="meta-chip">Revenue: $7.5B</span>
+        <span class="meta-chip">14,847 txns</span>
+        <span class="meta-chip">~3.5 min</span>
+      </div>
+      <div class="card-queries">
+        <div class="queries-label">Queries demonstrated</div>
+        <div class="query-item"><div class="query-dot"></div>Margin compression analysis — $412K Q4 erosion</div>
+        <div class="query-item"><div class="query-dot"></div>Anomaly detection — $775K exposure across 14,847 transactions</div>
+        <div class="query-item"><div class="query-dot"></div>CFO executive briefing — $620K–$820K Q2 improvement</div>
+      </div>
+    </div>
+  </a>
+
+  <!-- 5. FedShark Gov -->
+  <a href="v2-fedshark-gov.html" target="_blank" class="demo-card cyan" title="Open FedShark government contracting demo">
+    <div class="card-header">
+      <div class="card-icon icon-cyan">🦈</div>
+      <div class="card-title-wrap">
+        <div class="card-number">Demo 05 · Government</div>
+        <div class="card-title">FedShark — Gov Contracting Intelligence</div>
+      </div>
+      <div class="card-play">▶</div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Josh Williams's FedShark government contracting firm — AI-powered opportunity
+        scanning, competitive intelligence, and DISA win theme development.
+        $15M–$22M pipeline identified from live SAM.gov monitoring.
+      </div>
+      <div class="card-meta">
+        <span class="meta-chip">User: josh</span>
+        <span class="meta-chip">Sector: GovCon</span>
+        <span class="meta-chip">3,147 chunks</span>
+        <span class="meta-chip">~3.5 min</span>
+      </div>
+      <div class="card-queries">
+        <div class="queries-label">Queries demonstrated</div>
+        <div class="query-item"><div class="query-dot"></div>Opportunity scan — $15M–$22M Q2 pipeline (DISA + NIH)</div>
+        <div class="query-item"><div class="query-dot"></div>Competitive analysis — Booz Allen, Peraton, Decisive</div>
+        <div class="query-item"><div class="query-dot"></div>Win theme brief — 3 DISA differentiators</div>
+      </div>
+    </div>
+  </a>
+
+</div>
+
+<!-- Platform overview section -->
+<div class="section-label" style="margin-top:16px;">Platform Architecture</div>
+
+<div style="max-width:900px; margin:0 auto 48px; padding:0 24px;">
+  <div style="background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:20px;">
+    <div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Ingestion Pipeline</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        Parse → PII Mask<br>
+        Compliance Scan<br>
+        Chunk → 4-Tier Store<br>
+        <span style="color:var(--muted);font-size:11px;">~1.94s total · 20+ file types</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Zero-Token Compliance</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        23 frameworks<br>
+        Pattern matching<br>
+        $0 API cost<br>
+        <span style="color:var(--muted);font-size:11px;">GDPR, HIPAA, SOC2, NIST…</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">8-Role RBAC</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        Founder → Client<br>
+        Namespace isolation<br>
+        Owner filtering<br>
+        <span style="color:var(--muted);font-size:11px;">Per-chunk tenant separation</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">ADR Audit Trail</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        Every query logged<br>
+        Every change gated<br>
+        Rollback support<br>
+        <span style="color:var(--muted);font-size:11px;">Enterprise-grade governance</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div style="margin-bottom:8px;">
+    <strong style="color:var(--muted);">AIXaaS™</strong> — Multi-Agent Orchestration Platform by
+    <a href="https://inflexis.ai" target="_blank">Inflexis</a>
+    &nbsp;·&nbsp;
+    <a href="https://app.inflexis.ai" target="_blank">app.inflexis.ai</a>
+    &nbsp;·&nbsp;
+    <a href="https://app.aixaas.org" target="_blank">app.aixaas.org</a>
+  </div>
+  <div style="color:#2a4a6c; font-size:11px;">
+    Demo responses pre-recorded from live platform · April 1, 2026 Investor Presentation · Josh Williams presenting
+  </div>
+</div>
+
+</body>
+</html>

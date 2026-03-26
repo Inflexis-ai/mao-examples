@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIXaaS Query Panel — Mike Deskis Founder Demo</title>
+<link rel="stylesheet" href="https://app.inflexis.ai/static/css/query_panel.css">
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #1c2128;
+    --bg-card: #21262d;
+    --border: #30363d;
+    --border-subtle: #21262d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #656d76;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-green: #3fb950;
+    --accent-amber: #d29922;
+    --accent-red: #f85149;
+    --accent-cyan: #39c5cf;
+    --founder-color: #bc8cff;
+    --glow-blue: rgba(88,166,255,0.15);
+    --glow-purple: rgba(188,140,255,0.15);
+    --font-mono: 'SF Mono','Fira Code','Cascadia Code',monospace;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* ── Layout shell ── */
+  #app {
+    display: grid;
+    grid-template-rows: 48px 1fr 44px;
+    grid-template-columns: 240px 1fr 300px;
+    height: 100vh;
+    gap: 0;
+  }
+
+  /* ── Header ── */
+  #header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  #header .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  #header .logo-area img {
+    height: 24px;
+    width: auto;
+  }
+
+  #header .product-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+
+  #header .product-name span {
+    color: var(--accent-blue);
+  }
+
+  #header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px 4px 6px;
+    font-size: 12px;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+  }
+
+  .user-name { color: var(--text-primary); font-weight: 500; }
+  .user-org { color: var(--text-muted); }
+
+  .role-badge {
+    background: rgba(188,140,255,0.15);
+    color: var(--founder-color);
+    border: 1px solid rgba(188,140,255,0.3);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Left sidebar ── */
+  #sidebar-left {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 12px 0;
+  }
+
+  .sidebar-section {
+    padding: 0 12px;
+    margin-bottom: 16px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+
+  .domain-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 6px;
+  }
+
+  .domain-card.active {
+    border-color: var(--accent-blue);
+    background: rgba(88,166,255,0.07);
+  }
+
+  .domain-card:hover:not(.active) {
+    border-color: var(--border);
+    background: var(--bg-tertiary);
+  }
+
+  .domain-card .domain-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+
+  .domain-card .domain-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .domain-card .domain-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 5px;
+  }
+
+  .domain-badge.live { background: rgba(63,185,80,0.15); color: var(--accent-green); border: 1px solid rgba(63,185,80,0.3); }
+  .domain-badge.locked { background: rgba(139,148,158,0.1); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* ── Pattern library ── */
+  .pattern-category {
+    margin-bottom: 12px;
+  }
+
+  .pattern-category-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 4px 4px;
+    margin-bottom: 4px;
+  }
+
+  .cat-icon {
+    font-size: 12px;
+  }
+
+  .pattern-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .pattern-item:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  .pattern-item.selected {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .pattern-item.running {
+    color: var(--accent-blue);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-red { background: var(--accent-red); }
+  .dot-purple { background: var(--accent-purple); }
+  .dot-amber { background: var(--accent-amber); }
+  .dot-cyan { background: var(--accent-cyan); }
+  .dot-green { background: var(--accent-green); }
+  .dot-blue { background: var(--accent-blue); }
+
+  /* ── Main content ── */
+  #main {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-primary);
+  }
+
+  /* Query input area */
+  #query-area {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+  }
+
+  .query-bar {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    min-height: 48px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .query-bar.active {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+  }
+
+  .query-bar.running {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(63,185,80,0.1);
+    animation: pulse-border 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(63,185,80,0.1); }
+    50% { box-shadow: 0 0 0 6px rgba(63,185,80,0.05); }
+  }
+
+  #query-text {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    min-height: 24px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-family: inherit;
+  }
+
+  #query-text::placeholder { color: var(--text-muted); }
+
+  #run-btn {
+    background: var(--accent-blue);
+    color: #0d1117;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #run-btn:hover { background: #79c0ff; }
+  #run-btn:active { transform: scale(0.97); }
+  #run-btn.loading { background: var(--accent-green); cursor: not-allowed; }
+
+  .query-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .kb-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2px 8px;
+  }
+
+  .kb-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px rgba(63,185,80,0.5);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Response area */
+  #response-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .response-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    animation: slide-in 0.3s ease;
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .response-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+  }
+
+  .response-header .query-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .response-header .meta-pills {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .meta-pill {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .meta-pill.adr { color: var(--accent-purple); border-color: rgba(188,140,255,0.3); }
+  .meta-pill.time { color: var(--accent-green); }
+  .meta-pill.model { color: var(--accent-blue); }
+
+  .response-body {
+    padding: 16px;
+  }
+
+  /* Markdown rendering */
+  .md-content h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .md-content h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 14px 0 8px;
+  }
+
+  .md-content h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin: 10px 0 6px;
+  }
+
+  .md-content p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    line-height: 1.6;
+    font-size: 13px;
+  }
+
+  .md-content ul, .md-content ol {
+    color: var(--text-secondary);
+    padding-left: 18px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .md-content li { margin-bottom: 4px; line-height: 1.5; }
+
+  .md-content strong { color: var(--text-primary); font-weight: 600; }
+
+  .md-content code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0 4px;
+    color: var(--accent-cyan);
+  }
+
+  .md-content blockquote {
+    border-left: 3px solid var(--accent-purple);
+    background: rgba(188,140,255,0.05);
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .md-content blockquote p { margin: 0; color: var(--text-secondary); }
+
+  .md-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+  }
+
+  /* Table */
+  .md-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+
+  .md-content th {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .md-content td {
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  .md-content tr:nth-child(even) td { background: rgba(255,255,255,0.01); }
+
+  /* Sources row */
+  .sources-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-primary);
+  }
+
+  .source-chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: border-color 0.12s, color 0.12s;
+  }
+
+  .source-chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  /* Streaming cursor */
+  .typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--accent-blue);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink 0.7s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* ── Right sidebar (script panel) ── */
+  #sidebar-right {
+    grid-column: 3;
+    grid-row: 2;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .script-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+  }
+
+  .script-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .script-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .script-toggle:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  #script-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px;
+  }
+
+  .script-segment {
+    margin-bottom: 16px;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+
+  .script-segment.active {
+    opacity: 1;
+  }
+
+  .script-segment.past {
+    opacity: 0.25;
+  }
+
+  .time-marker {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--accent-blue);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .script-text {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .script-text em {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── Status bar ── */
+  #statusbar {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  #statusbar .stat { display: flex; align-items: center; gap: 4px; }
+  #statusbar .stat .val { color: var(--text-secondary); font-family: var(--font-mono); }
+  #statusbar .sep { color: var(--border); }
+  #statusbar .flex-push { flex: 1; }
+
+  .adr-total {
+    font-family: var(--font-mono);
+    color: var(--accent-purple);
+    font-weight: 600;
+  }
+
+  /* ── Floating controls bar ── */
+  #controls-bar {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 200;
+    backdrop-filter: blur(12px);
+  }
+
+  .ctrl-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .ctrl-btn:hover { border-color: var(--accent-blue); color: var(--text-primary); background: rgba(88,166,255,0.05); }
+
+  .ctrl-btn.primary {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #0d1117;
+  }
+
+  .ctrl-btn.primary:hover { background: #79c0ff; }
+
+  .ctrl-btn.danger {
+    border-color: rgba(248,81,73,0.4);
+    color: var(--accent-red);
+  }
+
+  .ctrl-btn.danger:hover { border-color: var(--accent-red); background: rgba(248,81,73,0.08); }
+
+  .ctrl-btn.active {
+    background: rgba(63,185,80,0.1);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+  }
+
+  #progress-display {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-blue);
+    min-width: 44px;
+    text-align: center;
+  }
+
+  /* ── Narration subtitle bar ── */
+  #narration-bar {
+    position: fixed;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 760px;
+    width: calc(100% - 40px);
+    background: rgba(13,17,23,0.92);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    z-index: 200;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    display: none;
+    transition: opacity 0.3s;
+  }
+
+  #narration-bar.visible { display: block; }
+
+  #narration-bar .narration-text {
+    color: #e6edf3;
+  }
+
+  #narration-bar .narration-text em {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── Animated glowing cursor ── */
+  #demo-cursor {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+    transition: left 0.6s cubic-bezier(0.25,0.8,0.25,1), top 0.6s cubic-bezier(0.25,0.8,0.25,1);
+  }
+
+  #demo-cursor::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(88,166,255,0.9);
+    box-shadow: 0 0 12px 4px rgba(88,166,255,0.5);
+    animation: cursor-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes cursor-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+  }
+
+  #demo-cursor.active { display: block; }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(88,166,255,0.2);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Intro overlay ── */
+  #intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,17,23,0.96);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    backdrop-filter: blur(8px);
+  }
+
+  #intro-overlay h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  #intro-overlay h1 span { color: var(--founder-color); }
+
+  #intro-overlay p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 440px;
+    line-height: 1.6;
+  }
+
+  .intro-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .intro-meta .chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-family: var(--font-mono);
+  }
+
+  #start-btn {
+    background: var(--founder-color);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.03em;
+  }
+
+  #start-btn:hover { background: #d2adff; transform: scale(1.02); }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+  /* ── Loading bar ── */
+  #loading-bar {
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-blue));
+    background-size: 200% 100%;
+    animation: loading-anim 1.5s linear infinite;
+    display: none;
+    border-radius: 2px;
+  }
+
+  #loading-bar.active { display: block; }
+
+  @keyframes loading-anim {
+    from { background-position: 0% 0%; }
+    to { background-position: 200% 0%; }
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 40px;
+  }
+
+  .empty-icon {
+    font-size: 32px;
+    opacity: 0.3;
+  }
+
+  .highlight-ring {
+    outline: 2px solid rgba(88,166,255,0.6);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+    transition: outline 0.2s;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Intro overlay ── -->
+<div id="intro-overlay">
+  <img src="https://app.inflexis.ai/static/img/aixaas-badge.png" alt="AIXaaS" style="height:48px; opacity:0.9">
+  <h1>AIXaaS Query Panel<br><span>Founder Account Demo</span></h1>
+  <p>Mike Deskis's live founder account — Document Library with 2,146 chunks from the Access Control Policy and Export Administration Regulations framework. Real documents. Real governance. Live retrieval.</p>
+  <div class="intro-meta">
+    <span class="chip">3.5 min demo</span>
+    <span class="chip">3 governance queries</span>
+    <span class="chip">ACP + EAR KB</span>
+  </div>
+  <button id="start-btn" onclick="startDemo()">&#9654;&nbsp; Start Demo</button>
+</div>
+
+<!-- ── Animated cursor ── -->
+<div id="demo-cursor"></div>
+
+<!-- ── Narration subtitle bar ── -->
+<div id="narration-bar"><span class="narration-text" id="narration-text"></span></div>
+
+<!-- ── Floating controls ── -->
+<div id="controls-bar">
+  <button class="ctrl-btn" onclick="rewindDemo()">&#9664;&#9664; Rewind</button>
+  <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlayPause()">&#9646;&#9646; Pause</button>
+  <span id="progress-display">0:00</span>
+  <button class="ctrl-btn" onclick="skipSection(-1)">&#9664; Prev</button>
+  <button class="ctrl-btn" onclick="skipSection(1)">Next &#9654;</button>
+  <button class="ctrl-btn" id="voice-btn" onclick="toggleVoice()">&#128263; Voice</button>
+  <button class="ctrl-btn" onclick="toggleScript()">&#128221; Script</button>
+  <button class="ctrl-btn danger" onclick="resetDemo()">&#9632; Reset</button>
+</div>
+
+<!-- ── App shell ── -->
+<div id="app">
+
+  <!-- Header -->
+  <header id="header">
+    <div class="logo-area">
+      <img src="https://app.inflexis.ai/static/img/aixaas-badge.png" alt="AIXaaS">
+      <span class="product-name">AIX<span>aaS</span>™ Query Panel</span>
+    </div>
+    <div class="header-right">
+      <div class="user-chip">
+        <div class="avatar">MD</div>
+        <span class="user-name">Mike Deskis</span>
+        <span class="user-org">Inflexis</span>
+        <span style="color:var(--text-muted)">•</span>
+        <span class="user-org">Founding Partner</span>
+      </div>
+      <span class="role-badge">founder</span>
+    </div>
+  </header>
+
+  <!-- Left sidebar -->
+  <aside id="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Knowledge Domains</div>
+
+      <div class="domain-card active" id="domain-doclib">
+        <div class="domain-name">Document Library</div>
+        <div class="domain-meta" id="kb-status-text">Document Library • 2,146 chunks</div>
+        <span class="domain-badge live">Live</span>
+      </div>
+
+      <div class="domain-card" id="domain-compliance">
+        <div class="domain-name">Compliance Engine</div>
+        <div class="domain-meta">23 frameworks • zero-token</div>
+        <span class="domain-badge live">Live</span>
+      </div>
+
+      <div class="domain-card" id="domain-sandbox">
+        <div class="domain-name">Sandbox</div>
+        <div class="domain-meta">Isolated test environment</div>
+        <span class="domain-badge locked">Restricted</span>
+      </div>
+
+      <div class="domain-card" id="domain-client">
+        <div class="domain-name">Client Namespace</div>
+        <div class="domain-meta">Tenant-isolated storage</div>
+        <span class="domain-badge locked">Locked</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pattern Library</div>
+
+      <div class="pattern-category">
+        <div class="pattern-category-header">
+          <span class="cat-icon">⚔</span>
+          <span>Governance &amp; Compliance</span>
+        </div>
+        <div class="pattern-item selected" id="pat-fail-closed" onclick="selectPattern('fail-closed')">
+          <span class="dot dot-red"></span>
+          Fail-Closed Architecture
+        </div>
+        <div class="pattern-item" id="pat-uarf" onclick="selectPattern('uarf')">
+          <span class="dot dot-purple"></span>
+          Risk Unification (UARF)
+        </div>
+        <div class="pattern-item" id="pat-export" onclick="selectPattern('export')">
+          <span class="dot dot-amber"></span>
+          Export Control &amp; RBAC
+        </div>
+        <div class="pattern-item" id="pat-drift" onclick="selectPattern('drift')">
+          <span class="dot dot-cyan"></span>
+          Compliance Drift Prevention
+        </div>
+        <div class="pattern-item" id="pat-hitl" onclick="selectPattern('hitl')">
+          <span class="dot dot-green"></span>
+          HITL Enforcement
+        </div>
+      </div>
+
+      <div class="pattern-category">
+        <div class="pattern-category-header">
+          <span class="cat-icon">🛡</span>
+          <span>Enterprise Security</span>
+        </div>
+        <div class="pattern-item" id="pat-pii" onclick="selectPattern('pii')">
+          <span class="dot dot-blue"></span>
+          PII Masking Controls
+        </div>
+        <div class="pattern-item" id="pat-ns" onclick="selectPattern('ns')">
+          <span class="dot dot-purple"></span>
+          Namespace Isolation
+        </div>
+        <div class="pattern-item" id="pat-mfa" onclick="selectPattern('mfa')">
+          <span class="dot dot-green"></span>
+          Multi-Factor Authorization
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main id="main">
+    <!-- Query area -->
+    <div id="query-area">
+      <div id="loading-bar"></div>
+      <div class="query-bar" id="query-bar">
+        <textarea id="query-text" placeholder="Select a pattern or type your governance query…" rows="1"></textarea>
+        <button id="run-btn" onclick="runQuery()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5V1z"/></svg>
+          Run
+        </button>
+      </div>
+      <div class="query-meta">
+        <div class="kb-status-pill">
+          <span class="kb-dot"></span>
+          <span id="kb-pill-text">Document Library • 2,146 chunks</span>
+        </div>
+        <span>Model: claude-haiku</span>
+        <span>Tier: cloud+keyword</span>
+      </div>
+    </div>
+
+    <!-- Response area -->
+    <div id="response-area">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">⚔</div>
+        <div>Select a governance pattern and run a query</div>
+        <div style="font-size:11px; color:var(--text-muted)">ACP + EAR knowledge base ready</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right sidebar — script panel -->
+  <aside id="sidebar-right">
+    <div class="script-header">
+      <span class="script-title">Narration Script</span>
+      <button class="script-toggle" onclick="toggleScript()">Hide</button>
+    </div>
+    <div id="script-body">
+      <!-- Populated by JS -->
+    </div>
+  </aside>
+
+  <!-- Status bar -->
+  <footer id="statusbar">
+    <div class="stat">
+      <span>KB:</span>
+      <span class="val">2,146 chunks</span>
+    </div>
+    <span class="sep">|</span>
+    <div class="stat">
+      <span>Mode:</span>
+      <span class="val">azure+keyword</span>
+    </div>
+    <span class="sep">|</span>
+    <div class="stat">
+      <span>ADRs logged:</span>
+      <span class="val adr-total" id="adr-count">0</span>
+    </div>
+    <span class="sep">|</span>
+    <div class="stat">
+      <span>Queries:</span>
+      <span class="val" id="query-count">0</span>
+    </div>
+    <div class="flex-push"></div>
+    <div class="stat">
+      <span>&#9679;</span>
+      <span class="val" style="color:var(--accent-green)">Live &mdash; Inflexis Platform v6C</span>
+    </div>
+  </footer>
+
+</div><!-- /#app -->
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA: QUERIES & RESPONSES
+// ══════════════════════════════════════════════════════════════════
+
+const QUERIES = {
+  'fail-closed': {
+    text: "What are the key principles of fail-closed architecture and how does it apply to AI governance?",
+    patternId: 'pat-fail-closed',
+    adr: 'ADR-0081',
+    time: '2.14s',
+    chunks: 8,
+    sources: [
+      'EAR-Full-NO-Trade-Secrets-110326_part020.txt',
+      'Inflexis and AIXaaS Platform Overview.md',
+      'ACP-Full-Core-Prod-KB-260226_part007.txt',
+      'EAR-Full-NO-Trade-Secrets-110326_part018.txt',
+      'C-Suite Pitch.pptx',
+      'ACP-Full-Core-Prod-KB-260226_part002.txt'
+    ],
+    markdown: `# Fail-Closed Architecture in AI Governance
+
+Based on the retrieved governance documentation, fail-closed architecture is a structural enforcement mechanism — not optional guidance — for managing enterprise AI risk.
+
+## Core Principles
+
+### 1. Structural Compliance Gates (Not Advisory)
+Fail-closed enforcement means that policy violations **block progression automatically**. According to the governance framework:
+
+- Required controls must be met before progression
+- If policy validation fails, **publication is blocked**
+- Named approval cannot be issued without control compliance
+- **Why it matters:** "Compliance is executable infrastructure — not advisory documentation" [ACP-Full-Core-Prod-KB-260226_part002.txt]
+
+### 2. Prevents Compliance Drift in AI Systems
+The architecture addresses a specific AI risk: model inference may evolve across versions, and without structural gates, compliance enforcement can unintentionally weaken.
+
+Fail-closed ensures:
+- Model updates cannot bypass compliance review
+- Each version must re-validate against policy controls
+- Historical compliance decisions cannot be overwritten by automation
+
+### 3. Human-in-the-Loop (HITL) Enforcement
+Each stage transition requires explicit human authorization:
+- **Explicit review completion** (not auto-approval)
+- **Named authorization** (accountability by role/individual)
+- **Logged decision** (audit trail)
+- **Stages cannot be skipped** [ACP-Full-Core-Prod-KB-260226_part002.txt]
+
+**Why it matters:** "Prevents automation overshoot and undocumented changes."
+
+## Specific AI Governance Applications
+
+### Quality Scan with Fail-Closed
+The QUALITY_SCAN stage applies deterministic validation:
+- Detects duplicates, nulls, type mismatches, outliers, schema validation
+- **Fail-closed rule:** unresolved critical issues block progression to policy enforcement
+- Exit only via remediation (resolve issues, rerun scan) [ACP-Full-Core-Prod-KB-260226_part007.txt]
+
+### Policy Check with Fail-Closed
+YAML policy packs execute deterministic compliance controls:
+- HIPAA, FERPA, PCI, and custom controls
+- **Fail-closed rule:** any required control failure blocks progression [ACP-Full-Core-Prod-KB-260226_part007.txt]
+
+## Key Business Implication
+
+Fail-closed governance balances **safety with innovation**: "Governance should protect the organization without preventing innovation." It ensures enterprises can scale AI automation confidently because compliance enforcement is structural — built into the execution pipeline — rather than dependent on manual oversight.`
+  },
+
+  'uarf': {
+    text: "What is the AIXaaS Sentinel governance architecture and how does it handle AI risk classification and escalation procedures?",
+    patternId: 'pat-uarf',
+    adr: 'ADR-0082',
+    time: '2.28s',
+    chunks: 8,
+    sources: [
+      'Inflexis and AIXaaS Platform Overview.md',
+      'AIXaaS vs Microsoft Copilot CTO Analysis.md',
+      'EAR-Full-NO-Trade-Secrets-110326_part008.txt',
+      'EAR-Full-NO-Trade-Secrets-110326_part010.txt',
+      'EAR-Full-NO-Trade-Secrets-110326_part020.txt'
+    ],
+    markdown: `# AIXaaS Sentinel Governance Architecture
+
+Based on the retrieved context, the platform implements a **Unified Agentic Risk Framework (UARF)** that serves as the executive-level governance architecture.
+
+## Core Governance Framework
+
+> "The Unified Agentic Risk Framework (UARF) becomes your top-tier governance and board-facing artifact." [EAR-Full-NO-Trade-Secrets-110326_part008.txt]
+
+### Risk Unification Layers
+
+UARF consolidates seven risk dimensions:
+- **Prompt instability** risk
+- **Multi-agent coordination** risk
+- **Structural contract** risk
+- **Escalation volatility**
+- **SLA exposure**
+- **Financial margin impact**
+- **Autonomy maturity gating**
+
+---
+
+## AI Risk Classification & Monitoring
+
+The **Risk Scoring & Monitoring Framework** governs: [EAR-Full-NO-Trade-Secrets-110326_part010.txt]
+
+- Workflow risk exposure
+- Prompt drift risk
+- Escalation volatility risk
+- Authority boundary risk
+
+### Executive Governance Principle
+
+> "Risk scoring within AIXaaS ensures autonomy only expands when structural, behavioral, and financial risks remain within tolerance." [EAR-Full-NO-Trade-Secrets-110326_part010.txt]
+
+**Key operational approach:** Risk scoring is **embedded in execution** — not external to it. Governance gates are active during automation, not applied retroactively.
+
+---
+
+## Escalation Procedures
+
+The governance framework includes:
+
+- **Continuous monitoring** of stability signals
+- **Automated gating** of automation based on risk posture
+- **Material risk escalation** to executive oversight
+- **Financial predictability protection**
+
+### Customer Deliverables
+
+Organizations adopting AIXaaS receive a **Documented AI Governance Framework** defining: [EAR-Full-NO-Trade-Secrets-110326_part020.txt]
+
+- AI risk classification categories
+- Governance policy categories
+- Escalation procedures for security anomalies, compliance concerns, and operational failures
+- Named oversight roles
+
+---
+
+## Business Implication
+
+Fail-closed governance and UARF together ensure: **autonomy only expands when risk remains in tolerance**. Enterprises can scale AI automation with confidence because governance is structural — embedded in every execution step — not a post-hoc audit.`
+  },
+
+  'export': {
+    text: "How does the ACP framework handle dynamic export suppression and what access control mechanisms prevent unauthorized data export?",
+    patternId: 'pat-export',
+    adr: 'ADR-0083',
+    time: '1.97s',
+    chunks: 7,
+    sources: [
+      'ACP-Full-Core-Prod-KB-260226_part015.txt',
+      'ACP-Full-Core-Prod-KB-260226_part005.txt',
+      'ACP-Full-Core-Prod-KB-260226_part002.txt',
+      'ACP-Full-Core-Prod-KB-260226_part007.txt'
+    ],
+    markdown: `# ACP Framework: Dynamic Export Suppression & Access Control
+
+## Dynamic Export Suppression
+
+For restricted datasets, the Compliance Engine implements **dynamic export suppression** as a fail-closed control [ACP-Full-Core-Prod-KB-260226_part015.txt]:
+
+- **External API export endpoints disabled** for datasets flagged as restricted
+- **Webhook suppression active** — no data can be pushed to external systems
+- **All export attempts logged** for audit purposes regardless of outcome
+- Export restrictions are applied at ingestion, not at query time
+
+### Who Can Export
+
+Export actions are gated through **RBAC and MFA validation** [ACP-Full-Core-Prod-KB-260226_part015.txt]:
+- Only users with explicit export roles can initiate export actions
+- Multi-factor authentication required for export operations
+- Each export attempt creates an audit record regardless of success or failure
+
+---
+
+## Access Control Architecture
+
+### Role-Based Access Control (RBAC)
+
+The ACP framework implements 8-tier RBAC with namespace isolation:
+
+| Role | Access Level | Export Rights |
+|------|-------------|--------------|
+| **admin** | All namespaces | System-level only |
+| **founder** | All namespaces | Full with MFA |
+| **cro** | 8 namespaces | Scoped by namespace |
+| **developer** | 4 namespaces | Dev/staging only |
+| **demo** | 3 namespaces | Read-only, no export |
+| **client** | 2 namespaces | No export |
+
+### Namespace Isolation
+
+Each tenant's data is isolated at the storage layer:
+- Chunks tagged with \`owner\` field at ingestion
+- Queries automatically filtered by authenticated user's owner
+- Cross-namespace access requires explicit role permission
+- No path exists for demo/client roles to access founder/admin data [ACP-Full-Core-Prod-KB-260226_part005.txt]
+
+---
+
+## Compliance Alignment
+
+Dynamic export suppression aligns with:
+- **ISO 27001 A.9/A.10** — Access control and cryptography
+- **HIPAA Privacy Rule** — Minimum necessary access
+- **FedRAMP AC-4/SC-7** — Information flow enforcement and boundary protection
+
+This control set ensures regulated data cannot leave the governed environment regardless of user action — **the system enforces compliance structurally**.`
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// NARRATION SCRIPT SEGMENTS
+// ══════════════════════════════════════════════════════════════════
+
+const SCRIPT_SEGMENTS = [
+  {
+    id: 'opening',
+    timeLabel: '0:00 – 0:20',
+    text: "This is Mike Deskis's founder account — he's a co-founder of Inflexis. I'm pulling up the Document Library domain which contains 2,146 chunks from his two core governance documents: the Access Control Policy and the Export Administration Regulations framework. These are his actual proprietary documents, and this is live. Watch what happens when a founder queries their own secured knowledge base."
+  },
+  {
+    id: 'q1-setup',
+    timeLabel: '0:20 – 0:35',
+    text: "First question — the one every enterprise AI buyer should ask. What is fail-closed architecture and why does it matter for AI governance? I'm selecting the pattern."
+  },
+  {
+    id: 'q1-run',
+    timeLabel: '0:35 – 0:50',
+    text: "Running against Mike's document library. 2,146 chunks, TXT-format only — average 3,100 characters per chunk. This is high-quality dense prose, not PDF fragments."
+  },
+  {
+    id: 'q1-response',
+    timeLabel: '0:50 – 1:40',
+    text: "Fail-closed is structural enforcement — not advisory guidance. The platform is pulling directly from Mike's Access Control Policy. Three core principles: compliance gates block progression automatically, model updates cannot bypass compliance review, and every stage transition requires named human authorization. You cannot skip stages. You cannot auto-approve. This is what makes AI governable at enterprise scale — the system enforces compliance, you don't depend on people remembering to check."
+  },
+  {
+    id: 'q2-setup',
+    timeLabel: '1:40 – 1:55',
+    text: "Now let's go deeper — the Unified Agentic Risk Framework. The board-level governance architecture."
+  },
+  {
+    id: 'q2-run',
+    timeLabel: '1:55 – 2:10',
+    text: "This is pulling from the EAR document — Export Administration Regulations — which contains the strategic governance frameworks."
+  },
+  {
+    id: 'q2-response',
+    timeLabel: '2:10 – 3:00',
+    text: "The UARF is the board-facing governance artifact. It consolidates seven risk dimensions — prompt instability, multi-agent coordination risk, structural contract risk, escalation volatility, SLA exposure, financial margin impact, and autonomy maturity gating. The key principle: risk scoring is embedded in execution — not external to it. Governance gates are active during automation, not applied retroactively as an audit. This is what separates a governed AI platform from an AI experiment."
+  },
+  {
+    id: 'q3-setup',
+    timeLabel: '3:00 – 3:15',
+    text: "One more — how does the platform prevent unauthorized data export? The access control architecture."
+  },
+  {
+    id: 'q3-response',
+    timeLabel: '3:15 – 3:45',
+    text: "Dynamic export suppression — for restricted datasets, external API endpoints are disabled, webhooks are suppressed, and every export attempt is logged regardless of outcome. Eight-tier RBAC with namespace isolation ensures demo and client roles have zero path to founder or admin data. Compliance alignment — ISO 27001, HIPAA, FedRAMP — is structural. The system enforces compliance. Not policy documents, not human checklists. The system."
+  },
+  {
+    id: 'close',
+    timeLabel: '3:45 – 4:00',
+    text: "Three ADRs logged. Zero security incidents. Complete audit trail. This is what 'compliance-ready AI' actually means — not a checkbox, not a policy document. Executable infrastructure."
+  }
+];
+
+// ══════════════════════════════════════════════════════════════════
+// DEMO TIMELINE (steps)
+// ══════════════════════════════════════════════════════════════════
+
+const DEMO_STEPS = [
+  // ── Opening
+  {
+    t: 0,
+    segmentId: 'opening',
+    action: () => {
+      setNarration("This is Mike Deskis's founder account — he's a co-founder of Inflexis. I'm pulling up the Document Library domain which contains 2,146 chunks from his two core governance documents: the Access Control Policy and the Export Administration Regulations framework. These are his actual proprietary documents, and this is live. Watch what happens when a founder queries their own secured knowledge base.");
+      highlightElement('domain-doclib');
+      moveCursorTo('domain-doclib');
+    }
+  },
+  // ── Q1 setup
+  {
+    t: 8000,
+    segmentId: 'q1-setup',
+    action: () => {
+      setNarration("First question — the one every enterprise AI buyer should ask. What is fail-closed architecture and why does it matter for AI governance? I'm selecting the pattern.");
+      moveCursorTo('pat-fail-closed');
+      setTimeout(() => selectPattern('fail-closed'), 800);
+    }
+  },
+  // ── Q1 run
+  {
+    t: 16000,
+    segmentId: 'q1-run',
+    action: () => {
+      setNarration("Running against Mike's document library. 2,146 chunks, TXT-format only — average 3,100 characters per chunk. This is high-quality dense prose, not PDF fragments.");
+      moveCursorTo('run-btn');
+      setTimeout(() => runQueryById('fail-closed'), 900);
+    }
+  },
+  // ── Q1 response narration
+  {
+    t: 30000,
+    segmentId: 'q1-response',
+    action: () => {
+      setNarration("Fail-closed is structural enforcement — not advisory guidance. The platform is pulling directly from Mike's Access Control Policy. Three core principles: compliance gates block progression automatically, model updates cannot bypass compliance review, and every stage transition requires named human authorization. You cannot skip stages. You cannot auto-approve. This is what makes AI governable at enterprise scale — the system enforces compliance, you don't depend on people remembering to check.");
+    }
+  },
+  // ── Q2 setup
+  {
+    t: 62000,
+    segmentId: 'q2-setup',
+    action: () => {
+      setNarration("Now let's go deeper — the Unified Agentic Risk Framework. The board-level governance architecture.");
+      moveCursorTo('pat-uarf');
+      setTimeout(() => selectPattern('uarf'), 800);
+    }
+  },
+  // ── Q2 run
+  {
+    t: 72000,
+    segmentId: 'q2-run',
+    action: () => {
+      setNarration("This is pulling from the EAR document — Export Administration Regulations — which contains the strategic governance frameworks.");
+      moveCursorTo('run-btn');
+      setTimeout(() => runQueryById('uarf'), 900);
+    }
+  },
+  // ── Q2 response narration
+  {
+    t: 86000,
+    segmentId: 'q2-response',
+    action: () => {
+      setNarration("The UARF is the board-facing governance artifact. It consolidates seven risk dimensions — prompt instability, multi-agent coordination risk, structural contract risk, escalation volatility, SLA exposure, financial margin impact, and autonomy maturity gating. The key principle: risk scoring is embedded in execution — not external to it. Governance gates are active during automation, not applied retroactively as an audit. This is what separates a governed AI platform from an AI experiment.");
+    }
+  },
+  // ── Q3 setup
+  {
+    t: 138000,
+    segmentId: 'q3-setup',
+    action: () => {
+      setNarration("One more — how does the platform prevent unauthorized data export? The access control architecture.");
+      moveCursorTo('pat-export');
+      setTimeout(() => selectPattern('export'), 800);
+    }
+  },
+  // ── Q3 run
+  {
+    t: 148000,
+    segmentId: 'q3-run',
+    action: () => {
+      setNarration("Running the export control query against the ACP document corpus.");
+      moveCursorTo('run-btn');
+      setTimeout(() => runQueryById('export'), 900);
+    }
+  },
+  // ── Q3 response narration
+  {
+    t: 162000,
+    segmentId: 'q3-response',
+    action: () => {
+      setNarration("Dynamic export suppression — for restricted datasets, external API endpoints are disabled, webhooks are suppressed, and every export attempt is logged regardless of outcome. Eight-tier RBAC with namespace isolation ensures demo and client roles have zero path to founder or admin data. Compliance alignment — ISO 27001, HIPAA, FedRAMP — is structural. The system enforces compliance. Not policy documents, not human checklists. The system.");
+    }
+  },
+  // ── Close
+  {
+    t: 198000,
+    segmentId: 'close',
+    action: () => {
+      setNarration("Three ADRs logged. Zero security incidents. Complete audit trail. This is what 'compliance-ready AI' actually means — not a checkbox, not a policy document. Executable infrastructure.");
+      flashADRCounter();
+    }
+  }
+];
+
+// ══════════════════════════════════════════════════════════════════
+// RUNTIME STATE
+// ══════════════════════════════════════════════════════════════════
+
+let demoRunning = false;
+let demoPaused = false;
+let demoStartTime = 0;
+let demoElapsed = 0;
+let stepIndex = 0;
+let rafId = null;
+let clockInterval = null;
+let voiceEnabled = false;
+let speechSynth = window.speechSynthesis;
+let currentUtterance = null;
+let adrCount = 0;
+let queryCount = 0;
+let scriptVisible = true;
+let activeSegmentId = null;
+
+// ══════════════════════════════════════════════════════════════════
+// MARKDOWN RENDERER
+// ══════════════════════════════════════════════════════════════════
+
+function renderMarkdown(md) {
+  let html = md
+    // Headers
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    // Horizontal rule
+    .replace(/^---$/gm, '<hr>')
+    // Blockquote
+    .replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic (not inside words)
+    .replace(/(?<!\w)\*(.+?)\*(?!\w)/g, '<em>$1</em>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Table (basic)
+    .replace(/^\|(.+)\|$/gm, (match, inner) => {
+      if (inner.replace(/[-| ]/g, '') === '') return '<tr class="sep-row"></tr>';
+      const cells = inner.split('|').map(c => c.trim());
+      return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+    })
+    // Unordered list items
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    // Ordered list items
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Paragraph (blank-line separated)
+    .replace(/\n{2,}/g, '\n\n')
+    .replace(/^([^<\n].+)$/gm, '<p>$1</p>');
+
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/(<li>[\s\S]*?<\/li>(\n|$))+/g, m => `<ul>${m}</ul>`);
+
+  // Wrap consecutive <tr> in <table>
+  html = html.replace(/(<tr>[\s\S]*?<\/tr>(\n|$))+/g, m => {
+    const rows = m.trim().split('\n').filter(r => r.includes('<tr>'));
+    if (rows.length <= 1) return m;
+    // First row becomes thead
+    const [head, ...body] = rows;
+    const thRow = head.replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>');
+    return `<table><thead>${thRow}</thead><tbody>${body.join('')}</tbody></table>`;
+  });
+
+  // Remove sep rows
+  html = html.replace(/<tr class="sep-row"><\/tr>/g, '');
+
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+
+function setNarration(text) {
+  const bar = document.getElementById('narration-bar');
+  const el = document.getElementById('narration-text');
+  el.innerHTML = text;
+  bar.classList.add('visible');
+
+  if (voiceEnabled && speechSynth) {
+    if (currentUtterance) { speechSynth.cancel(); }
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.92;
+    utt.pitch = 0.95;
+    currentUtterance = utt;
+    speechSynth.speak(utt);
+  }
+}
+
+function hideNarration() {
+  document.getElementById('narration-bar').classList.remove('visible');
+}
+
+function moveCursorTo(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const cursor = document.getElementById('demo-cursor');
+  cursor.classList.add('active');
+  const rect = el.getBoundingClientRect();
+  cursor.style.left = (rect.left + rect.width / 2 - 9) + 'px';
+  cursor.style.top = (rect.top + rect.height / 2 - 9) + 'px';
+}
+
+function highlightElement(elId) {
+  document.querySelectorAll('.highlight-ring').forEach(e => e.classList.remove('highlight-ring'));
+  const el = document.getElementById(elId);
+  if (el) {
+    el.classList.add('highlight-ring');
+    setTimeout(() => el.classList.remove('highlight-ring'), 2200);
+  }
+}
+
+function selectPattern(patternKey) {
+  // Deselect all
+  document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('selected', 'running'));
+  const q = QUERIES[patternKey];
+  if (!q) return;
+  const el = document.getElementById(q.patternId);
+  if (el) el.classList.add('selected');
+
+  const textarea = document.getElementById('query-text');
+  textarea.value = q.text;
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+
+  document.getElementById('query-bar').classList.add('active');
+}
+
+function runQueryById(key) {
+  const q = QUERIES[key];
+  if (!q) return;
+  selectPattern(key);
+
+  const bar = document.getElementById('query-bar');
+  const btn = document.getElementById('run-btn');
+  const patEl = document.getElementById(q.patternId);
+  const loadingBar = document.getElementById('loading-bar');
+
+  // Set running state
+  bar.classList.remove('active');
+  bar.classList.add('running');
+  btn.classList.add('loading');
+  btn.innerHTML = '<div class="spinner"></div> Running';
+  if (patEl) { patEl.classList.remove('selected'); patEl.classList.add('running'); }
+  loadingBar.classList.add('active');
+
+  // Remove empty state
+  const empty = document.getElementById('empty-state');
+  if (empty) empty.remove();
+
+  // Show streaming placeholder after 600ms
+  const responseArea = document.getElementById('response-area');
+  const cardId = 'response-' + key;
+  const existingCard = document.getElementById(cardId);
+  if (existingCard) existingCard.remove();
+
+  const card = document.createElement('div');
+  card.className = 'response-card';
+  card.id = cardId;
+  card.innerHTML = `
+    <div class="response-header">
+      <span class="query-label">${q.text}</span>
+      <div class="meta-pills">
+        <span class="meta-pill">streaming...</span>
+      </div>
+    </div>
+    <div class="response-body">
+      <div class="md-content" id="md-${key}">
+        <p style="color:var(--text-muted); font-style:italic;">Retrieving ${q.chunks} chunks from Document Library<span class="typing-cursor"></span></p>
+      </div>
+    </div>`;
+  responseArea.appendChild(card);
+  responseArea.scrollTop = responseArea.scrollHeight;
+
+  // Simulate streaming typeout
+  const streamDelay = 1200;
+  setTimeout(() => {
+    streamResponse(key, card, q);
+  }, streamDelay);
+}
+
+function streamResponse(key, card, q) {
+  const mdEl = document.getElementById('md-' + key);
+  const words = q.markdown.split(' ');
+  let idx = 0;
+  let current = '';
+  const batchSize = 4;
+  const intervalMs = 28;
+
+  const iv = setInterval(() => {
+    if (!demoRunning && !demoPaused) { clearInterval(iv); return; }
+    if (idx >= words.length) {
+      clearInterval(iv);
+      finishResponse(key, card, q);
+      return;
+    }
+    const end = Math.min(idx + batchSize, words.length);
+    for (let i = idx; i < end; i++) {
+      current += (i > 0 ? ' ' : '') + words[i];
+    }
+    idx = end;
+    mdEl.innerHTML = renderMarkdown(current) + '<span class="typing-cursor"></span>';
+    // Auto-scroll
+    const ra = document.getElementById('response-area');
+    ra.scrollTop = ra.scrollHeight;
+  }, intervalMs);
+}
+
+function finishResponse(key, card, q) {
+  const mdEl = document.getElementById('md-' + key);
+  mdEl.innerHTML = renderMarkdown(q.markdown);
+
+  // Update card header with metadata
+  const header = card.querySelector('.response-header');
+  header.querySelector('.meta-pills').innerHTML = `
+    <span class="meta-pill adr">${q.adr}</span>
+    <span class="meta-pill time">${q.time}</span>
+    <span class="meta-pill">${q.chunks} chunks</span>
+    <span class="meta-pill model">haiku</span>`;
+
+  // Sources
+  const sourcesHtml = q.sources.map(s =>
+    `<span class="source-chip" title="${s}">${s.length > 30 ? s.substring(0, 28) + '...' : s}</span>`
+  ).join('');
+  const sourcesRow = document.createElement('div');
+  sourcesRow.className = 'sources-row';
+  sourcesRow.innerHTML = sourcesHtml;
+  card.appendChild(sourcesRow);
+
+  // Update stats
+  adrCount++;
+  queryCount++;
+  document.getElementById('adr-count').textContent = adrCount;
+  document.getElementById('query-count').textContent = queryCount;
+
+  // Reset UI state
+  const bar = document.getElementById('query-bar');
+  const btn = document.getElementById('run-btn');
+  const patEl = document.getElementById(QUERIES[key].patternId);
+  const loadingBar = document.getElementById('loading-bar');
+
+  bar.classList.remove('running');
+  bar.classList.add('active');
+  btn.classList.remove('loading');
+  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5V1z"/></svg> Run';
+  if (patEl) { patEl.classList.remove('running'); patEl.classList.add('selected'); }
+  loadingBar.classList.remove('active');
+
+  // Scroll to top of new card
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function flashADRCounter() {
+  const el = document.getElementById('adr-count');
+  el.style.color = '#3fb950';
+  el.style.textShadow = '0 0 8px rgba(63,185,80,0.6)';
+  setTimeout(() => {
+    el.style.color = '';
+    el.style.textShadow = '';
+  }, 2000);
+}
+
+function updateScriptHighlight(segmentId) {
+  if (segmentId === activeSegmentId) return;
+  activeSegmentId = segmentId;
+  document.querySelectorAll('.script-segment').forEach(s => {
+    const sid = s.dataset.segid;
+    const idx = SCRIPT_SEGMENTS.findIndex(x => x.id === sid);
+    const activeIdx = SCRIPT_SEGMENTS.findIndex(x => x.id === segmentId);
+    if (sid === segmentId) {
+      s.classList.add('active');
+      s.classList.remove('past');
+      s.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (idx < activeIdx) {
+      s.classList.remove('active');
+      s.classList.add('past');
+    } else {
+      s.classList.remove('active', 'past');
+    }
+  });
+}
+
+function formatTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DEMO ENGINE
+// ══════════════════════════════════════════════════════════════════
+
+function startDemo() {
+  document.getElementById('intro-overlay').style.display = 'none';
+  demoRunning = true;
+  demoPaused = false;
+  demoStartTime = performance.now();
+  demoElapsed = 0;
+  stepIndex = 0;
+  adrCount = 0;
+  queryCount = 0;
+
+  document.getElementById('adr-count').textContent = '0';
+  document.getElementById('query-count').textContent = '0';
+
+  document.getElementById('play-pause-btn').textContent = '⏸ Pause';
+  document.getElementById('demo-cursor').classList.add('active');
+
+  buildScriptSidebar();
+  runClock();
+  runTimeline();
+}
+
+function buildScriptSidebar() {
+  const body = document.getElementById('script-body');
+  body.innerHTML = '';
+  SCRIPT_SEGMENTS.forEach(seg => {
+    const div = document.createElement('div');
+    div.className = 'script-segment';
+    div.dataset.segid = seg.id;
+    div.innerHTML = `<div class="time-marker">${seg.timeLabel}</div><div class="script-text">${seg.text}</div>`;
+    body.appendChild(div);
+  });
+}
+
+function runClock() {
+  if (clockInterval) clearInterval(clockInterval);
+  clockInterval = setInterval(() => {
+    if (!demoPaused && demoRunning) {
+      demoElapsed = performance.now() - demoStartTime;
+    }
+    document.getElementById('progress-display').textContent = formatTime(demoElapsed);
+  }, 250);
+}
+
+function runTimeline() {
+  if (!demoRunning || demoPaused) return;
+
+  const elapsed = performance.now() - demoStartTime;
+
+  while (stepIndex < DEMO_STEPS.length && elapsed >= DEMO_STEPS[stepIndex].t) {
+    const step = DEMO_STEPS[stepIndex];
+    if (step.segmentId) updateScriptHighlight(step.segmentId);
+    step.action();
+    stepIndex++;
+  }
+
+  if (stepIndex < DEMO_STEPS.length) {
+    rafId = requestAnimationFrame(runTimeline);
+  } else {
+    // Demo complete
+    setTimeout(() => {
+      setNarration("Demo complete. Three ADRs logged. Full audit trail available.");
+      demoRunning = false;
+    }, 2000);
+  }
+}
+
+function togglePlayPause() {
+  if (!demoRunning && !demoPaused) return;
+
+  if (demoPaused) {
+    // Resume
+    demoPaused = false;
+    demoStartTime = performance.now() - demoElapsed;
+    document.getElementById('play-pause-btn').textContent = '⏸ Pause';
+    runTimeline();
+    if (voiceEnabled && currentUtterance) speechSynth.resume();
+  } else {
+    // Pause
+    demoPaused = true;
+    demoRunning = false; // needed to halt streaming
+    demoRunning = true; // but keep flag for checks
+    if (rafId) cancelAnimationFrame(rafId);
+    document.getElementById('play-pause-btn').textContent = '▶ Resume';
+    if (voiceEnabled) speechSynth.pause();
+  }
+}
+
+function rewindDemo() {
+  if (rafId) cancelAnimationFrame(rafId);
+  if (clockInterval) clearInterval(clockInterval);
+  if (voiceEnabled) speechSynth.cancel();
+
+  demoElapsed = 0;
+  stepIndex = 0;
+  demoStartTime = performance.now();
+  demoPaused = false;
+  demoRunning = true;
+
+  // Clear responses
+  const ra = document.getElementById('response-area');
+  ra.innerHTML = '<div class="empty-state" id="empty-state"><div class="empty-icon">⚔</div><div>Select a governance pattern and run a query</div><div style="font-size:11px;color:var(--text-muted)">ACP + EAR knowledge base ready</div></div>';
+
+  // Reset query bar
+  document.getElementById('query-text').value = '';
+  document.getElementById('query-bar').classList.remove('active','running');
+  document.getElementById('run-btn').innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5V1z"/></svg> Run';
+  document.getElementById('loading-bar').classList.remove('active');
+
+  // Reset pattern selections
+  document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('selected','running'));
+  document.getElementById('pat-fail-closed').classList.add('selected');
+
+  // Reset stats
+  adrCount = 0; queryCount = 0;
+  document.getElementById('adr-count').textContent = '0';
+  document.getElementById('query-count').textContent = '0';
+  document.getElementById('play-pause-btn').textContent = '⏸ Pause';
+
+  hideNarration();
+  buildScriptSidebar();
+  runClock();
+  runTimeline();
+}
+
+function resetDemo() {
+  if (rafId) cancelAnimationFrame(rafId);
+  if (clockInterval) clearInterval(clockInterval);
+  if (voiceEnabled) speechSynth.cancel();
+
+  demoRunning = false;
+  demoPaused = false;
+  stepIndex = 0;
+  demoElapsed = 0;
+
+  document.getElementById('demo-cursor').classList.remove('active');
+  hideNarration();
+
+  const ra = document.getElementById('response-area');
+  ra.innerHTML = '<div class="empty-state" id="empty-state"><div class="empty-icon">⚔</div><div>Select a governance pattern and run a query</div><div style="font-size:11px;color:var(--text-muted)">ACP + EAR knowledge base ready</div></div>';
+
+  document.getElementById('query-text').value = '';
+  document.getElementById('query-bar').classList.remove('active','running');
+  document.getElementById('run-btn').innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5V1z"/></svg> Run';
+  document.getElementById('loading-bar').classList.remove('active');
+
+  document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('selected','running'));
+  document.getElementById('pat-fail-closed').classList.add('selected');
+
+  adrCount = 0; queryCount = 0;
+  document.getElementById('adr-count').textContent = '0';
+  document.getElementById('query-count').textContent = '0';
+  document.getElementById('progress-display').textContent = '0:00';
+  document.getElementById('play-pause-btn').textContent = '▶ Play';
+
+  // Show intro
+  document.getElementById('intro-overlay').style.display = 'flex';
+}
+
+function skipSection(dir) {
+  if (!demoRunning) return;
+
+  let targetIdx = stepIndex + (dir > 0 ? 0 : -2);
+  targetIdx = Math.max(0, Math.min(targetIdx, DEMO_STEPS.length - 1));
+
+  if (rafId) cancelAnimationFrame(rafId);
+
+  const targetT = DEMO_STEPS[targetIdx].t;
+  demoStartTime = performance.now() - targetT;
+  demoElapsed = targetT;
+  stepIndex = targetIdx;
+
+  runTimeline();
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  const btn = document.getElementById('voice-btn');
+  if (voiceEnabled) {
+    btn.classList.add('active');
+    btn.textContent = '🔊 Voice On';
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '🔇 Voice';
+    if (speechSynth) speechSynth.cancel();
+  }
+}
+
+function toggleScript() {
+  scriptVisible = !scriptVisible;
+  const sidebar = document.getElementById('sidebar-right');
+  const app = document.getElementById('app');
+  if (scriptVisible) {
+    sidebar.style.display = 'flex';
+    app.style.gridTemplateColumns = '240px 1fr 300px';
+  } else {
+    sidebar.style.display = 'none';
+    app.style.gridTemplateColumns = '240px 1fr 0';
+  }
+}
+
+// Manual run button
+function runQuery() {
+  const text = document.getElementById('query-text').value.trim();
+  if (!text) return;
+
+  // Find matching query or use first available
+  const matchKey = Object.keys(QUERIES).find(k => QUERIES[k].text === text);
+  if (matchKey) {
+    runQueryById(matchKey);
+  }
+}
+
+// Auto-resize textarea
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('query-text');
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  });
+  ta.addEventListener('focus', () => {
+    document.getElementById('query-bar').classList.add('active');
+  });
+  ta.addEventListener('blur', () => {
+    document.getElementById('query-bar').classList.remove('active');
+  });
+});
+
+// Keyboard shortcut: Space = play/pause, R = rewind
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  if (e.key === ' ') { e.preventDefault(); togglePlayPause(); }
+  if (e.key === 'r' || e.key === 'R') rewindDemo();
+  if (e.key === 'ArrowRight') skipSection(1);
+  if (e.key === 'ArrowLeft') skipSection(-1);
+});
+</script>
+</body>
+</html>

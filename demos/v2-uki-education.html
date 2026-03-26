@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIXaaS — UKI Education Demo | April 1, 2026</title>
+<link rel="stylesheet" href="https://app.inflexis.ai/static/css/query_panel.css">
+<style>
+/* ─── Demo-only chrome ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --qp-void: #040b1a;
+  --qp-blue: #3b82f6;
+  --qp-purple: #8b5cf6;
+  --qp-cyan: #22d3ee;
+  --qp-green: #10b981;
+  --qp-amber: #f59e0b;
+  --qp-red: #ef4444;
+  --qp-card: #0e1e3a;
+  --qp-text: #dde8f8;
+  --qp-muted: #7a9bc8;
+  --qp-border: #1a3356;
+  --demo-bar-h: 64px;
+  --narration-h: 52px;
+}
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--qp-void);
+  color: var(--qp-text);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* App wrapper — push content above demo bar + narration */
+#app-wrapper {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  bottom: calc(var(--demo-bar-h) + var(--narration-h));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── NARRATION BAR ─────────────────────────────────────────── */
+#narration-bar {
+  position: fixed;
+  bottom: var(--demo-bar-h);
+  left: 0; right: 340px;
+  height: var(--narration-h);
+  background: rgba(4,11,26,0.93);
+  border-top: 1px solid rgba(59,130,246,0.25);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 10px;
+  z-index: 900;
+  backdrop-filter: blur(6px);
+  transition: right 0.3s ease;
+}
+#narration-bar.script-hidden { right: 0; }
+
+#narration-speaker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--qp-cyan);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+#narration-text {
+  font-size: 14px;
+  color: #e8f0ff;
+  line-height: 1.35;
+  flex: 1;
+  font-style: italic;
+}
+
+/* ─── DEMO CONTROLS BAR ─────────────────────────────────────── */
+#demo-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--demo-bar-h);
+  background: rgba(6,14,30,0.97);
+  border-top: 1px solid rgba(59,130,246,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 901;
+  backdrop-filter: blur(8px);
+}
+
+.demo-bar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 200px;
+}
+.demo-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--qp-cyan);
+  letter-spacing: 0.04em;
+}
+.demo-presenter {
+  font-size: 10px;
+  color: var(--qp-muted);
+}
+
+.demo-bar-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+#progress-track {
+  width: 100%;
+  max-width: 480px;
+  height: 4px;
+  background: rgba(59,130,246,0.15);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+#progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--qp-blue), var(--qp-cyan));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.2s linear;
+}
+#progress-fill::after {
+  content: '';
+  position: absolute;
+  right: -4px; top: -4px;
+  width: 12px; height: 12px;
+  background: var(--qp-cyan);
+  border-radius: 50%;
+  border: 2px solid var(--qp-void);
+}
+#timestamp-display {
+  font-size: 11px;
+  color: var(--qp-muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+.demo-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrl-btn {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  color: var(--qp-text);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.ctrl-btn:hover { background: rgba(59,130,246,0.18); border-color: var(--qp-blue); }
+.ctrl-btn.active { background: rgba(59,130,246,0.25); border-color: var(--qp-blue); color: var(--qp-cyan); }
+
+.speed-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  min-width: 38px;
+  justify-content: center;
+}
+
+/* ─── SCRIPT SIDEBAR ─────────────────────────────────────────── */
+#script-sidebar {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 340px;
+  background: rgba(8,18,36,0.98);
+  border-left: 1px solid rgba(59,130,246,0.25);
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(12px);
+}
+#script-sidebar.hidden { transform: translateX(100%); }
+
+.script-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(59,130,246,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.script-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--qp-cyan);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.script-close {
+  background: none;
+  border: none;
+  color: var(--qp-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.script-close:hover { color: var(--qp-text); }
+
+#script-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#script-body::-webkit-scrollbar { width: 4px; }
+#script-body::-webkit-scrollbar-track { background: transparent; }
+#script-body::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 2px; }
+
+.script-section {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+.script-section.active {
+  background: rgba(59,130,246,0.12);
+  border-left-color: var(--qp-blue);
+}
+.script-ts {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--qp-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.script-section.active .script-ts { color: var(--qp-cyan); }
+.script-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--qp-purple);
+  margin-bottom: 5px;
+}
+.script-text {
+  font-size: 12px;
+  color: #b0c8e8;
+  line-height: 1.55;
+}
+.script-section.active .script-text { color: var(--qp-text); }
+
+/* ─── ANIMATED CURSOR ─────────────────────────────────────────── */
+#demo-cursor {
+  position: fixed;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.9);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.25), 0 0 12px rgba(59,130,246,0.6);
+  pointer-events: none;
+  z-index: 9999;
+  transition: left 0.6s cubic-bezier(0.4,0,0.2,1), top 0.6s cubic-bezier(0.4,0,0.2,1);
+  transform: translate(-50%, -50%);
+}
+#demo-cursor.clicking {
+  animation: cursor-click 0.25s ease-out;
+}
+@keyframes cursor-click {
+  0% { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 4px rgba(59,130,246,0.25), 0 0 12px rgba(59,130,246,0.6); }
+  40% { transform: translate(-50%,-50%) scale(1.8); box-shadow: 0 0 0 8px rgba(255,255,255,0.4), 0 0 24px rgba(59,130,246,0.9); }
+  100% { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 4px rgba(59,130,246,0.25), 0 0 12px rgba(59,130,246,0.6); }
+}
+
+/* ─── APP LAYOUT OVERRIDES (fit within app-wrapper) ─────────────── */
+.qp-nav {
+  position: relative !important;
+  flex-shrink: 0;
+}
+
+.qp-partner-bar {
+  flex-shrink: 0;
+}
+
+.qp-layout {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.qp-sidebar {
+  overflow-y: auto;
+}
+.qp-sidebar::-webkit-scrollbar { width: 3px; }
+.qp-sidebar::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.25); }
+
+.qp-main {
+  overflow-y: auto;
+  min-height: 0;
+}
+.qp-main::-webkit-scrollbar { width: 4px; }
+.qp-main::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); }
+
+.qp-right-panel {
+  overflow-y: auto;
+  min-height: 0;
+}
+.qp-right-panel::-webkit-scrollbar { width: 3px; }
+.qp-right-panel::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); }
+
+/* ─── RESPONSE STREAMING ─────────────────────────────────────── */
+.qp-response-body {
+  display: none;
+}
+.qp-response-body.visible {
+  display: block;
+}
+
+.stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--qp-blue);
+  animation: blink 0.8s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Markdown rendered content */
+.md-h1 { font-size: 17px; font-weight: 700; color: var(--qp-text); margin: 14px 0 8px; border-bottom: 1px solid var(--qp-border); padding-bottom: 6px; }
+.md-h2 { font-size: 14px; font-weight: 700; color: var(--qp-cyan); margin: 12px 0 6px; }
+.md-h3 { font-size: 13px; font-weight: 600; color: var(--qp-blue); margin: 10px 0 4px; }
+.md-p { font-size: 13px; color: var(--qp-text); line-height: 1.6; margin: 6px 0; }
+.md-bold { font-weight: 700; color: #e8f0ff; }
+.md-hr { border: none; border-top: 1px solid var(--qp-border); margin: 12px 0; }
+.md-ul { padding-left: 18px; margin: 6px 0; }
+.md-li { font-size: 13px; color: var(--qp-text); line-height: 1.6; margin: 3px 0; }
+.md-table-wrap { overflow-x: auto; margin: 10px 0; }
+.md-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.md-table th { background: rgba(59,130,246,0.12); color: var(--qp-cyan); padding: 6px 10px; text-align: left; border: 1px solid var(--qp-border); font-weight: 600; font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase; }
+.md-table td { padding: 6px 10px; border: 1px solid var(--qp-border); color: var(--qp-text); }
+.md-table tr:nth-child(even) td { background: rgba(59,130,246,0.04); }
+.md-source-chip { display: inline-block; background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: var(--qp-blue); font-size: 10px; padding: 1px 7px; border-radius: 10px; margin: 1px 2px; font-weight: 500; }
+.md-inline-code { font-family: monospace; background: rgba(59,130,246,0.1); padding: 1px 5px; border-radius: 3px; font-size: 12px; color: var(--qp-cyan); }
+
+/* Sources section */
+.response-sources {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--qp-border);
+  font-size: 11px;
+  color: var(--qp-muted);
+  display: none;
+}
+.response-sources.visible { display: block; }
+.sources-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; color: var(--qp-muted); }
+.source-chip-list { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* ADR pill */
+.response-adr {
+  display: none;
+  margin-top: 8px;
+}
+.response-adr.visible { display: flex; align-items: center; gap: 6px; }
+.adr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.3);
+  color: var(--qp-purple);
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.adr-dot { width: 5px; height: 5px; background: var(--qp-green); border-radius: 50%; animation: pulse-dot 2s ease infinite; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.3); } }
+
+/* Meta */
+.response-meta-row {
+  display: none;
+  margin-top: 6px;
+}
+.response-meta-row.visible { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ─── RIGHT PANEL CUSTOM ─────────────────────────────────────── */
+#right-panel {
+  width: 280px;
+  flex-shrink: 0;
+  background: rgba(8,16,34,0.8);
+  border-left: 1px solid var(--qp-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rp-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--qp-border);
+  flex-shrink: 0;
+}
+.rp-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--qp-purple);
+  margin-bottom: 3px;
+}
+.rp-subtitle {
+  font-size: 10px;
+  color: var(--qp-muted);
+}
+
+.rp-domain-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.25);
+  color: var(--qp-purple);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.rp-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--qp-border);
+  flex-shrink: 0;
+}
+.rp-tab {
+  flex: 1;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--qp-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rp-tab.active {
+  color: var(--qp-blue);
+  border-bottom-color: var(--qp-blue);
+}
+
+.rp-suggestions {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.rp-suggestion {
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.15);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 11px;
+  color: var(--qp-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rp-suggestion:hover {
+  background: rgba(59,130,246,0.12);
+  border-color: rgba(59,130,246,0.35);
+}
+.rp-suggestion-icon { font-size: 13px; }
+
+.rp-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.rp-chat-area::-webkit-scrollbar { width: 3px; }
+.rp-chat-area::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); }
+
+.rp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--qp-muted);
+  font-size: 11px;
+  text-align: center;
+  gap: 8px;
+  padding: 20px;
+}
+.rp-empty-icon { font-size: 28px; opacity: 0.4; }
+
+.rp-msg {
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  animation: msg-fade-in 0.3s ease;
+}
+@keyframes msg-fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.rp-msg-ai {
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.2);
+  color: #c4b5fd;
+}
+.rp-msg-system {
+  background: rgba(34,211,238,0.06);
+  border: 1px solid rgba(34,211,238,0.15);
+  color: var(--qp-cyan);
+  font-size: 11px;
+}
+
+.rp-kb-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  background: rgba(16,185,129,0.07);
+  border-top: 1px solid rgba(16,185,129,0.15);
+  font-size: 10px;
+  color: var(--qp-green);
+  flex-shrink: 0;
+}
+.rp-kb-dot { width: 6px; height: 6px; background: var(--qp-green); border-radius: 50%; animation: pulse-dot 2s ease infinite; }
+
+/* ─── QUERY TEXTAREA HIGHLIGHT ───────────────────────────────── */
+.qp-query-textarea.typing {
+  border-color: rgba(59,130,246,0.5) !important;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1) !important;
+}
+
+/* ─── STATUS INDICATOR ───────────────────────────────────────── */
+.qp-status-dot.amber { background: var(--qp-amber); animation: pulse-amber 1s ease infinite; }
+@keyframes pulse-amber { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.qp-status-dot.green { background: var(--qp-green); animation: pulse-green 2.5s ease infinite; }
+@keyframes pulse-green { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.25); } }
+
+/* ─── PATTERN ACTIVE ─────────────────────────────────────────── */
+.qp-pattern-btn { cursor: pointer; transition: all 0.15s; }
+.qp-pattern-btn:hover { background: rgba(59,130,246,0.08) !important; }
+
+/* ─── KB STATUS PANEL ────────────────────────────────────────── */
+.qp-kb-status-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--qp-muted);
+}
+.kb-chunk-label { font-size: 10px; }
+.kb-chunk-count { font-weight: 700; color: var(--qp-green); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  APP WRAPPER                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="app-wrapper">
+
+  <!-- NAV -->
+  <nav class="qp-nav">
+    <div class="qp-nav-brand">
+      <img class="qp-brand-badge" src="https://app.inflexis.ai/static/img/aixaas-badge.png" alt="AIXaaS" onerror="this.style.display='none'">
+    </div>
+    <div class="qp-nav-center">
+      <div class="qp-domain-select-wrap">
+        <span class="qp-domain-select-label">Knowledge Domain</span>
+        <select class="qp-domain-select" id="domain-select">
+          <option value="foundation" selected>Foundation Demo</option>
+          <option value="documents">Documents</option>
+          <option value="compliance">Compliance</option>
+          <option value="structured_data">Structured Data</option>
+          <option value="web">Web Intelligence</option>
+        </select>
+      </div>
+    </div>
+    <div class="qp-status-indicator" id="status-indicator">
+      <span class="qp-status-dot amber" id="status-dot"></span>
+      <span class="qp-status-text" id="status-text">Connecting to Knowledge Base...</span>
+    </div>
+    <div class="qp-nav-right">
+      <div class="qp-user-chip">
+        <span>Josh Williams</span>
+        <span class="qp-role-badge">demo</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PARTNER BAR -->
+  <div class="qp-partner-bar">
+    <div class="qp-partner-avatar">JW</div>
+    <div>
+      <div class="qp-partner-name">Josh Williams</div>
+      <div class="qp-partner-org">FedShark &bull; Government Contracting &amp; AI Partner</div>
+    </div>
+    <div class="qp-kb-status-panel">
+      <span class="kb-chunk-label">KB:</span>
+      <span class="kb-chunk-count" id="chunk-count">—</span>
+      <span class="kb-chunk-label">chunks</span>
+      &bull;
+      <span style="color:var(--qp-muted)">Foundation Demo</span>
+    </div>
+  </div>
+
+  <!-- 3-COLUMN LAYOUT -->
+  <div class="qp-layout" id="main-layout">
+
+    <!-- LEFT SIDEBAR: Pattern Library -->
+    <aside class="qp-sidebar">
+      <div class="qp-sidebar-inner">
+        <div class="qp-sidebar-header">Pattern Library</div>
+
+        <!-- Foundation Demo patterns (expanded) -->
+        <div class="qp-pattern-category" id="cat-foundation">
+          <div class="qp-category-header" onclick="toggleCategory('foundation')">
+            <span class="qp-category-icon">🎓</span>
+            <span class="qp-category-label">Foundation Demo</span>
+            <span class="qp-category-chevron" id="chev-foundation">▾</span>
+          </div>
+          <div class="qp-category-patterns" id="patterns-foundation">
+            <div class="qp-pattern-btn" id="pat-q1" onclick="selectPattern(0)">
+              <span class="qp-pattern-dot" style="background:var(--qp-green)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Spend Analysis</div>
+                <div class="qp-pattern-desc">Q1 2026 spend breakdown &amp; anomalies</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn" id="pat-q2" onclick="selectPattern(1)">
+              <span class="qp-pattern-dot" style="background:var(--qp-red)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">AI Governance Pain Points</div>
+                <div class="qp-pattern-desc">Ungoverned AI usage &amp; FERPA risk</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn" id="pat-q3" onclick="selectPattern(2)">
+              <span class="qp-pattern-dot" style="background:var(--qp-blue)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">AIXaaS Value for UKI</div>
+                <div class="qp-pattern-desc">Platform capabilities &amp; roadmap</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn" id="pat-q4" onclick="selectPattern(3)">
+              <span class="qp-pattern-dot" style="background:var(--qp-purple)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">2026 Strategic Plan</div>
+                <div class="qp-pattern-desc">Institutional priorities &amp; OKRs</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn" id="pat-q5">
+              <span class="qp-pattern-dot" style="background:var(--qp-amber)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Compliance Framework Map</div>
+                <div class="qp-pattern-desc">FERPA, SACSCOC, Title IV coverage</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn" id="pat-q6">
+              <span class="qp-pattern-dot" style="background:var(--qp-cyan)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Technology Stack Audit</div>
+                <div class="qp-pattern-desc">Current vendor inventory &amp; gaps</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Analysis (collapsed) -->
+        <div class="qp-pattern-category">
+          <div class="qp-category-header" onclick="toggleCategory('financial')">
+            <span class="qp-category-icon">💹</span>
+            <span class="qp-category-label">Financial Analysis</span>
+            <span class="qp-category-chevron" id="chev-financial">▸</span>
+          </div>
+          <div class="qp-category-patterns" id="patterns-financial" style="display:none">
+            <div class="qp-pattern-btn">
+              <span class="qp-pattern-dot" style="background:var(--qp-green)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Budget vs Actuals</div>
+                <div class="qp-pattern-desc">Variance analysis by department</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn">
+              <span class="qp-pattern-dot" style="background:var(--qp-amber)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Vendor Cost Review</div>
+                <div class="qp-pattern-desc">Contract value &amp; renewal risk</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk & Compliance (collapsed) -->
+        <div class="qp-pattern-category">
+          <div class="qp-category-header" onclick="toggleCategory('risk')">
+            <span class="qp-category-icon">🛡️</span>
+            <span class="qp-category-label">Risk &amp; Compliance</span>
+            <span class="qp-category-chevron" id="chev-risk">▸</span>
+          </div>
+          <div class="qp-category-patterns" id="patterns-risk" style="display:none">
+            <div class="qp-pattern-btn">
+              <span class="qp-pattern-dot" style="background:var(--qp-red)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">FERPA Gap Analysis</div>
+                <div class="qp-pattern-desc">Student data exposure audit</div>
+              </div>
+            </div>
+            <div class="qp-pattern-btn">
+              <span class="qp-pattern-dot" style="background:var(--qp-purple)"></span>
+              <div class="qp-pattern-content">
+                <div class="qp-pattern-name">Accreditation Readiness</div>
+                <div class="qp-pattern-desc">SACSCOC 2027 preparation status</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- CENTER: Query + Response -->
+    <main class="qp-main" id="qp-main">
+      <!-- Query Card -->
+      <div class="qp-card qp-query-card">
+        <div class="qp-card-header">
+          <span class="qp-card-title">Query Builder</span>
+          <span class="qp-card-subtitle" id="active-pattern-label">Select a pattern or type your query</span>
+        </div>
+        <textarea class="qp-query-textarea" id="query-textarea" placeholder="Select a pattern from the library, or type your question here..." rows="4"></textarea>
+        <div class="qp-query-footer">
+          <span class="qp-char-count" id="char-count">0 / 2000</span>
+          <div class="qp-query-actions">
+            <button class="qp-btn qp-btn-ghost" onclick="clearQuery()">Clear</button>
+            <button class="qp-btn qp-btn-primary" id="run-btn" onclick="manualRun()">▶ Run Query</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Response Card -->
+      <div class="qp-card qp-response-card">
+        <div class="qp-card-header">
+          <span class="qp-card-title">AI Response</span>
+          <span class="qp-card-subtitle" id="response-subtitle">Awaiting query</span>
+        </div>
+        <div class="qp-response-empty" id="response-empty">
+          <div class="qp-empty-icon">✦</div>
+          <div>Run a query to see AI-generated insights from UKI's knowledge base</div>
+        </div>
+        <div class="qp-response-body" id="response-body"></div>
+        <div class="response-sources" id="response-sources">
+          <div class="sources-label">Sources</div>
+          <div class="source-chip-list" id="source-chips"></div>
+        </div>
+        <div class="response-adr" id="response-adr"></div>
+        <div class="response-meta-row" id="response-meta"></div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: AI Navigator -->
+    <div id="right-panel">
+      <div class="rp-header">
+        <div class="rp-title">✯ Inflexis AI Navigator</div>
+        <div class="rp-subtitle">Powered by MAO &bull; AIXaaS™ v6C</div>
+        <div class="rp-domain-pill">🎓 Foundation Demo</div>
+      </div>
+
+      <div class="rp-tabs">
+        <div class="rp-tab active">Explore</div>
+        <div class="rp-tab">Analyst</div>
+        <div class="rp-tab">Execute</div>
+        <div class="rp-tab">Govern</div>
+      </div>
+
+      <div class="rp-suggestions">
+        <div class="rp-suggestion"><span class="rp-suggestion-icon">📊</span>Show me trends</div>
+        <div class="rp-suggestion"><span class="rp-suggestion-icon">⚡</span>Convert to workflow</div>
+        <div class="rp-suggestion"><span class="rp-suggestion-icon">⚠️</span>Highlight anomalies</div>
+        <div class="rp-suggestion"><span class="rp-suggestion-icon">📋</span>Create executive summary</div>
+      </div>
+
+      <div class="rp-chat-area" id="rp-chat">
+        <div class="rp-empty" id="rp-empty">
+          <div class="rp-empty-icon">🤖</div>
+          <div>Run a query to activate AI Navigator insights</div>
+        </div>
+      </div>
+
+      <div class="rp-kb-badge">
+        <div class="rp-kb-dot"></div>
+        <span id="rp-kb-text">Knowledge Base Ready</span>
+      </div>
+    </div>
+
+  </div><!-- /qp-layout -->
+</div><!-- /app-wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  NARRATION BAR                                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="narration-bar">
+  <span id="narration-speaker">Josh —</span>
+  <span id="narration-text">Initializing demo…</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  DEMO CONTROLS BAR                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="demo-bar">
+  <div class="demo-bar-left">
+    <div class="demo-title">AIXaaS — UKI Education Demo</div>
+    <div class="demo-presenter">Presenter: Josh Williams &bull; April 1, 2026</div>
+  </div>
+
+  <div class="demo-bar-center">
+    <div id="progress-track" onclick="seekTo(event)">
+      <div id="progress-fill"></div>
+    </div>
+    <div id="timestamp-display">0:00 / 4:00</div>
+  </div>
+
+  <div class="demo-bar-right">
+    <button class="ctrl-btn" id="play-btn" onclick="togglePlay()" title="Space">⏸ Pause</button>
+    <button class="ctrl-btn" onclick="resetDemo()" title="R">⟳ Reset</button>
+    <button class="ctrl-btn" id="mute-btn" onclick="toggleMute()" title="M">🔊 Voice</button>
+    <button class="ctrl-btn speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="script-btn" onclick="toggleScript()" title="Script">≡ Script</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCRIPT SIDEBAR                                             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="script-sidebar">
+  <div class="script-header">
+    <span class="script-header-title">📜 Demo Script</span>
+    <button class="script-close" onclick="toggleScript()">✕</button>
+  </div>
+  <div id="script-body">
+    <div class="script-section" id="ss-0">
+      <div class="script-ts">[0:00 – 0:20]</div>
+      <div class="script-label">OPENING</div>
+      <div class="script-text">"What you're looking at right now is AIXaaS — the AI intelligence platform built by Inflexis. I'm Josh Williams, presenting to Tony at Ultimate Knowledge Institute. This is a live, governed AI knowledge platform. UKI's actual operational data has already been ingested — documents, spend reports, compliance frameworks, strategic plans. Everything you're about to see is real output from real data."</div>
+    </div>
+    <div class="script-section" id="ss-1">
+      <div class="script-ts">[0:20 – 0:35]</div>
+      <div class="script-label">PATTERN SELECTION</div>
+      <div class="script-text">"I'm going to start with a spend analysis. The Pattern Library on the left has pre-built queries tuned for UKI's data. I'll click Spend Analysis."</div>
+    </div>
+    <div class="script-section" id="ss-2">
+      <div class="script-ts">[0:35 – 0:50]</div>
+      <div class="script-label">RUNNING QUERY 1</div>
+      <div class="script-text">"The query auto-populated. Clicking Run Query. Watch the Knowledge Base — it's retrieving chunks from UKI's actual spend documents."</div>
+    </div>
+    <div class="script-section" id="ss-3">
+      <div class="script-ts">[0:50 – 1:30]</div>
+      <div class="script-label">SPEND RESPONSE</div>
+      <div class="script-text">"There it is. Q1 2026 operational spend — $2.8 million total, broken down by category. IT Infrastructure at 32%, Facilities at 31%. And look at this — $681,400 in flagged anomalies across 5 invoices. The platform found that automatically. No SQL, no spreadsheet, no analyst. That finding happened in under 2 seconds. The sources at the bottom show exactly which documents were used."</div>
+    </div>
+    <div class="script-section" id="ss-4">
+      <div class="script-ts">[1:30 – 1:45]</div>
+      <div class="script-label">SECOND QUERY</div>
+      <div class="script-text">"Now let me ask the question that keeps compliance officers up at night. AI governance. I'm clicking the AI Governance Pain Points pattern."</div>
+    </div>
+    <div class="script-section" id="ss-5">
+      <div class="script-ts">[1:45 – 2:00]</div>
+      <div class="script-label">RUNNING QUERY 2</div>
+      <div class="script-text">"Running the governance analysis against UKI's documented pain points and technology inventory."</div>
+    </div>
+    <div class="script-section" id="ss-6">
+      <div class="script-ts">[2:00 – 2:50]</div>
+      <div class="script-label">GOVERNANCE RESPONSE</div>
+      <div class="script-text">"Here's the governance picture at UKI right now. 200 faculty members are actively using ChatGPT — with zero audit trail. That's $48,000 a year in ungoverned AI spend. No documented policy. No visibility into what student data is being exposed. And Tony — SACSCOC reaffirmation is due in 2027. Uncontrolled AI usage would be a material accreditation finding. This platform solves that. Every query, every interaction, logged with complete traceability."</div>
+    </div>
+    <div class="script-section" id="ss-7">
+      <div class="script-ts">[2:50 – 3:05]</div>
+      <div class="script-label">THIRD QUERY</div>
+      <div class="script-text">"Last one — let me show you how AIXaaS specifically addresses UKI's pain points. The value proposition query."</div>
+    </div>
+    <div class="script-section" id="ss-8">
+      <div class="script-ts">[3:05 – 3:45]</div>
+      <div class="script-label">VALUE RESPONSE</div>
+      <div class="script-text">"Six compliance frameworks, all handled by design. FERPA, Title IV, SACSCOC, GDPR, SOC 2. And a four-phase implementation roadmap — governance framework in 90 days, full knowledge base consolidation in 180 days, automated compliance reporting in a year. This is how UKI moves from ungoverned AI pilots to enterprise-grade governed intelligence. Every question answered by your own data. Every answer auditable. This is governance-first AI."</div>
+    </div>
+    <div class="script-section" id="ss-9">
+      <div class="script-ts">[3:45 – 4:00]</div>
+      <div class="script-label">CLOSE</div>
+      <div class="script-text">"See that ADR pill in the response? That's Architectural Decision Record zero-zero-forty-four. Every interaction on this platform creates one. Complete chain of custody for every AI query. This is what Tony's institution needs before AI governance becomes a regulatory requirement."</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  ANIMATED CURSOR                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="demo-cursor"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT ENGINE                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── DATA ────────────────────────────────────────────────────── */
+const QUERIES = [
+  {
+    id: 'q1',
+    text: "What does the UKI spend analysis show? Break down the top spending categories by dollar amount and percentage, and identify the biggest opportunities to reduce cost.",
+    sources: ["UKI-Spend-Analysis.md","UKI-AIXaaS-Value-Proposition.md","UKI-Pain-Points.md","UKI-Continuum-Roadmap.md","UKI-Strategic-Plan-2026.md"],
+    adr: "ADR-0042",
+    time: "1.84s",
+    chunks: "8",
+    model: "claude-haiku",
+    response: `# UKI Q1 2026 Spend Analysis
+
+## Top Spending Categories
+
+Based on the Q1 2026 spend analysis, UKI's operational expenditure breaks down as follows:
+
+| Category | Amount | % of Total |
+|----------|--------|-----------|
+| **IT Infrastructure** | $588,041 | 32% |
+| **Facilities** | $570,950 | 31% |
+| **Curriculum Development** | $236,900 | 13% |
+| **Student Services** | $184,600 | 10% |
+| **HR & Talent** | $124,300 | 7% |
+| **Compliance & Legal** | $120,500 | 7% |
+| **Marketing** | $108,550 | 6% |
+| **Anomalous/Flagged Spend** | $681,400 | — |
+
+**Total identified spend: ~$2.8M in Q1** [UKI-Spend-Analysis.md]
+
+---
+
+## Cost Reduction Opportunities
+
+### 1. Resolve Anomalous Spend ($681K) — Immediate Quick Win
+Five invoices have been flagged as anomalies representing **$681,400 in unresolved variance**. This is the single largest opportunity:
+- The AIXaaS platform identified these discrepancies in seconds using anomaly detection
+- Resolving just these 5 invoices would eliminate the largest Q1 spend variance [UKI-AIXaaS-Value-Proposition.md]
+
+### 2. Tackle Vendor Contract Cost Variance ($493K Pending)
+UKI has **3 pending invoices flagged as anomalies totaling $493,000** in unresolved spend, suggesting systematic issues with vendor contract management and invoice reconciliation [UKI-Pain-Points.md]
+
+### 3. Eliminate Curriculum Content Licensing Duplication (~$120K)
+- **15 vendors** manage curriculum licensing with manual renewal tracking
+- **Estimated $120K in duplicate licensing costs** due to lack of centralized management [UKI-Pain-Points.md]
+- This is a structural problem addressable through knowledge consolidation
+
+### 4. Optimize IT Infrastructure ($588K / 32% of spend)
+IT Infrastructure is the largest single category. The AIXaaS platform indexes **171,000+ document chunks** and enables automated vendor audit and cost variance alerts on infrastructure contracts.`
+  },
+  {
+    id: 'q2',
+    text: "What are the UKI pain points with AI governance and ungoverned faculty AI usage? What is the estimated annual cost and risk exposure?",
+    sources: ["UKI-Pain-Points.md","UKI-Technology-Inventory.md","UKI-AIXaaS-Value-Proposition.md","UKI-Strategic-Plan-2026.md","UKI-Compliance-Framework.md"],
+    adr: "ADR-0043",
+    time: "2.01s",
+    chunks: "8",
+    model: "claude-haiku",
+    response: `# UKI AI Governance Pain Points & Risk Exposure
+
+## Key Pain Points
+
+### 1. Ungoverned Faculty AI Usage & FERPA Risk
+UKI faces critical risk from **ungoverned AI usage by faculty creating FERPA violations**. The core issue: there is **no audit trail on student data interactions with commercial AI tools** — meaning the institution has no visibility into whether sensitive student information is being exposed to third-party AI systems. [UKI-Pain-Points.md]
+
+### 2. Scale of Usage Without Controls
+The problem is substantial: [UKI-Technology-Inventory.md]
+- **Estimated 200 faculty users** actively using ChatGPT with zero governance
+- **$48K/yr in current spend** on ungoverned AI pilots
+- **No enterprise AI governance framework in place**
+
+---
+
+## Annual Cost & Risk Exposure Summary
+
+| Dimension | Metric | Source |
+|-----------|--------|--------|
+| **Current AI Spend (Ungoverned)** | $48K/yr | UKI-Technology-Inventory.md |
+| **Total Compliance Audit Budget** | $38.5K/yr | UKI-Compliance-Framework.md |
+| **Operational Spend Variance Flagged** | $681.4K (Q1 2026) | UKI-Spend-Analysis.md |
+| **FERPA Exposure** | Unquantified but critical | UKI-Pain-Points.md |
+
+## Risk Analysis
+
+**Direct Financial Exposure:**
+- $48K in ongoing ungoverned AI spend represents a compliance liability, not a justified investment
+- No documented policy, no audit trail = non-compliant with institutional governance standards
+
+**Regulatory & Reputational Exposure:**
+- **FERPA Violation Risk**: Student PII (names, grades, financial aid) could be leaked to commercial AI services without detection
+- **Accreditation Risk**: SACSCOC reaffirmation is **due in 2027**. Uncontrolled AI usage would be a material accreditation finding
+- **No Audit Trail**: If a breach occurs, UKI cannot demonstrate controls were in place or quantify the scope of exposure`
+  },
+  {
+    id: 'q3',
+    text: "What is the AIXaaS value proposition for UKI? How does the platform directly address UKI's top pain points around compliance, cost, and governance?",
+    sources: ["UKI-AIXaaS-Value-Proposition.md","UKI-Technology-Inventory.md","UKI-Strategic-Plan-2026.md","UKI-Continuum-Roadmap.md","UKI-Compliance-Coverage.md"],
+    adr: "ADR-0044",
+    time: "1.93s",
+    chunks: "5",
+    model: "claude-haiku",
+    response: `# AIXaaS Platform Value for UKI
+
+## Core Capabilities
+
+### 1. AI Governance & Audit Trail
+- **Full audit logging** of every query with complete traceability [UKI-AIXaaS-Value-Proposition.md]
+- **FERPA-compliant by design** — zero student PII leaves the governed environment
+- Extends to Title IV financial aid, SACSCOC accreditation, ADA, GDPR, and SOC 2 Type II [UKI-Compliance-Coverage.md]
+
+### 2. Cost Intelligence & Anomaly Detection
+- Automatic detection of spending anomalies in operational data
+- Identified **$687K in unresolved variance** across flagged invoices — processed in seconds [UKI-AIXaaS-Value-Proposition.md]
+
+### 3. Knowledge Consolidation & Rapid Retrieval
+- **171,000+ document chunks** currently indexed from enterprise documents, audio, and web sources
+- Sub-second retrieval across the consolidated knowledge base
+
+---
+
+## Compliance Coverage
+
+| Regulation | Mechanism |
+|-----------|-----------|
+| **FERPA** | PII masking; student namespace isolation |
+| **Title IV** | Audit trail on all financial aid-adjacent queries |
+| **SACSCOC** | Documentation management for accreditation evidence |
+| **GDPR** | Data residency controls; right-to-deletion capability |
+| **SOC 2 Type II** | Encryption at rest & in transit; full access controls |
+| **ADA** | All outputs accessible; no image-only responses |
+
+## Inflexis Continuum Roadmap for UKI
+
+- **Phase 1 (0–90 days):** Governance framework & AI policy documentation deployment
+- **Phase 2 (90–180 days):** Knowledge base consolidation — ingest all policy documents, contracts, curricula
+- **Phase 3 (180–360 days):** Automated compliance reporting and cost variance alerts
+- **Phase 4 (360+ days):** Predictive intelligence layers and strategic scenario modeling [UKI-Continuum-Roadmap.md]`
+  }
+];
+
+const SCRIPT_SECTIONS = [
+  { id:'ss-0', speech: "What you're looking at right now is AIXaaS — the AI intelligence platform built by Inflexis. I'm Josh Williams, presenting to Tony at Ultimate Knowledge Institute. This is a live, governed AI knowledge platform. UKI's actual operational data has already been ingested — documents, spend reports, compliance frameworks, strategic plans. Everything you're about to see is real output from real data." },
+  { id:'ss-1', speech: "I'm going to start with a spend analysis. The Pattern Library on the left has pre-built queries tuned for UKI's data. I'll click Spend Analysis." },
+  { id:'ss-2', speech: "The query auto-populated. Clicking Run Query. Watch the Knowledge Base — it's retrieving chunks from UKI's actual spend documents." },
+  { id:'ss-3', speech: "There it is. Q1 2026 operational spend — $2.8 million total, broken down by category. IT Infrastructure at 32%, Facilities at 31%. And look at this — $681,400 in flagged anomalies across 5 invoices. The platform found that automatically. No SQL, no spreadsheet, no analyst. That finding happened in under 2 seconds. The sources at the bottom show exactly which documents were used." },
+  { id:'ss-4', speech: "Now let me ask the question that keeps compliance officers up at night. AI governance. I'm clicking the AI Governance Pain Points pattern." },
+  { id:'ss-5', speech: "Running the governance analysis against UKI's documented pain points and technology inventory." },
+  { id:'ss-6', speech: "Here's the governance picture at UKI right now. 200 faculty members are actively using ChatGPT — with zero audit trail. That's $48,000 a year in ungoverned AI spend. No documented policy. No visibility into what student data is being exposed. And Tony — SACSCOC reaffirmation is due in 2027. Uncontrolled AI usage would be a material accreditation finding. This platform solves that. Every query, every interaction, logged with complete traceability." },
+  { id:'ss-7', speech: "Last one — let me show you how AIXaaS specifically addresses UKI's pain points. The value proposition query." },
+  { id:'ss-8', speech: "Six compliance frameworks, all handled by design. FERPA, Title IV, SACSCOC, GDPR, SOC 2. And a four-phase implementation roadmap — governance framework in 90 days, full knowledge base consolidation in 180 days, automated compliance reporting in a year. This is how UKI moves from ungoverned AI pilots to enterprise-grade governed intelligence. Every question answered by your own data. Every answer auditable. This is governance-first AI." },
+  { id:'ss-9', speech: "See that ADR pill in the response? That's Architectural Decision Record zero-zero-forty-four. Every interaction on this platform creates one. Complete chain of custody for every AI query. This is what Tony's institution needs before AI governance becomes a regulatory requirement." }
+];
+
+const TOTAL_MS = 240000; // 4 minutes
+
+/* ── TIMELINE STEPS ─────────────────────────────────────────── */
+// time in ms from start
+const STEPS = [
+  // t=0: KB connecting animation
+  { time: 0, section: 0, narration: "What you're looking at right now is AIXaaS — the AI intelligence platform built by Inflexis.", action: () => {
+    setNarration(SCRIPT_SECTIONS[0].speech.slice(0,90) + "…");
+    speak(SCRIPT_SECTIONS[0].speech);
+    highlightSection(0);
+    moveCursorToEl('status-indicator');
+  }},
+
+  // t=1000: KB ready
+  { time: 1000, action: () => {
+    setStatusReady();
+    moveCursorToEl('domain-select');
+  }},
+
+  // t=5000: move cursor to pattern 1
+  { time: 5000, section: 1, narration: "Starting with Spend Analysis — pre-built query tuned for UKI's data.", action: () => {
+    setNarration("I'm going to start with a spend analysis. The Pattern Library on the left has pre-built queries…");
+    speak(SCRIPT_SECTIONS[1].speech);
+    highlightSection(1);
+    moveCursorToEl('pat-q1');
+  }},
+
+  // t=8500: click pattern 1
+  { time: 8500, action: () => {
+    clickPattern(0);
+    moveCursorToEl('pat-q1');
+    clickCursorAnim();
+  }},
+
+  // t=10500: move to Run button
+  { time: 10500, section: 2, narration: "The query auto-populated. Clicking Run Query. Watch the Knowledge Base…", action: () => {
+    setNarration("The query auto-populated. Clicking Run Query. Watch the Knowledge Base…");
+    speak(SCRIPT_SECTIONS[2].speech);
+    highlightSection(2);
+    moveCursorToEl('run-btn');
+  }},
+
+  // t=13000: click run — start streaming Q1
+  { time: 13000, action: () => {
+    clickCursorAnim();
+    startQueryStream(0);
+  }},
+
+  // t=14000: narration during stream
+  { time: 14000, section: 3, narration: "There it is — Q1 2026 spend breakdown. $2.8M total. $681K in flagged anomalies.", action: () => {
+    setNarration("There it is. Q1 2026 operational spend — $2.8 million total. IT Infrastructure at 32%…");
+    speak(SCRIPT_SECTIONS[3].speech);
+    highlightSection(3);
+    moveCursorToEl('response-body');
+  }},
+
+  // t=52000: scroll to response, show anomaly insight in right panel
+  { time: 52000, action: () => {
+    showRightPanelMsg("🔍 Anomaly detected: 5 invoices totaling $681,400 flagged in Q1 spend. Recommend immediate review.", 'ai');
+    scrollMainToResponse();
+  }},
+
+  // t=60000: move to pattern 2
+  { time: 60000, section: 4, narration: "Now — the question that keeps compliance officers up at night. AI governance.", action: () => {
+    setNarration("Now let me ask the question that keeps compliance officers up at night. AI governance.");
+    speak(SCRIPT_SECTIONS[4].speech);
+    highlightSection(4);
+    moveCursorToEl('pat-q2');
+  }},
+
+  // t=63000: click pattern 2
+  { time: 63000, action: () => {
+    clickPattern(1);
+    clickCursorAnim();
+  }},
+
+  // t=65000: move to run button
+  { time: 65000, section: 5, narration: "Running governance analysis against UKI's pain points and technology inventory.", action: () => {
+    setNarration("Running the governance analysis against UKI's documented pain points and technology inventory.");
+    speak(SCRIPT_SECTIONS[5].speech);
+    highlightSection(5);
+    moveCursorToEl('run-btn');
+  }},
+
+  // t=68000: click run — start Q2
+  { time: 68000, action: () => {
+    clickCursorAnim();
+    startQueryStream(1);
+  }},
+
+  // t=69000: narration during Q2 stream
+  { time: 69000, section: 6, narration: "200 faculty using ChatGPT with zero audit trail. $48K/yr ungoverned. SACSCOC at risk in 2027.", action: () => {
+    setNarration("Here's the governance picture at UKI right now. 200 faculty using ChatGPT — with zero audit trail…");
+    speak(SCRIPT_SECTIONS[6].speech);
+    highlightSection(6);
+    moveCursorToEl('response-body');
+  }},
+
+  // t=120000: show right panel system insight
+  { time: 120000, action: () => {
+    showRightPanelMsg("⚠️ SACSCOC reaffirmation 2027: Uncontrolled AI usage flagged as material risk. Recommend governance framework deployment in next 90 days.", 'system');
+  }},
+
+  // t=130000: move to pattern 3
+  { time: 130000, section: 7, narration: "Last one — the full value proposition. How AIXaaS addresses UKI's pain points.", action: () => {
+    setNarration("Last one — let me show you how AIXaaS specifically addresses UKI's pain points.");
+    speak(SCRIPT_SECTIONS[7].speech);
+    highlightSection(7);
+    moveCursorToEl('pat-q3');
+  }},
+
+  // t=133000: click pattern 3
+  { time: 133000, action: () => {
+    clickPattern(2);
+    clickCursorAnim();
+  }},
+
+  // t=135000: move to run, run Q3
+  { time: 135000, section: 8, narration: "Six compliance frameworks handled by design. Four-phase roadmap to governed intelligence.", action: () => {
+    setNarration("Six compliance frameworks, all handled by design. FERPA, Title IV, SACSCOC, GDPR, SOC 2…");
+    speak(SCRIPT_SECTIONS[8].speech);
+    highlightSection(8);
+    moveCursorToEl('run-btn');
+  }},
+
+  { time: 137000, action: () => {
+    clickCursorAnim();
+    startQueryStream(2);
+    moveCursorToEl('response-body');
+  }},
+
+  // t=200000: final section — ADR explanation
+  { time: 200000, section: 9, narration: "See that ADR pill? Every interaction creates a complete chain of custody. Governance-first AI.", action: () => {
+    setNarration("See that ADR pill in the response? Every interaction on this platform creates a chain of custody.");
+    speak(SCRIPT_SECTIONS[9].speech);
+    highlightSection(9);
+    moveCursorToEl('response-adr');
+  }},
+
+  // t=230000: demo end
+  { time: 230000, action: () => {
+    setNarration("Demo complete. AIXaaS — Governance-first AI for UKI.");
+    moveCursorToEl('status-indicator');
+  }}
+];
+
+/* ── ENGINE STATE ────────────────────────────────────────────── */
+let running = false;
+let muted = false;
+let speedMultiplier = 1.0;
+let startWallTime = null;
+let pausedAt = 0;
+let rafId = null;
+let nextStepIdx = 0;
+let currentStreamCancel = null;
+let currentSection = -1;
+
+/* ── MARKDOWN RENDERER ───────────────────────────────────────── */
+function renderMarkdown(raw) {
+  const lines = raw.split('\n');
+  let html = '';
+  let inTable = false;
+  let tableRows = [];
+
+  function flushTable() {
+    if (!tableRows.length) return;
+    let th = '';
+    let tb = '';
+    // first row = headers, second = separator, rest = data
+    const headers = tableRows[0];
+    th = '<tr>' + headers.map(h => `<th>${parseLine(h)}</th>`).join('') + '</tr>';
+    for (let i = 2; i < tableRows.length; i++) {
+      tb += '<tr>' + tableRows[i].map(c => `<td>${parseLine(c)}</td>`).join('') + '</tr>';
+    }
+    html += `<div class="md-table-wrap"><table class="md-table"><thead>${th}</thead><tbody>${tb}</tbody></table></div>`;
+    tableRows = [];
+    inTable = false;
+  }
+
+  function parseLine(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<span class="md-bold">$1</span>')
+      .replace(/`(.+?)`/g, '<span class="md-inline-code">$1</span>')
+      .replace(/\[([^\]]+\.md)\]/g, '<span class="md-source-chip">$1</span>');
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Table detection
+    if (line.trim().startsWith('|')) {
+      if (!inTable) inTable = true;
+      const cells = line.split('|').slice(1,-1).map(c => c.trim());
+      // Skip separator rows
+      if (!cells.every(c => /^[-: ]+$/.test(c))) {
+        tableRows.push(cells);
+      }
+      continue;
+    } else if (inTable) {
+      flushTable();
+    }
+
+    if (line.startsWith('### ')) {
+      html += `<div class="md-h3">${parseLine(line.slice(4))}</div>`;
+    } else if (line.startsWith('## ')) {
+      html += `<div class="md-h2">${parseLine(line.slice(3))}</div>`;
+    } else if (line.startsWith('# ')) {
+      html += `<div class="md-h1">${parseLine(line.slice(2))}</div>`;
+    } else if (line.startsWith('---')) {
+      html += `<hr class="md-hr">`;
+    } else if (line.startsWith('- ')) {
+      html += `<ul class="md-ul"><li class="md-li">${parseLine(line.slice(2))}</li></ul>`;
+    } else if (line.trim() === '') {
+      // blank line — do nothing (handled by margins)
+    } else {
+      html += `<p class="md-p">${parseLine(line)}</p>`;
+    }
+  }
+  if (inTable) flushTable();
+  return html;
+}
+
+/* ── STREAMING LOGIC ─────────────────────────────────────────── */
+let activeStreamQ = null;
+
+function startQueryStream(queryIdx) {
+  // Cancel any in-progress stream
+  if (currentStreamCancel) { currentStreamCancel(); currentStreamCancel = null; }
+
+  const q = QUERIES[queryIdx];
+  activeStreamQ = queryIdx;
+
+  // Reset response area
+  const empty = document.getElementById('response-empty');
+  const body = document.getElementById('response-body');
+  const sources = document.getElementById('response-sources');
+  const adrEl = document.getElementById('response-adr');
+  const metaEl = document.getElementById('response-meta');
+
+  empty.style.display = 'none';
+  body.classList.add('visible');
+  body.innerHTML = '<span class="stream-cursor"></span>';
+  sources.classList.remove('visible');
+  adrEl.classList.remove('visible');
+  metaEl.classList.remove('visible');
+
+  document.getElementById('response-subtitle').textContent = 'Generating response…';
+  document.getElementById('chunk-count').textContent = '3,936';
+
+  // Mark pattern active
+  ['pat-q1','pat-q2','pat-q3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('qp-pattern-active');
+  });
+  const patIds = ['pat-q1','pat-q2','pat-q3'];
+  if (patIds[queryIdx]) document.getElementById(patIds[queryIdx]).classList.add('qp-pattern-active');
+
+  // Stream characters
+  const text = q.response;
+  const chunkSize = 40;
+  const delayMs = 30 / speedMultiplier;
+  let pos = 0;
+  let cancelled = false;
+  let rendered = '';
+
+  currentStreamCancel = () => { cancelled = true; };
+
+  function streamChunk() {
+    if (cancelled) return;
+    if (pos >= text.length) {
+      // Done streaming — show final rendered content
+      body.innerHTML = renderMarkdown(text);
+      showPostStream(q);
+      currentStreamCancel = null;
+      return;
+    }
+    const chunk = text.slice(pos, pos + chunkSize);
+    rendered += chunk;
+    pos += chunkSize;
+
+    // Incremental render
+    body.innerHTML = renderMarkdown(rendered) + '<span class="stream-cursor"></span>';
+
+    // Auto-scroll response card
+    const main = document.getElementById('qp-main');
+    main.scrollTop = main.scrollHeight;
+
+    setTimeout(streamChunk, delayMs);
+  }
+
+  setTimeout(streamChunk, 100);
+}
+
+function showPostStream(q) {
+  const sources = document.getElementById('response-sources');
+  const chips = document.getElementById('source-chips');
+  const adrEl = document.getElementById('response-adr');
+  const metaEl = document.getElementById('response-meta');
+
+  chips.innerHTML = q.sources.map(s => `<span class="md-source-chip">${s}</span>`).join('');
+  sources.classList.add('visible');
+
+  setTimeout(() => {
+    adrEl.innerHTML = `<span class="adr-pill"><span class="adr-dot"></span>${q.adr}</span><span style="font-size:10px;color:var(--qp-muted);">Change record logged</span>`;
+    adrEl.classList.add('visible');
+  }, 400);
+
+  setTimeout(() => {
+    metaEl.innerHTML = [
+      `<span class="qp-meta-chip">⏱ ${q.time}</span>`,
+      `<span class="qp-meta-chip">📦 ${q.chunks} chunks</span>`,
+      `<span class="qp-meta-chip">🤖 ${q.model}</span>`
+    ].join('');
+    metaEl.classList.add('visible');
+    document.getElementById('response-subtitle').textContent = `Response complete — ${q.time}`;
+  }, 700);
+
+  scrollMainToResponse();
+}
+
+/* ── PATTERN CLICK ───────────────────────────────────────────── */
+function selectPattern(idx) {
+  const q = QUERIES[idx];
+  if (!q) return;
+  const ta = document.getElementById('query-textarea');
+  ta.value = q.text;
+  ta.classList.add('typing');
+  setTimeout(() => ta.classList.remove('typing'), 1200);
+  document.getElementById('char-count').textContent = `${q.text.length} / 2000`;
+  document.getElementById('active-pattern-label').textContent = ['Spend Analysis','AI Governance Pain Points','AIXaaS Value for UKI'][idx] || '';
+
+  // Highlight in pattern list
+  ['pat-q1','pat-q2','pat-q3'].forEach(id => {
+    document.getElementById(id)?.classList.remove('qp-pattern-active');
+  });
+  const patEl = document.getElementById(['pat-q1','pat-q2','pat-q3'][idx]);
+  if (patEl) patEl.classList.add('qp-pattern-active');
+}
+
+function clickPattern(idx) {
+  selectPattern(idx);
+}
+
+/* ── STATUS ──────────────────────────────────────────────────── */
+function setStatusReady() {
+  document.getElementById('status-dot').className = 'qp-status-dot green';
+  document.getElementById('status-text').textContent = 'Knowledge Base Ready — 3,936 chunks';
+  document.getElementById('chunk-count').textContent = '3,936';
+}
+
+/* ── RIGHT PANEL MESSAGES ────────────────────────────────────── */
+function showRightPanelMsg(text, type) {
+  const chat = document.getElementById('rp-chat');
+  const empty = document.getElementById('rp-empty');
+  if (empty) empty.style.display = 'none';
+  const msg = document.createElement('div');
+  msg.className = `rp-msg rp-msg-${type}`;
+  msg.textContent = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ── CURSOR ──────────────────────────────────────────────────── */
+const cursor = document.getElementById('demo-cursor');
+let cursorX = window.innerWidth / 2;
+let cursorY = 100;
+cursor.style.left = cursorX + 'px';
+cursor.style.top = cursorY + 'px';
+
+function moveCursorToEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  cursor.style.left = x + 'px';
+  cursor.style.top = y + 'px';
+}
+
+function clickCursorAnim() {
+  cursor.classList.remove('clicking');
+  void cursor.offsetWidth;
+  cursor.classList.add('clicking');
+  setTimeout(() => cursor.classList.remove('clicking'), 300);
+}
+
+/* ── NARRATION ───────────────────────────────────────────────── */
+function setNarration(text) {
+  document.getElementById('narration-text').textContent = text;
+}
+
+/* ── SCRIPT SIDEBAR ──────────────────────────────────────────── */
+function highlightSection(idx) {
+  if (currentSection === idx) return;
+  currentSection = idx;
+  document.querySelectorAll('.script-section').forEach(el => el.classList.remove('active'));
+  const sec = document.getElementById(SCRIPT_SECTIONS[idx]?.id);
+  if (sec) {
+    sec.classList.add('active');
+    sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* ── WEB SPEECH ──────────────────────────────────────────────── */
+let speechEnabled = true;
+const synth = window.speechSynthesis;
+let voicesLoaded = false;
+
+function loadVoices() {
+  if (voicesLoaded) return;
+  synth.getVoices();
+  voicesLoaded = true;
+}
+if (synth.onvoiceschanged !== undefined) {
+  synth.onvoiceschanged = () => { voicesLoaded = true; };
+}
+
+function speak(text, rate) {
+  if (muted || !speechEnabled) return;
+  loadVoices();
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = (rate || 1.0) * speedMultiplier;
+  u.pitch = 1.0;
+  u.volume = 1.0;
+  const voices = synth.getVoices();
+  const preferred = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
+    || voices.find(v => v.lang.startsWith('en-US'))
+    || voices.find(v => v.lang.startsWith('en'))
+    || voices[0];
+  if (preferred) u.voice = preferred;
+  synth.speak(u);
+}
+
+/* ── TIMELINE ENGINE ─────────────────────────────────────────── */
+function getElapsed() {
+  if (!running) return pausedAt;
+  return (performance.now() - startWallTime) * speedMultiplier + pausedAt;
+}
+
+function tick(now) {
+  if (!running) return;
+
+  const elapsed = (now - startWallTime) * speedMultiplier + pausedAt;
+  const clampedElapsed = Math.min(elapsed, TOTAL_MS);
+
+  // Update progress bar
+  const pct = (clampedElapsed / TOTAL_MS) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  // Update timestamp
+  const secs = Math.floor(clampedElapsed / 1000);
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  document.getElementById('timestamp-display').textContent =
+    `${m}:${String(s).padStart(2,'0')} / 4:00`;
+
+  // Fire pending steps
+  while (nextStepIdx < STEPS.length && STEPS[nextStepIdx].time <= clampedElapsed) {
+    const step = STEPS[nextStepIdx];
+    try { step.action(); } catch(e) { console.warn('Step error', e); }
+    nextStepIdx++;
+  }
+
+  if (clampedElapsed >= TOTAL_MS) {
+    pauseDemo();
+    return;
+  }
+
+  rafId = requestAnimationFrame(tick);
+}
+
+function playDemo() {
+  if (running) return;
+  running = true;
+  startWallTime = performance.now();
+  document.getElementById('play-btn').textContent = '⏸ Pause';
+  rafId = requestAnimationFrame(tick);
+}
+
+function pauseDemo() {
+  if (!running) return;
+  pausedAt = getElapsed();
+  running = false;
+  cancelAnimationFrame(rafId);
+  synth.pause();
+  document.getElementById('play-btn').textContent = '▶ Play';
+}
+
+function togglePlay() {
+  if (running) { pauseDemo(); } else {
+    if (pausedAt >= TOTAL_MS) { resetDemo(); return; }
+    synth.resume();
+    playDemo();
+  }
+}
+
+function resetDemo() {
+  pauseDemo();
+  pausedAt = 0;
+  nextStepIdx = 0;
+  currentSection = -1;
+  if (currentStreamCancel) { currentStreamCancel(); currentStreamCancel = null; }
+  synth.cancel();
+
+  // Reset UI
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('timestamp-display').textContent = '0:00 / 4:00';
+  document.getElementById('status-dot').className = 'qp-status-dot amber';
+  document.getElementById('status-text').textContent = 'Connecting to Knowledge Base...';
+  document.getElementById('chunk-count').textContent = '—';
+  document.getElementById('query-textarea').value = '';
+  document.getElementById('char-count').textContent = '0 / 2000';
+  document.getElementById('active-pattern-label').textContent = 'Select a pattern or type your query';
+  document.getElementById('response-empty').style.display = 'flex';
+  document.getElementById('response-body').classList.remove('visible');
+  document.getElementById('response-body').innerHTML = '';
+  document.getElementById('response-sources').classList.remove('visible');
+  document.getElementById('response-adr').classList.remove('visible');
+  document.getElementById('response-meta').classList.remove('visible');
+  document.getElementById('response-subtitle').textContent = 'Awaiting query';
+  document.getElementById('narration-text').textContent = 'Press Play to begin demo…';
+  document.getElementById('rp-chat').innerHTML = `<div class="rp-empty" id="rp-empty"><div class="rp-empty-icon">🤖</div><div>Run a query to activate AI Navigator insights</div></div>`;
+
+  // Remove pattern active
+  document.querySelectorAll('.qp-pattern-btn').forEach(el => el.classList.remove('qp-pattern-active'));
+  document.querySelectorAll('.script-section').forEach(el => el.classList.remove('active'));
+
+  playDemo();
+}
+
+function seekTo(e) {
+  const track = document.getElementById('progress-track');
+  const rect = track.getBoundingClientRect();
+  const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const targetMs = fraction * TOTAL_MS;
+
+  pauseDemo();
+  pausedAt = targetMs;
+
+  // Find the last step at or before this time
+  nextStepIdx = 0;
+  for (let i = 0; i < STEPS.length; i++) {
+    if (STEPS[i].time <= targetMs) nextStepIdx = i + 1;
+    else break;
+  }
+
+  playDemo();
+}
+
+function cycleSpeed() {
+  const speeds = [0.5, 1.0, 1.5, 2.0];
+  const cur = speeds.indexOf(speedMultiplier);
+  speedMultiplier = speeds[(cur + 1) % speeds.length];
+  document.getElementById('speed-btn').textContent = speedMultiplier + '×';
+}
+
+function toggleMute() {
+  muted = !muted;
+  const btn = document.getElementById('mute-btn');
+  if (muted) {
+    synth.cancel();
+    btn.textContent = '🔇 Muted';
+    btn.classList.add('active');
+  } else {
+    btn.textContent = '🔊 Voice';
+    btn.classList.remove('active');
+  }
+}
+
+let scriptVisible = true;
+function toggleScript() {
+  scriptVisible = !scriptVisible;
+  const sidebar = document.getElementById('script-sidebar');
+  const narBar = document.getElementById('narration-bar');
+  const btn = document.getElementById('script-btn');
+  if (scriptVisible) {
+    sidebar.classList.remove('hidden');
+    narBar.classList.remove('script-hidden');
+    btn.classList.add('active');
+    btn.textContent = '≡ Script';
+  } else {
+    sidebar.classList.add('hidden');
+    narBar.classList.add('script-hidden');
+    btn.classList.remove('active');
+    btn.textContent = '≡ Script';
+  }
+}
+
+function toggleCategory(name) {
+  const el = document.getElementById(`patterns-${name}`);
+  const chev = document.getElementById(`chev-${name}`);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : '';
+  if (chev) chev.textContent = open ? '▸' : '▾';
+}
+
+function clearQuery() {
+  document.getElementById('query-textarea').value = '';
+  document.getElementById('char-count').textContent = '0 / 2000';
+}
+
+function manualRun() {
+  const ta = document.getElementById('query-textarea');
+  if (!ta.value.trim()) return;
+  // Find matching query
+  for (let i = 0; i < QUERIES.length; i++) {
+    if (ta.value.includes(QUERIES[i].text.slice(0, 30))) {
+      startQueryStream(i);
+      return;
+    }
+  }
+  startQueryStream(0); // default
+}
+
+function scrollMainToResponse() {
+  const main = document.getElementById('qp-main');
+  const card = document.querySelector('.qp-response-card');
+  if (main && card) {
+    main.scrollTo({ top: card.offsetTop - 8, behavior: 'smooth' });
+  }
+}
+
+/* ── KEYBOARD SHORTCUTS ──────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  if (e.code === 'KeyR') { e.preventDefault(); resetDemo(); }
+  if (e.code === 'KeyM') { e.preventDefault(); toggleMute(); }
+  if (e.code === 'KeyS') { e.preventDefault(); toggleScript(); }
+});
+
+/* ── TEXTAREA CHAR COUNT ─────────────────────────────────────── */
+document.getElementById('query-textarea').addEventListener('input', function() {
+  document.getElementById('char-count').textContent = `${this.value.length} / 2000`;
+});
+
+/* ── INIT ────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  // Show script by default
+  document.getElementById('script-btn').classList.add('active');
+
+  // Start demo after brief delay
+  setTimeout(() => {
+    playDemo();
+  }, 800);
+});
+
+// Fix app-wrapper height on sidebar toggle
+function updateLayout() {
+  const sidebarW = scriptVisible ? 340 : 0;
+  document.getElementById('app-wrapper').style.right = sidebarW + 'px';
+}
+// Initial call
+document.getElementById('app-wrapper').style.right = '340px';
+
+</script>
+</body>
+</html>
