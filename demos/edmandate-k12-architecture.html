@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>EdMandate™ Powered by Inflexis — K-12 Architecture</title>
+  <style>
+    :root {
+      --qp-bg: #0a0e1a;
+      --qp-panel: #0f1523;
+      --qp-card: #141928;
+      --qp-deep: #090d17;
+      --qp-border: rgba(255,255,255,0.08);
+      --qp-text: #e8eaf0;
+      --qp-muted: #6b7280;
+      --qp-dim: #374151;
+      --qp-blue: #3b82f6;
+      --qp-cyan: #22d3ee;
+      --qp-green: #10b981;
+      --qp-amber: #f59e0b;
+      --qp-purple: #a855f7;
+      --qp-red: #ef4444;
+      --qp-glow: rgba(59,130,246,0.25);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--qp-bg);
+      color: var(--qp-text);
+      font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Brand bar ── */
+    .brand-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 24px;
+      background: var(--qp-deep);
+      border-bottom: 1px solid var(--qp-border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .brand-bar .title { font-size: 15px; font-weight: 700; color: var(--qp-text); }
+    .brand-bar .separator { color: var(--qp-dim); }
+    .brand-bar .subtitle { font-size: 13px; color: var(--qp-muted); }
+    .brand-badge {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 3px 10px; border-radius: 4px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(34,211,238,0.15));
+      border: 1px solid rgba(59,130,246,0.4);
+      color: var(--qp-cyan);
+    }
+    .ip-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+      background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3);
+      color: var(--qp-purple); margin-left: auto;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Section header ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .page-header h1 {
+      font-size: 28px; font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #3b82f6, #22d3ee);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      font-size: 14px; color: var(--qp-muted); max-width: 640px; margin: 0 auto;
+    }
+    .mandate-label {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+      background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4);
+      color: var(--qp-purple); letter-spacing: 1px; text-transform: uppercase;
+    }
+
+    /* ── Grid layout ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── 3-Layer architecture ── */
+    .layers-section {}
+    .layer {
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 0;
+      position: relative;
+    }
+    .layer + .layer { margin-top: 0; }
+    .layer-connector {
+      display: flex; justify-content: center; align-items: center;
+      height: 36px; position: relative;
+    }
+    .connector-line {
+      width: 2px; height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--qp-dim), transparent);
+      position: absolute;
+    }
+    .connector-arrow {
+      font-size: 20px; color: var(--qp-dim); z-index: 1;
+      background: var(--qp-bg); padding: 0 8px;
+    }
+    .connector-label {
+      font-size: 10px; color: var(--qp-muted); z-index: 1;
+      background: var(--qp-bg); padding: 0 8px; letter-spacing: 0.5px;
+    }
+
+    /* Governance layer */
+    .layer-governance {
+      background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%);
+      border: 2px solid rgba(168,85,247,0.35);
+      box-shadow: 0 4px 24px rgba(168,85,247,0.1);
+    }
+    .layer-execution {
+      background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(34,211,238,0.04) 100%);
+      border: 2px solid rgba(59,130,246,0.35);
+      box-shadow: 0 4px 24px rgba(59,130,246,0.1);
+    }
+    .layer-district {
+      background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.02) 100%);
+      border: 2px solid rgba(16,185,129,0.25);
+    }
+    .layer-header {
+      display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px;
+    }
+    .layer-icon { font-size: 32px; flex-shrink: 0; }
+    .layer-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .layer-governance .layer-title { color: #c084fc; }
+    .layer-execution .layer-title { color: var(--qp-cyan); }
+    .layer-district .layer-title { color: var(--qp-green); }
+    .layer-owner {
+      font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 4px;
+      display: inline-block;
+    }
+    .layer-governance .layer-owner {
+      background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3);
+    }
+    .layer-execution .layer-owner {
+      background: rgba(59,130,246,0.15); color: var(--qp-cyan); border: 1px solid rgba(59,130,246,0.3);
+    }
+    .layer-district .layer-owner {
+      background: rgba(16,185,129,0.12); color: var(--qp-green); border: 1px solid rgba(16,185,129,0.25);
+    }
+    .layer-desc { font-size: 13px; color: var(--qp-muted); margin-top: 6px; }
+
+    .layer-items {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;
+    }
+    .layer-item {
+      padding: 8px 14px; border-radius: 8px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .layer-governance .layer-item {
+      background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: #e9d5ff;
+    }
+    .layer-execution .layer-item {
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #bfdbfe;
+    }
+    .layer-district .layer-item {
+      background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #a7f3d0;
+    }
+    .item-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .layer-governance .item-dot { background: #c084fc; }
+    .layer-execution .item-dot { background: var(--qp-cyan); }
+    .layer-district .item-dot { background: var(--qp-green); }
+
+    /* ── API contract callout ── */
+    .api-contract {
+      margin-top: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.25);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .api-contract-label { font-size: 11px; font-weight: 700; color: var(--qp-amber); }
+    .api-contract-desc { font-size: 11px; color: var(--qp-muted); }
+
+    /* ── Side panels ── */
+    .side-panels { display: flex; flex-direction: column; gap: 16px; }
+
+    .panel {
+      background: var(--qp-panel);
+      border: 1px solid var(--qp-border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .panel-title {
+      font-size: 13px; font-weight: 700; color: var(--qp-text);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel-title .panel-icon { font-size: 16px; }
+
+    /* Ohio stats panel */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card {
+      padding: 14px; border-radius: 10px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      text-align: center;
+    }
+    .stat-number { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 10px; color: var(--qp-muted); line-height: 1.3; }
+    .stat-blue .stat-number { color: var(--qp-blue); }
+    .stat-purple .stat-number { color: #c084fc; }
+    .stat-amber .stat-number { color: var(--qp-amber); }
+    .stat-green .stat-number { color: var(--qp-green); }
+
+    /* Timeline panel */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item {
+      display: flex; gap: 12px; position: relative; padding-bottom: 14px;
+    }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .tl-spine {
+      display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+    }
+    .tl-dot {
+      width: 10px; height: 10px; border-radius: 50%; margin-top: 3px; flex-shrink: 0;
+    }
+    .tl-line {
+      width: 2px; flex: 1; margin-top: 4px;
+      background: var(--qp-border);
+    }
+    .timeline-item:last-child .tl-line { display: none; }
+    .tl-phase { font-size: 10px; font-weight: 700; color: var(--qp-muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tl-name { font-size: 12px; font-weight: 600; color: var(--qp-text); margin-bottom: 2px; }
+    .tl-time { font-size: 10px; color: var(--qp-muted); }
+
+    .phase-1 .tl-dot { background: #c084fc; }
+    .phase-2 .tl-dot { background: var(--qp-blue); }
+    .phase-3 .tl-dot { background: var(--qp-cyan); }
+    .phase-4 .tl-dot { background: var(--qp-green); }
+    .phase-5 .tl-dot { background: var(--qp-amber); }
+    .phase-6 .tl-dot { background: var(--qp-red); }
+    .phase-7 .tl-dot { background: #f97316; }
+
+    /* Compliance panel */
+    .compliance-items { display: flex; flex-direction: column; gap: 8px; }
+    .compliance-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+    }
+    .ci-icon { font-size: 16px; flex-shrink: 0; }
+    .ci-title { font-size: 12px; font-weight: 700; color: var(--qp-text); }
+    .ci-desc { font-size: 10px; color: var(--qp-muted); margin-top: 1px; }
+    .ci-badge {
+      margin-left: auto; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px;
+    }
+    .badge-live { background: rgba(16,185,129,0.15); color: var(--qp-green); border: 1px solid rgba(16,185,129,0.3); }
+    .badge-build { background: rgba(245,158,11,0.12); color: var(--qp-amber); border: 1px solid rgba(245,158,11,0.3); }
+
+    /* RTI transform panel */
+    .rti-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .rti-side {
+      padding: 12px; border-radius: 8px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+    }
+    .rti-before .rti-side-title { color: var(--qp-red); font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .rti-after .rti-side-title { color: var(--qp-green); font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .rti-before { border-color: rgba(239,68,68,0.2); }
+    .rti-after { border-color: rgba(16,185,129,0.2); }
+    .rti-point {
+      font-size: 11px; color: var(--qp-muted); margin-bottom: 5px;
+      display: flex; align-items: flex-start; gap: 6px; line-height: 1.35;
+    }
+    .rti-point .dot { flex-shrink: 0; margin-top: 4px; }
+
+    /* Market data panel */
+    .market-items { display: flex; flex-direction: column; gap: 6px; }
+    .market-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 7px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      font-size: 11px;
+    }
+    .market-item .mi-label { color: var(--qp-muted); }
+    .market-item .mi-value { font-weight: 700; color: var(--qp-text); }
+    .market-item .mi-value.green { color: var(--qp-green); }
+    .market-item .mi-value.amber { color: var(--qp-amber); }
+    .market-item .mi-value.purple { color: #c084fc; }
+
+    /* IP callout */
+    .ip-callout {
+      margin-top: 24px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: rgba(168,85,247,0.06);
+      border: 1px solid rgba(168,85,247,0.25);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .ip-callout-icon { font-size: 20px; flex-shrink: 0; }
+    .ip-callout-title { font-size: 12px; font-weight: 700; color: #c084fc; margin-bottom: 4px; }
+    .ip-callout-body { font-size: 11px; color: var(--qp-muted); line-height: 1.6; }
+
+    /* Ohio mandate banner */
+    .mandate-banner {
+      padding: 14px 20px;
+      border-radius: 10px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.3);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .mb-icon { font-size: 20px; }
+    .mb-text { font-size: 12px; }
+    .mb-text strong { color: var(--qp-amber); }
+    .mb-text span { color: var(--qp-muted); }
+
+    /* Revenue model */
+    .rev-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .rev-table th {
+      font-size: 10px; font-weight: 700; color: var(--qp-muted);
+      text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--qp-border);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rev-table td {
+      font-size: 11px; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .rev-table tr:last-child td { border-bottom: none; font-weight: 700; color: var(--qp-green); }
+    .rev-table td:first-child { color: var(--qp-muted); }
+    .rev-table td:last-child { color: var(--qp-cyan); font-weight: 600; }
+
+    /* Footer */
+    .page-footer {
+      text-align: center; padding: 16px 24px;
+      border-top: 1px solid var(--qp-border);
+      font-size: 11px; color: var(--qp-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Brand bar -->
+  <div class="brand-bar">
+    <span class="brand-badge">AIXaaS</span>
+    <span class="title">EdMandate™ Powered by Inflexis</span>
+    <span class="separator">|</span>
+    <span class="subtitle">K-12 RTI Governance Architecture — Ohio Scale</span>
+    <span class="ip-badge">CONFIDENTIAL — Team Workspace</span>
+  </div>
+
+  <div class="page">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="mandate-label">EdMandate™ × AIXaaS Integration</div>
+      <h1>K-12 Governance + AI Orchestration Architecture</h1>
+      <p>How EdMandate's governance framework and Inflexis's AIXaaS execution engine combine to transform Response to Intervention (RTI) for Ohio's 611 school districts.</p>
+    </div>
+
+    <!-- Ohio mandate banner -->
+    <div class="mandate-banner">
+      <div class="mb-icon">&#9888;</div>
+      <div class="mb-text">
+        <strong>Ohio State Mandate Active — July 1, 2026 Deadline:</strong>
+        <span> All 611 Ohio public school districts must adopt a formal AI policy. Ohio is the first state in the nation to require this. A wave of vendor procurement is expected through Q2–Q3 2026.</span>
+      </div>
+    </div>
+
+    <div class="main-grid">
+
+      <!-- Left: 3-Layer Architecture -->
+      <div class="layers-section">
+
+        <!-- Layer 1: EdMandate Governance -->
+        <div class="layer layer-governance">
+          <div class="layer-header">
+            <div class="layer-icon">&#9878;</div>
+            <div>
+              <div class="layer-title">EdMandate™ Governance Layer</div>
+              <div class="layer-owner">MetHer by Design, LLC — Matt Meador, Ed.D</div>
+              <div class="layer-desc">The system of record. Defines the rules, policies, scoring rubrics, compliance requirements, and governance structure that the execution layer must enforce. <strong>This is Matt's proprietary IP.</strong></div>
+            </div>
+          </div>
+          <div class="layer-items">
+            <div class="layer-item"><div class="item-dot"></div>RTI Policy Engine</div>
+            <div class="layer-item"><div class="item-dot"></div>Student Risk Scoring (Tier 1–3)</div>
+            <div class="layer-item"><div class="item-dot"></div>Intervention Assignment Rules</div>
+            <div class="layer-item"><div class="item-dot"></div>IDEA / FERPA Compliance Rules</div>
+            <div class="layer-item"><div class="item-dot"></div>Accountability Rubrics</div>
+            <div class="layer-item"><div class="item-dot"></div>Governance Audit Framework</div>
+            <div class="layer-item"><div class="item-dot"></div>Ohio State Mandate Alignment</div>
+            <div class="layer-item"><div class="item-dot"></div>Educator Workgroup Structure</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="layer-connector">
+          <div class="connector-line"></div>
+          <div class="connector-label">&#11015; API Contract &nbsp;|&nbsp; Governance rules enforced by execution engine</div>
+        </div>
+
+        <!-- Layer 2: Inflexis Execution -->
+        <div class="layer layer-execution">
+          <div class="layer-header">
+            <div class="layer-icon">&#9881;&#65039;</div>
+            <div>
+              <div class="layer-title">Inflexis AIXaaS Execution Layer</div>
+              <div class="layer-owner">Inflexis — Bryan Shaw, CTO</div>
+              <div class="layer-desc">The engine. Multi-agent orchestration, data pipelines, dashboards, and workflow automation that operate <em>within</em> the EdMandate governance structure. Inflexis provides the AI horsepower; EdMandate defines the rules.</div>
+            </div>
+          </div>
+          <div class="layer-items">
+            <div class="layer-item"><div class="item-dot"></div>MAO Multi-Agent Orchestration</div>
+            <div class="layer-item"><div class="item-dot"></div>Universal RAG Knowledge Base</div>
+            <div class="layer-item"><div class="item-dot"></div>8-Role RBAC (district → teacher)</div>
+            <div class="layer-item"><div class="item-dot"></div>ADR Audit Trail (every decision)</div>
+            <div class="layer-item"><div class="item-dot"></div>Zero-Token PII Masking</div>
+            <div class="layer-item"><div class="item-dot"></div>Student Risk Dashboard Suite</div>
+            <div class="layer-item"><div class="item-dot"></div>Intervention Workflow Engine</div>
+            <div class="layer-item"><div class="item-dot"></div>Parent Communication Automation</div>
+            <div class="layer-item"><div class="item-dot"></div>State Reporting Automation</div>
+            <div class="layer-item"><div class="item-dot"></div>Semantic Cache (query optimization)</div>
+          </div>
+          <div class="api-contract">
+            <div class="api-contract-label">&#128274; IP Boundary</div>
+            <div class="api-contract-desc">Inflexis executes within governance constraints. No access to EdMandate source rules — only compiled policy API responses. Dual-container REST pattern: each party's code stays isolated.</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="layer-connector">
+          <div class="connector-line"></div>
+          <div class="connector-label">&#11015; MCP Connectors &nbsp;|&nbsp; SIS / LMS / Assessment data ingestion</div>
+        </div>
+
+        <!-- Layer 3: District Systems -->
+        <div class="layer layer-district">
+          <div class="layer-header">
+            <div class="layer-icon">&#127983;</div>
+            <div>
+              <div class="layer-title">District Systems (Existing Infrastructure)</div>
+              <div class="layer-owner">Client — Ohio K-12 Districts</div>
+              <div class="layer-desc">The data source. Existing school technology systems that EdMandate + AIXaaS connect to via MCP-pattern API connectors. No rip-and-replace — the platform layers on top of existing tools.</div>
+            </div>
+          </div>
+          <div class="layer-items">
+            <div class="layer-item"><div class="item-dot"></div>PowerSchool / Infinite Campus (SIS)</div>
+            <div class="layer-item"><div class="item-dot"></div>Canvas / Schoology (LMS)</div>
+            <div class="layer-item"><div class="item-dot"></div>Branching Minds / Panorama (MTSS)</div>
+            <div class="layer-item"><div class="item-dot"></div>i-Ready / Star Assessments</div>
+            <div class="layer-item"><div class="item-dot"></div>Attendance Tracking Systems</div>
+            <div class="layer-item"><div class="item-dot"></div>Behavior Incident Logs</div>
+            <div class="layer-item"><div class="item-dot"></div>Special Ed / IEP Platforms</div>
+          </div>
+        </div>
+
+        <!-- IP callout -->
+        <div class="ip-callout">
+          <div class="ip-callout-icon">&#169;</div>
+          <div>
+            <div class="ip-callout-title">Intellectual Property Attribution</div>
+            <div class="ip-callout-body">
+              <strong>EdMandate™</strong> is the proprietary intellectual property of <strong>MetHer by Design, LLC</strong> (Matt Meador, Ed.D — matt@metherbydesign.com). EdMandate is the governance system itself — not a concept to be implemented into a platform. Any commercial use requires a licensing agreement. Correct positioning: <em>"EdMandate™ Powered by Inflexis"</em> — governance is Matt's, execution is Inflexis's.<br><br>
+              The Inflexis MAO platform, AIXaaS architecture, and all execution-layer code are the proprietary IP of <strong>Inflexis</strong> (Bryan Shaw, CTO — bryan.shaw@inflexis.ai).
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Side panels -->
+      <div class="side-panels">
+
+        <!-- Ohio Scale panel -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#127979;</span> Ohio Market Scale</div>
+          <div class="stat-grid">
+            <div class="stat-card stat-blue">
+              <div class="stat-number">611</div>
+              <div class="stat-label">Public School Districts</div>
+            </div>
+            <div class="stat-card stat-purple">
+              <div class="stat-number">3,055</div>
+              <div class="stat-label">Schools Statewide</div>
+            </div>
+            <div class="stat-card stat-amber">
+              <div class="stat-number">July 1</div>
+              <div class="stat-label">2026 AI Policy Deadline</div>
+            </div>
+            <div class="stat-card stat-green">
+              <div class="stat-number">$30M+</div>
+              <div class="stat-label">Ohio ARR Potential</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market context -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#128200;</span> 2026 Market Context</div>
+          <div class="market-items">
+            <div class="market-item">
+              <span class="mi-label">AI K-12 market CAGR</span>
+              <span class="mi-value green">39.3%</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">States with AI mandates/guidance</span>
+              <span class="mi-value amber">28+</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">Districts using AI tools</span>
+              <span class="mi-value">850+</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">MTSS full implementation rate</span>
+              <span class="mi-value amber">42%</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">Admins w/ no formal AI policy</span>
+              <span class="mi-value amber">95%</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">Trust in agentic AI (enterprises)</span>
+              <span class="mi-value amber">6%</span>
+            </div>
+            <div class="market-item">
+              <span class="mi-label">AI K-12 spend → 2032 projection</span>
+              <span class="mi-value green">$5.24B</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RTI transformation panel -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#128260;</span> RTI Transformation</div>
+          <div class="rti-compare">
+            <div class="rti-side rti-before">
+              <div class="rti-side-title">&#10060; Today (Manual)</div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Quarterly screening, stale data</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Manual tier placement</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Fragmented SIS/LMS tools</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Paper-based IEP docs</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>No audit trail for decisions</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Manual parent outreach</span></div>
+            </div>
+            <div class="rti-side rti-after">
+              <div class="rti-side-title">&#9989; With EdMandate + AIXaaS</div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Real-time risk scoring</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>AI-assisted tier placement</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Unified cross-system view</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Auto-generated IEP docs</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>ADR audit on every decision</span></div>
+              <div class="rti-point"><span class="dot">&#8226;</span><span>Automated parent texts (40–50% response)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7-Phase timeline -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#128197;</span> 7-Phase Deployment Model</div>
+          <div class="timeline">
+            <div class="timeline-item phase-1">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 1</div><div class="tl-name">Foundation Readiness</div><div class="tl-time">Weeks 1–4</div></div>
+            </div>
+            <div class="timeline-item phase-2">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 2</div><div class="tl-name">Strategic Alignment</div><div class="tl-time">Weeks 3–6</div></div>
+            </div>
+            <div class="timeline-item phase-3">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 3</div><div class="tl-name">Knowledge Structuring</div><div class="tl-time">Weeks 5–8</div></div>
+            </div>
+            <div class="timeline-item phase-4">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 4</div><div class="tl-name">Orchestration Deployment</div><div class="tl-time">Weeks 7–10</div></div>
+            </div>
+            <div class="timeline-item phase-5">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 5</div><div class="tl-name">Governance Activation</div><div class="tl-time">Week 10</div></div>
+            </div>
+            <div class="timeline-item phase-6">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 6</div><div class="tl-name">Agentic Expansion</div><div class="tl-time">Months 3–6</div></div>
+            </div>
+            <div class="timeline-item phase-7">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div><div class="tl-phase">Phase 7</div><div class="tl-name">Autonomous Optimization</div><div class="tl-time">Months 6–18</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance panel -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#9989;</span> Compliance Coverage</div>
+          <div class="compliance-items">
+            <div class="compliance-item">
+              <div class="ci-icon">&#128272;</div>
+              <div>
+                <div class="ci-title">FERPA</div>
+                <div class="ci-desc">Student data privacy — PII masking + DPA required</div>
+              </div>
+              <div class="ci-badge badge-live">LIVE</div>
+            </div>
+            <div class="compliance-item">
+              <div class="ci-icon">&#127919;</div>
+              <div>
+                <div class="ci-title">IDEA</div>
+                <div class="ci-desc">Individualized intervention + IEP audit trail</div>
+              </div>
+              <div class="ci-badge badge-build">BUILD</div>
+            </div>
+            <div class="compliance-item">
+              <div class="ci-icon">&#128100;</div>
+              <div>
+                <div class="ci-title">COPPA 2025</div>
+                <div class="ci-desc">Parental consent; eff. April 22, 2026</div>
+              </div>
+              <div class="ci-badge badge-build">BUILD</div>
+            </div>
+            <div class="compliance-item">
+              <div class="ci-icon">&#127982;</div>
+              <div>
+                <div class="ci-title">Ohio AI Mandate</div>
+                <div class="ci-desc">Workgroup structure + policy audit by July 1, 2026</div>
+              </div>
+              <div class="ci-badge badge-build">BUILD</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue model -->
+        <div class="panel">
+          <div class="panel-title"><span class="panel-icon">&#128176;</span> Revenue Model (Ohio Only)</div>
+          <table class="rev-table">
+            <thead>
+              <tr><th>Scope</th><th>Districts</th><th>$/District/Yr</th><th>ARR</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Pilot</td><td>3</td><td>$25,000</td><td>$75K</td></tr>
+              <tr><td>Early Adoption</td><td>50</td><td>$15–30K</td><td>$750K–1.5M</td></tr>
+              <tr><td>Ohio Statewide</td><td>611</td><td>$5–50K</td><td style="color:var(--qp-green)">$3M–$30M</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    EdMandate™ is proprietary IP of MetHer by Design, LLC &nbsp;|&nbsp; AIXaaS platform is proprietary IP of Inflexis &nbsp;|&nbsp; CONFIDENTIAL — Internal Use Only &nbsp;|&nbsp; March 2026
+  </div>
+
+</body>
+</html>
