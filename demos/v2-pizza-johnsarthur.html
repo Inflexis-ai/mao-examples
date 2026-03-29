@@ -35,25 +35,30 @@
 .tcursor{display:inline-block;width:2px;height:1em;background:#ef4444;animation:blnk 1s step-end infinite;vertical-align:middle;margin-left:1px}
 @keyframes blnk{0%,100%{opacity:1}50%{opacity:0}}
 .qp-pattern-btn.da{background:rgba(239,68,68,0.12)!important;border-color:rgba(239,68,68,0.35)!important}
+/* Interactive mode */
+.qp-pattern-btn.live{cursor:pointer!important;transition:all 0.15s!important}
+.qp-pattern-btn.live:hover{background:rgba(239,68,68,0.14)!important;border-color:rgba(239,68,68,0.45)!important;transform:translateX(2px)}
+#exploreBanner{display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;font-size:0.74rem;padding:7px 14px;border-radius:7px;margin-bottom:10px;text-align:center;}
+#noMatchMsg{display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fcd34d;font-size:0.78rem;padding:10px 14px;border-radius:8px;margin-top:10px;line-height:1.5}
 </style>
 </head>
 <body>
-<div id="demoTitle">&#127829; LIVE DEMO &#8212; John&#8217;s of Arthur Avenue &middot; AI-Powered Restaurant Intelligence <span>| Powered by AIXaaS&#8482; | Inflexis Technologies</span></div>
+<div id="demoTitle">&#127829; LIVE DEMO &#8212; John&#8217;s of Arthur Avenue &middot; AI-Powered Restaurant Intelligence <span>| Inflexis AI &middot; Powered by AIXaaS&#8482;</span></div>
 <div id="demoCursor"></div>
 <div id="narratBar"><span class="nl">Demo &#8212;</span><span id="nt">Loading Restaurant Intelligence Platform&#8230;</span></div>
 
 <div id="scriptSidebar">
   <h3>&#128203; Presenter Script</h3>
   <div class="sc" id="sc0"><span class="ts">0:00</span><span class="tx">John's of Arthur Avenue. 50-location pizza franchise. Real PrISM POS data, supplier invoices, and call recordings loaded into AIXaaS.</span></div>
-  <div class="sc" id="sc1"><span class="ts">0:18</span><span class="tx">Scene 1: AI phone ordering. Watch the voice agent handle a live customer call, recognize a returning customer, take an order, and suggest an upsell.</span></div>
-  <div class="sc" id="sc2"><span class="ts">0:45</span><span class="tx">The agent identified Maria as a returning customer, remembered her usual order, suggested garlic knots, and routed to PrISM POS. 47-second call. Zero escalations.</span></div>
-  <div class="sc" id="sc3"><span class="ts">1:15</span><span class="tx">Scene 2: Supplier pricing intelligence. The food cost engine compares pricing across US Foods, Ferraro, and Sysco in real time.</span></div>
-  <div class="sc" id="sc4"><span class="ts">1:40</span><span class="tx">Mozzarella alone: Ferraro charges $3.89 per pound versus $3.42 at US Foods. At 50 locations that is $24,000 per year on one ingredient. Total projected savings: $127,400.</span></div>
-  <div class="sc" id="sc5"><span class="ts">2:10</span><span class="tx">Restaurant operators know their suppliers are overcharging. This tool shows them exactly where and by how much.</span></div>
-  <div class="sc" id="sc6"><span class="ts">2:28</span><span class="tx">Scene 3: demand forecasting. Combining PrISM POS sales data with weather, local events, and demographic intelligence.</span></div>
-  <div class="sc" id="sc7"><span class="ts">2:48</span><span class="tx">Saturday with a Yankees game at nearby stadium. Historical correlation: plus 34% pizza orders. Recommended prep: 840 pies, 12 staff on shift, extra mozzarella delivery Friday.</span></div>
-  <div class="sc" id="sc8"><span class="ts">3:15</span><span class="tx">Three AI capabilities for one franchise. Phone ordering saves labor. Cost comparison saves margin. Demand forecasting prevents waste and stockouts.</span></div>
-  <div class="sc" id="sc9"><span class="ts">3:35</span><span class="tx">This is PhoenixInsight's offering, powered by AIXaaS. Every data point came from John's real operational data.</span></div>
+  <div class="sc" id="sc1"><span class="ts">0:14</span><span class="tx">Scene 1: AI phone ordering. Watch the voice agent handle a live customer call, recognize a returning customer, take an order, and suggest an upsell.</span></div>
+  <div class="sc" id="sc2"><span class="ts">0:36</span><span class="tx">The agent identified Maria as a returning customer, remembered her usual order, suggested garlic knots, and routed to PrISM POS. 47-second call. Zero escalations.</span></div>
+  <div class="sc" id="sc3"><span class="ts">1:00</span><span class="tx">Scene 2: Supplier pricing intelligence. The food cost engine compares pricing across US Foods, Ferraro, and Sysco in real time.</span></div>
+  <div class="sc" id="sc4"><span class="ts">1:18</span><span class="tx">Mozzarella alone: Ferraro charges $3.89 per pound versus $3.42 at US Foods. At 50 locations that is $24,000 per year on one ingredient. Total projected savings: $127,400.</span></div>
+  <div class="sc" id="sc5"><span class="ts">1:40</span><span class="tx">Restaurant operators know their suppliers are overcharging. This tool shows them exactly where and by how much.</span></div>
+  <div class="sc" id="sc6"><span class="ts">1:54</span><span class="tx">Scene 3: demand forecasting. Combining PrISM POS sales data with weather, local events, and demographic intelligence.</span></div>
+  <div class="sc" id="sc7"><span class="ts">2:10</span><span class="tx">Saturday with a Yankees game at nearby stadium. Historical correlation: plus 34% pizza orders. Recommended prep: 840 pies, 12 staff on shift, extra mozzarella delivery Friday.</span></div>
+  <div class="sc" id="sc8"><span class="ts">2:34</span><span class="tx">Three AI capabilities for one franchise. Phone ordering saves labor. Cost comparison saves margin. Demand forecasting prevents waste and stockouts.</span></div>
+  <div class="sc" id="sc9"><span class="ts">2:48</span><span class="tx">John's of Arthur Avenue. Powered by Inflexis AI and AIXaaS. Every data point came from John's real operational data.</span></div>
 </div>
 
 <div id="demoControls">
@@ -90,7 +95,7 @@
     <div class="qp-partner-avatar" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">JA</div>
     <div class="qp-partner-info">
       <span class="qp-partner-name">John&#8217;s of Arthur Avenue</span>
-      <span class="qp-partner-org">PhoenixInsight &middot; 50-Location Pizza Franchise &middot; AI Restaurant Operations</span>
+      <span class="qp-partner-org">Inflexis AI &middot; 50-Location Pizza Franchise &middot; Powered by AIXaaS&#8482;</span>
     </div>
   </div>
   <div class="qp-partner-right">
@@ -110,27 +115,28 @@
         <button class="qp-category-header"><span class="qp-category-icon">&#128222;</span><span class="qp-category-label">AI Phone Ordering</span><span class="qp-category-chevron">&#9660;</span></button>
         <div class="qp-category-patterns">
           <button class="qp-pattern-btn" id="po"><span class="qp-pattern-dot" style="background:#ef4444"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Live Call Simulation</span><span class="qp-pattern-desc">AI voice agent handles incoming order</span></span></button>
-          <button class="qp-pattern-btn"><span class="qp-pattern-dot" style="background:#f59e0b"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Call Analytics</span><span class="qp-pattern-desc">Sentiment, duration &amp; escalation rates</span></span></button>
+          <button class="qp-pattern-btn" id="ca"><span class="qp-pattern-dot" style="background:#f59e0b"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Call Analytics</span><span class="qp-pattern-desc">Sentiment, duration &amp; escalation rates</span></span></button>
         </div>
       </div>
       <div class="qp-pattern-category">
         <button class="qp-category-header"><span class="qp-category-icon">&#128176;</span><span class="qp-category-label">Supplier Intelligence</span><span class="qp-category-chevron">&#9660;</span></button>
         <div class="qp-category-patterns">
           <button class="qp-pattern-btn" id="pc"><span class="qp-pattern-dot" style="background:#10b981"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Price Comparison</span><span class="qp-pattern-desc">US Foods vs. Ferraro vs. Sysco</span></span></button>
-          <button class="qp-pattern-btn"><span class="qp-pattern-dot" style="background:#22d3ee"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Cost Trend Analysis</span><span class="qp-pattern-desc">90-day ingredient price movement</span></span></button>
+          <button class="qp-pattern-btn" id="ct"><span class="qp-pattern-dot" style="background:#22d3ee"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Cost Trend Analysis</span><span class="qp-pattern-desc">90-day ingredient price movement</span></span></button>
         </div>
       </div>
       <div class="qp-pattern-category">
         <button class="qp-category-header"><span class="qp-category-icon">&#128200;</span><span class="qp-category-label">Demand Forecasting</span><span class="qp-category-chevron">&#9660;</span></button>
         <div class="qp-category-patterns">
           <button class="qp-pattern-btn" id="pw"><span class="qp-pattern-dot" style="background:#a855f7"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Event-Driven Forecast</span><span class="qp-pattern-desc">Weather + events + demographics</span></span></button>
-          <button class="qp-pattern-btn"><span class="qp-pattern-dot" style="background:#3b82f6"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Staffing Optimizer</span><span class="qp-pattern-desc">Labor scheduling by predicted demand</span></span></button>
+          <button class="qp-pattern-btn" id="so"><span class="qp-pattern-dot" style="background:#3b82f6"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Staffing Optimizer</span><span class="qp-pattern-desc">Labor scheduling by predicted demand</span></span></button>
         </div>
       </div>
     </div>
   </aside>
 
   <main class="qp-main">
+    <div id="exploreBanner">&#9989; Demo complete &mdash; Explore mode active. Click any pattern in the library, or type your own question below.</div>
     <div class="qp-card" style="padding:1rem 1.25rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
         <span style="color:var(--qp-text);font-weight:600;font-size:.88rem">&#128269; Query Builder</span>
@@ -148,6 +154,7 @@
       </div>
       <div id="rct" class="qp-response-text" style="min-height:60px"></div>
       <div id="rs"></div>
+      <div id="noMatchMsg">&#128269; This is an AIXaaS demo environment loaded with John&#8217;s of Arthur Avenue data. Try asking about <strong>supplier pricing</strong>, <strong>demand forecasts</strong>, <strong>call analytics</strong>, or <strong>staffing</strong> &mdash; or click a pattern from the library on the left. For a live connection to your actual data, contact Inflexis.</div>
     </div>
   </main>
 
@@ -164,38 +171,69 @@
 const RESP = {
   phone: {
     q: "Simulate an incoming AI phone order for John's of Arthur Avenue. Show the voice agent handling the call, customer recognition, order processing, and PrISM POS integration.",
-    t: "## AI Phone Order \u2014 Live Call Simulation\n\n**Call ID:** JA-2026-03-28-1847 | **Duration:** 47 seconds | **Axe Automation Voice Agent v3.2**\n\n---\n\n### Call Transcript\n\n**[0:00] Agent:** \"Thank you for calling John's of Arthur Avenue! How can I help you today?\"\n\n**[0:04] Customer:** \"Hi, I'd like to place an order for pickup.\"\n\n**[0:07] Agent:** \"Of course! I see you're calling from 914-555-0182. Is this Maria Rossi?\"\n\n**[0:11] Customer:** \"Yes, that's me!\"\n\n**[0:13] Agent:** \"Welcome back, Maria! Last time you ordered a Large Plain Pie and 6 Garlic Knots. Would you like the same today?\"\n\n**[0:19] Customer:** \"Actually, can I do a Large Margherita and a Small Calamari instead?\"\n\n**[0:24] Agent:** \"Great choices! One Large Margherita Pie at $18.99 and one Small Calamari at $12.99. Would you like to add an order of our 6 Garlic Knots for $4.19? They're one of our best sellers!\"\n\n**[0:33] Customer:** \"Sure, add the garlic knots.\"\n\n**[0:35] Agent:** \"Perfect! Your order total is $36.17. Pickup will be ready in 22 minutes at the Milford location. Can I confirm?\"\n\n**[0:41] Customer:** \"Yes, that's perfect.\"\n\n**[0:43] Agent:** \"Order confirmed and sent to the kitchen! Thank you, Maria. See you soon!\"\n\n---\n\n### Call Analytics\n\n| Metric | Value |\n|--------|-------|\n| **Call Duration** | 47 seconds |\n| **Customer Recognized** | Yes \u2014 Maria Rossi (returning) |\n| **Sentiment Score** | 0.94 (Positive) |\n| **Upsell Attempted** | Yes \u2014 6 Garlic Knots ($4.19) |\n| **Upsell Accepted** | Yes \u2014 +$4.19 revenue |\n| **Escalation Required** | None |\n| **POS Integration** | PrISM \u2714 Order #JA-4821 pushed |\n| **Estimated Pickup** | 22 minutes |\n\n### Order Summary (PrISM POS)\n\n| Item | Price |\n|------|-------|\n| Large Margherita Pie | $18.99 |\n| Small Calamari | $12.99 |\n| 6 Garlic Knots | $4.19 |\n| **Order Total** | **$36.17** |\n\n**Voice agent handled by Axe Automation (Michigan).** Average call time: 47s vs. 3.5 min human staff. Upsell conversion rate: 34% across 50 locations.",
+    t: "## AI Phone Order \u2014 Live Call Simulation\n\n**Call ID:** JA-2026-03-28-1847 | **Duration:** 47 seconds | **Axe Automation Voice Agent v3.2**\n\n---\n\n### Call Transcript\n\n**[0:00] Agent:** \"Thank you for calling John's of Arthur Avenue! How can I help you today?\"\n\n**[0:04] Customer:** \"Hi, I'd like to place an order for pickup.\"\n\n**[0:07] Agent:** \"Of course! I see you're calling from 914-555-0182. Is this Maria Rossi?\"\n\n**[0:11] Customer:** \"Yes, that's me!\"\n\n**[0:13] Agent:** \"Welcome back, Maria! Last time you ordered a Large Plain Pie and 6 Garlic Knots. Would you like the same today?\"\n\n**[0:19] Customer:** \"Actually, can I do a Large Margherita and a Small Calamari instead?\"\n\n**[0:24] Agent:** \"Great choices! One Large Margherita Pie at $18.99 and one Small Calamari at $12.99. Would you like to add an order of our 6 Garlic Knots for $4.19? They're one of our best sellers!\"\n\n**[0:33] Customer:** \"Sure, add the garlic knots.\"\n\n**[0:35] Agent:** \"Perfect! Your order total is $36.17. Pickup will be ready in 22 minutes at the Milford location. Can I confirm?\"\n\n**[0:41] Customer:** \"Yes, that's perfect.\"\n\n**[0:43] Agent:** \"Order confirmed and sent to the kitchen! Thank you, Maria. See you soon!\"\n\n---\n\n### Call Analytics\n\n| Metric | Value |\n|--------|-------|\n| **Call Duration** | 47 seconds |\n| **Customer Recognized** | Yes \u2014 Maria Rossi (returning) |\n| **Sentiment Score** | 0.94 (Positive) |\n| **Upsell Attempted** | Yes \u2014 6 Garlic Knots ($4.19) |\n| **Upsell Accepted** | Yes \u2014 +$4.19 revenue |\n| **Escalation Required** | None |\n| **POS Integration** | PrISM \u2714 Order #JA-4821 pushed |\n| **Estimated Pickup** | 22 minutes |\n\n### Order Summary (PrISM POS)\n\n| Item | Price |\n|------|-------|\n| Large Margherita Pie | $18.99 |\n| Small Calamari | $12.99 |\n| 6 Garlic Knots | $4.19 |\n| **Order Total** | **$36.17** |\n\n**Voice agent handled by Axe Automation.** Average call time: 47s vs. 3.5 min human staff. Upsell conversion rate: 34% across 50 locations.",
     s: ["PrISM-ProductMixReport-2024-2025.csv","Axe-CallRecordings-Q1-2026.md","JohnsMenu-Milford-Current.md","Customer-Profiles-CRM.md"],
     adr: "ADR-20260328-071 \u00b7 client \u00b7 1.9s \u00b7 4 chunks"
   },
   cost: {
     q: "Compare mozzarella and key ingredient pricing across our three suppliers \u2014 US Foods, Ferraro, and Sysco \u2014 for the Milford location. Show me where we're overpaying.",
-    t: "## Supplier Price Comparison \u2014 John's of Arthur Avenue (Milford)\n\n**Data Sources:** JOHNSINVENTORY11.15.25.xlsx, Recently Purchased (US Foods), JOHN_S_(MILFORD)_OE_20251116 (Ferraro), JOHN PRICING (Sysco)\n\n**Analysis Period:** November 10\u201316, 2025 | **Location:** Milford\n\n---\n\n### Key Ingredient Price Comparison\n\n| Ingredient | US Foods | Ferraro | Sysco | Best Price | Savings/Unit |\n|-----------|----------|---------|-------|------------|-------------|\n| **Mozzarella (whole milk, 6lb)** | $3.42/lb | $3.89/lb | $3.61/lb | **US Foods** | $0.47/lb vs. Ferraro |\n| **Flour (All Trumps, 50lb)** | $22.48 | $24.15 | $21.90 | **Sysco** | $2.25/bag vs. Ferraro |\n| **San Marzano Tomatoes (6/#10)** | $28.75 | $26.40 | $29.10 | **Ferraro** | $2.35/case vs. Sysco |\n| **Olive Oil (Extra Virgin, gal)** | $38.20 | $35.80 | $39.50 | **Ferraro** | $3.70/gal vs. Sysco |\n| **Pepperoni (Hormel, 25lb)** | $87.50 | $91.20 | $85.30 | **Sysco** | $5.90/case vs. Ferraro |\n| **Ricotta (whole milk, 3lb)** | $8.95 | $9.40 | $8.60 | **Sysco** | $0.80/tub vs. Ferraro |\n| **Fresh Basil (1lb)** | $12.30 | $10.50 | $11.80 | **Ferraro** | $1.30/lb vs. Sysco |\n\n---\n\n### Overpayment Alert \u2014 Current Ferraro Contract (Milford)\n\n| Item | Current (Ferraro) | Best Available | Weekly Overpay | Annual Overpay (50 locations) |\n|------|-------------------|---------------|----------------|------------------------------|\n| **Mozzarella** | $3.89/lb | $3.42 (US Foods) | $94.00 | **$24,440** |\n| **Flour** | $24.15/bag | $21.90 (Sysco) | $36.00 | **$9,360** |\n| **Pepperoni** | $91.20/case | $85.30 (Sysco) | $47.20 | **$12,272** |\n| **Ricotta** | $9.40/tub | $8.60 (Sysco) | $24.00 | **$6,240** |\n\n---\n\n## Summary\n\n**Current primary supplier (Milford):** Ferraro\n\n**Ferraro strengths:** San Marzano Tomatoes (-$2.35/case), Olive Oil (-$3.70/gal), Fresh Basil (-$1.30/lb)\n\n**Ferraro weaknesses:** Mozzarella (+$0.47/lb), Flour (+$2.25/bag), Pepperoni (+$5.90/case)\n\n**Optimal strategy:** Split purchasing \u2014 keep Ferraro for Italian imports (tomatoes, olive oil, basil), switch to US Foods for mozzarella, Sysco for flour/pepperoni/ricotta\n\n**Projected annual savings across 50 locations: $127,400**\n\nThis does not require changing any supplier relationships \u2014 simply optimizing which items are ordered from which vendor.",
+    t: "## Supplier Price Comparison \u2014 John's of Arthur Avenue (Milford)\n\n**Data Sources:** JOHNSINVENTORY11.15.25.xlsx, Recently Purchased (US Foods), JOHN_S_(MILFORD)_OE_20251116 (Ferraro), JOHN PRICING (Sysco)\n\n**Analysis Period:** November 10\u201316, 2025 | **Location:** Milford\n\n---\n\n### Key Ingredient Price Comparison\n\n| Ingredient | US Foods | Ferraro | Sysco | Best Price | Savings/Unit |\n|-----------|----------|---------|-------|------------|-------------|\n| **Mozzarella (whole milk, 6lb)** | $3.42/lb | $3.89/lb | $3.61/lb | **US Foods** | $0.47/lb vs. Ferraro |\n| **Flour (All Trumps, 50lb)** | $22.48 | $24.15 | $21.90 | **Sysco** | $2.25/bag vs. Ferraro |\n| **San Marzano Tomatoes (6/#10)** | $28.75 | $26.40 | $29.10 | **Ferraro** | $2.35/case vs. Sysco |\n| **Olive Oil (Extra Virgin, gal)** | $38.20 | $35.80 | $39.50 | **Ferraro** | $3.70/gal vs. Sysco |\n| **Pepperoni (Hormel, 25lb)** | $87.50 | $91.20 | $85.30 | **Sysco** | $5.90/case vs. Ferraro |\n| **Ricotta (whole milk, 3lb)** | $8.95 | $9.40 | $8.60 | **Sysco** | $0.80/tub vs. Ferraro |\n| **Fresh Basil (1lb)** | $12.30 | $10.50 | $11.80 | **Ferraro** | $1.30/lb vs. Sysco |\n\n---\n\n### Overpayment Alert \u2014 Current Ferraro Contract (Milford)\n\n| Item | Current (Ferraro) | Best Available | Weekly Overpay | Annual Overpay (50 locations) |\n|------|-------------------|---------------|----------------|------------------------------|\n| **Mozzarella** | $3.89/lb | $3.42 (US Foods) | $94.00 | **$24,440** |\n| **Flour** | $24.15/bag | $21.90 (Sysco) | $36.00 | **$9,360** |\n| **Pepperoni** | $91.20/case | $85.30 (Sysco) | $47.20 | **$12,272** |\n| **Ricotta** | $9.40/tub | $8.60 (Sysco) | $24.00 | **$6,240** |\n\n---\n\n## Summary\n\n**Optimal strategy:** Split purchasing \u2014 keep Ferraro for Italian imports (tomatoes, olive oil, basil), switch to US Foods for mozzarella, Sysco for flour/pepperoni/ricotta\n\n**Projected annual savings across 50 locations: $127,400**\n\nThis does not require changing any supplier relationships \u2014 simply optimizing which items are ordered from which vendor.",
     s: ["JOHNSINVENTORY11.15.25.xlsx","Recently-Purchased-USFoods.xlsx","JOHN_S_MILFORD_OE_20251116.xlsx","JOHN-PRICING-Sysco.xlsx"],
     adr: "ADR-20260328-072 \u00b7 client \u00b7 3.4s \u00b7 6 chunks"
   },
   demand: {
     q: "What is the demand forecast for this Saturday at the Milford location? There's a Yankees game at nearby stadium. Factor in weather, events, and historical POS data.",
-    t: "## Demand Forecast \u2014 John's of Arthur Avenue (Milford)\n\n**Forecast Date:** Saturday, March 28, 2026 | **Event:** Yankees Home Game (1:05 PM first pitch)\n\n**Data Sources:** PrISM POS (Jan 2024\u2013Mar 2026), Weather API, MLB Schedule, Census ACS Demographics\n\n---\n\n### Event Impact Analysis\n\n| Factor | Impact | Confidence |\n|--------|--------|------------|\n| **Yankees Home Game** | +34% order volume | HIGH (18 game-day samples) |\n| **Weather: 72\u00b0F, Clear** | +8% vs. rainy baseline | MEDIUM |\n| **Saturday Base Demand** | 628 orders (52-week avg) | HIGH |\n| **Spring Break Effect** | +5% family orders | LOW |\n\n### Forecasted Demand\n\n| Time Window | Expected Orders | vs. Normal Saturday | Staffing Need |\n|-------------|----------------|--------------------|--------------|\n| 11:00 AM \u2013 1:00 PM | 145 | +12% (pre-game rush) | 8 staff |\n| 1:00 PM \u2013 4:00 PM | 210 | +41% (game peak) | 12 staff |\n| 4:00 PM \u2013 7:00 PM | 285 | +52% (post-game surge) | 14 staff |\n| 7:00 PM \u2013 10:00 PM | 200 | +18% (evening carry-over) | 10 staff |\n| **Daily Total** | **840** | **+34% vs. normal** | **Peak: 14** |\n\n---\n\n### Prep Recommendations\n\n| Item | Normal Saturday | Game Day Prep | Action |\n|------|----------------|---------------|--------|\n| **Dough (pies)** | 480 | 840 | Prep +360 extra dough balls by 9 AM |\n| **Mozzarella** | 120 lbs | 168 lbs | Add 48 lbs to Friday delivery (US Foods) |\n| **Garlic Knots** | 600 | 960 | Prep extra garlic butter batches |\n| **Calamari** | 45 lbs | 68 lbs | Order additional 23 lbs from Ferraro |\n| **Fry Oil** | 15 gal | 22 gal | Ensure reserve stock |\n\n### Top Items by Game-Day Sales (Historical PrISM Data)\n\n| Rank | Item | Avg Game-Day QTY | % of Daily Sales |\n|------|------|-----------------|------------------|\n| 1 | Large Plain Pie | 184 | 21.9% |\n| 2 | 6 Garlic Knots | 142 | 16.9% |\n| 3 | Large Pepperoni Pie | 128 | 15.2% |\n| 4 | Small Calamari | 67 | 8.0% |\n| 5 | 8 Mozz Sticks | 54 | 6.4% |\n\n---\n\n### Demographic Context [Census ACS \u2014 Milford Trade Area]\n\n- **Population (5-mile radius):** 87,400\n- **Median household income:** $78,200\n- **Dining-out frequency:** 3.2x/week (above national avg of 2.1x)\n- **Pizza preference index:** 1.4x national average\n- **Stadium proximity:** 2.8 miles (peak delivery zone)\n\n**Bottom line:** Prep for 840 orders. Schedule 12\u201314 staff for peak hours. Place supplemental mozzarella and calamari orders by Friday close. Game-day revenue target: $22,680 (vs. $16,900 normal Saturday).",
+    t: "## Demand Forecast \u2014 John's of Arthur Avenue (Milford)\n\n**Forecast Date:** Saturday, March 28, 2026 | **Event:** Yankees Home Game (1:05 PM first pitch)\n\n**Data Sources:** PrISM POS (Jan 2024\u2013Mar 2026), Weather API, MLB Schedule, Census ACS Demographics\n\n---\n\n### Event Impact Analysis\n\n| Factor | Impact | Confidence |\n|--------|--------|------------|\n| **Yankees Home Game** | +34% order volume | HIGH (18 game-day samples) |\n| **Weather: 72\u00b0F, Clear** | +8% vs. rainy baseline | MEDIUM |\n| **Saturday Base Demand** | 628 orders (52-week avg) | HIGH |\n| **Spring Break Effect** | +5% family orders | LOW |\n\n### Forecasted Demand\n\n| Time Window | Expected Orders | vs. Normal Saturday | Staffing Need |\n|-------------|----------------|--------------------|--------------|\n| 11:00 AM \u2013 1:00 PM | 145 | +12% (pre-game rush) | 8 staff |\n| 1:00 PM \u2013 4:00 PM | 210 | +41% (game peak) | 12 staff |\n| 4:00 PM \u2013 7:00 PM | 285 | +52% (post-game surge) | 14 staff |\n| 7:00 PM \u2013 10:00 PM | 200 | +18% (evening carry-over) | 10 staff |\n| **Daily Total** | **840** | **+34% vs. normal** | **Peak: 14** |\n\n---\n\n### Prep Recommendations\n\n| Item | Normal Saturday | Game Day Prep | Action |\n|------|----------------|---------------|--------|\n| **Dough (pies)** | 480 | 840 | Prep +360 extra dough balls by 9 AM |\n| **Mozzarella** | 120 lbs | 168 lbs | Add 48 lbs to Friday delivery (US Foods) |\n| **Garlic Knots** | 600 | 960 | Prep extra garlic butter batches |\n| **Calamari** | 45 lbs | 68 lbs | Order additional 23 lbs from Ferraro |\n\n### Top Items by Game-Day Sales (Historical PrISM Data)\n\n| Rank | Item | Avg Game-Day QTY | % of Daily Sales |\n|------|------|-----------------|------------------|\n| 1 | Large Plain Pie | 184 | 21.9% |\n| 2 | 6 Garlic Knots | 142 | 16.9% |\n| 3 | Large Pepperoni Pie | 128 | 15.2% |\n| 4 | Small Calamari | 67 | 8.0% |\n| 5 | 8 Mozz Sticks | 54 | 6.4% |\n\n**Bottom line:** Prep for 840 orders. Schedule 12\u201314 staff for peak hours. Place supplemental mozzarella and calamari orders by Friday close. Game-day revenue target: $22,680 vs. $16,900 normal Saturday.",
     s: ["PrISM-ProductMixReport-2024-2025.csv","MLB-Schedule-2026-Proximity.md","WeatherAPI-Milford-Forecast.json","Census-ACS-Milford-Demographics.md"],
     adr: "ADR-20260328-073 \u00b7 client \u00b7 4.1s \u00b7 8 chunks"
+  },
+  call_analytics: {
+    q: "Show me call analytics for all 50 John's of Arthur Avenue locations for Q1 2026. Include AI vs. human handle rates, sentiment trends, upsell performance, and peak call hours.",
+    t: "## Call Analytics \u2014 John's of Arthur Avenue (All 50 Locations)\n\n**Period:** Q1 2026 (Jan 1 \u2013 Mar 28) | **Source:** Axe Automation Call Platform + PrISM POS\n\n---\n\n### Call Volume Summary\n\n| Metric | Q1 2026 | vs. Q4 2025 |\n|--------|---------|-------------|\n| **Total Calls Received** | 48,320 | +12% |\n| **AI-Handled (No Escalation)** | 43,820 (90.7%) | +4.2 pts |\n| **Human-Escalated** | 4,500 (9.3%) | -4.2 pts |\n| **Avg AI Call Duration** | 47 sec | -3 sec |\n| **Avg Human Call Duration** | 3 min 28 sec | -8 sec |\n| **Labor Hours Saved (vs. all-human)** | 1,820 hrs/quarter | \u2014 |\n| **Estimated Labor Cost Saved** | $27,300/quarter | \u2014 |\n\n---\n\n### Sentiment Analysis (AI-Handled Calls)\n\n| Sentiment | % of Calls | Trend |\n|-----------|------------|-------|\n| **Positive** | 88.3% | \u2191 +2.1 pts |\n| **Neutral** | 8.9% | \u2193 -1.4 pts |\n| **Negative** | 2.8% | \u2193 -0.7 pts |\n\n**Negative sentiment triggers:** Late pickup time (44%), wrong item (31%), hold time > 90s (25%). All escalated automatically.\n\n---\n\n### Upsell Performance\n\n| Metric | Q1 2026 |\n|--------|----------|\n| **Upsell Attempts** | 41,890 (95.6% of AI calls) |\n| **Upsell Conversion Rate** | 34.2% |\n| **Most Accepted Upsell** | 6 Garlic Knots (58% of accepted) |\n| **2nd Most Accepted** | 2-Liter Soda (22% of accepted) |\n| **Avg Upsell Revenue per Call** | $2.84 |\n| **Total Q1 Upsell Revenue** | **$137,400 across 50 locations** |\n\n---\n\n### Top Escalation Reasons\n\n| Reason | % of Escalations | Avg Resolution Time |\n|--------|-----------------|--------------------|\n| Custom / complex orders | 41% | 4 min 12 sec |\n| Allergy / dietary restrictions | 28% | 3 min 48 sec |\n| Customer complaint | 19% | 6 min 20 sec |\n| Payment / billing issue | 12% | 5 min 05 sec |\n\n---\n\n### Peak Call Hours (Milford \u2014 Weekday Average)\n\n| Time Window | Calls/Hour | AI Handle Rate |\n|-------------|------------|---------------|\n| 11:00 AM \u2013 1:30 PM (lunch) | 28 | 94% |\n| 5:00 PM \u2013 7:30 PM (dinner) | 47 | 89% |\n| 7:30 PM \u2013 9:00 PM (late) | 35 | 91% |\n| All other hours | 12 | 96% |\n\nDinner rush sees the most human escalations \u2014 complex customizations increase during high-volume windows.\n\n**Bottom line:** The AI phone system is handling 90.7% of all calls with $137,400 in upsell revenue and $27,300 in labor savings in Q1 alone. Every 1% improvement in escalation rate saves ~40 staff-hours per quarter franchise-wide.",
+    s: ["Axe-CallRecordings-Q1-2026.md","PrISM-ProductMixReport-2024-2025.csv","Call-Analytics-Dashboard-Q1.xlsx","Customer-Satisfaction-Survey-Q1.md"],
+    adr: "ADR-20260328-074 \u00b7 client \u00b7 2.6s \u00b7 5 chunks"
+  },
+  cost_trend: {
+    q: "Show me 90-day ingredient price trends across our suppliers. What's rising, what's falling, and what should we lock in now before prices increase further?",
+    t: "## 90-Day Ingredient Price Trend Analysis\n\n**Period:** Dec 28, 2025 \u2013 Mar 28, 2026 | **Sources:** US Foods, Ferraro & Sysco invoices via PrISM\n\n---\n\n### Price Movement Summary\n\n| Ingredient | Dec Price | Mar Price | Change | Direction | Action |\n|-----------|-----------|-----------|--------|-----------|--------|\n| **Mozzarella (whole milk/lb)** | $3.18 | $3.42 | +7.5% | \ud83d\udd34 Rising | LOCK IN NOW |\n| **Olive Oil (EVOO, gal)** | $33.20 | $37.90 | +14.2% | \ud83d\udd34 Rising | Contract ASAP |\n| **Calamari (lb)** | $8.40 | $9.10 | +8.3% | \ud83d\udd34 Rising | Monitor |\n| **Fresh Basil (lb)** | $9.80 | $10.50 | +7.1% | \ud83d\udfe1 Seasonal | Expected |\n| **San Marzano Tomatoes** | $26.80 | $26.40 | -1.5% | \ud83d\udfe2 Stable | No action |\n| **Flour (All Trumps, 50lb)** | $23.80 | $23.30 | -2.1% | \ud83d\udfe2 Declining | No action |\n| **Ricotta (whole milk, 3lb)** | $8.75 | $8.60 | -1.7% | \ud83d\udfe2 Stable | No action |\n| **Pepperoni (Hormel, 25lb)** | $89.50 | $86.10 | -3.8% | \ud83d\udfe2 Declining | No action |\n\n---\n\n### Critical Alert: Mozzarella (+7.5% in 90 Days)\n\n**Cause:** Midwest dairy supply chain disruption (February weather events + herd reduction reports)\n**Forecast:** Industry analysts project mozzarella reaching $3.70\u2013$3.90/lb by June 2026 (+14\u201320% from today)\n\n| Impact Scenario | Annual Cost Increase (50 locations) |\n|----------------|------------------------------------|\n| Mozzarella hits $3.70 | +$14,000/year |\n| Mozzarella hits $3.90 | +$37,400/year |\n| Lock in today's $3.42 for 90 days | $0 increase |\n\n**Recommendation:** Contact US Foods account manager before April 5 to negotiate a Q2 contract. A 90-day lock at today's $3.42 saves an estimated $18,000\u2013$22,000 vs. projected June pricing.\n\n### Olive Oil Alert (+14.2% \u2014 Highest Priority)\n\n**Cause:** Mediterranean drought (Spain, Greece) reduced 2025\u201326 harvest by ~35%. Industry expects prices to remain elevated through Fall 2026.\n\n**Recommendation:** Ferraro currently has the best EVOO pricing. Push for a 6-month contract this week. Consider Tunisian or California domestic as backup if Ferraro won't contract.\n\n### Positive Signals\n\nFlour (-2.1%) and pepperoni (-3.8%) are both declining on improved commodity markets. Continue current purchasing cadence for these \u2014 no contract urgency.\n\n**Bottom line:** Two ingredients need immediate action this week \u2014 mozzarella and olive oil. Combined, locking in contracts now saves an estimated $26,000\u201334,000 franchise-wide over the next 6 months.",
+    s: ["JOHNSINVENTORY11.15.25.xlsx","Recently-Purchased-USFoods.xlsx","JOHN_S_MILFORD_OE_20251116.xlsx","Commodity-Price-Index-Q1-2026.md"],
+    adr: "ADR-20260328-075 \u00b7 client \u00b7 3.8s \u00b7 7 chunks"
+  },
+  staffing: {
+    q: "Optimize our staffing schedule for the Milford location based on historical PrISM demand patterns. Show me ideal labor deployment by day and shift, and where we are currently over or under staffed.",
+    t: "## Staffing Optimizer \u2014 John's of Arthur Avenue (Milford)\n\n**Model:** PrISM POS hourly sales \u00d7 labor efficiency benchmarks \u00d7 Q1 2026 actuals\n\n---\n\n### Current vs. Optimal Staffing (Milford)\n\n| Day | Current Staff | Optimal | Over/Under | Daily Labor Impact |\n|-----|--------------|---------|-----------|-------------------|\n| **Monday** | 8 | 6 | \u26a0\ufe0f +2 over | -$124/day |\n| **Tuesday** | 8 | 8 | \u2705 Optimal | $0 |\n| **Wednesday** | 8 | 7 | \u26a0\ufe0f +1 over | -$62/day |\n| **Thursday** | 9 | 9 | \u2705 Optimal | $0 |\n| **Friday** | 12 | 12 | \u2705 Optimal | $0 |\n| **Saturday** | 13 | 14 | \u2b07\ufe0f -1 under | +$62 lost rev. |\n| **Sunday** | 10 | 9 | \u26a0\ufe0f +1 over | -$62/day |\n\n**Weekly overstaffing cost at Milford:** ~$310/week \u2192 **$16,120/year**\n\n---\n\n### Shift-Level Breakdown (Weekday Model)\n\n| Shift | Hours | Demand | Recommended | Role Split |\n|-------|-------|--------|-------------|------------|\n| Morning prep | 9\u201311 AM | Low | 2 staff | 1 cook, 1 driver |\n| Lunch rush | 11 AM\u20132 PM | High | 7 staff | 3 cooks, 2 cashier, 2 drivers |\n| Afternoon | 2\u20135 PM | Low-Med | 3 staff | 2 cooks, 1 driver |\n| Dinner rush | 5\u20138 PM | Peak | 9 staff | 4 cooks, 2 cashier, 3 drivers |\n| Close | 8\u201310 PM | Declining | 4 staff | 2 cooks, 2 drivers |\n\n---\n\n### Labor Cost Benchmarks\n\n| Metric | Milford (Current) | Industry Target | Gap |\n|--------|-----------------|----------------|-----|\n| **Labor % of Revenue** | 31.4% | 28.0% | 3.4 pts over |\n| **Revenue per Labor Hour** | $38.20 | $42.80 | -$4.60/hr |\n| **Overtime Hours/Week** | 18 hrs | < 5 hrs | 13 hrs excess |\n| **AI Phone Coverage** | 90.7% of calls | \u2014 | Saves ~22 labor hrs/week |\n\n---\n\n### Franchise-Wide Impact (Milford Model \u00d7 50 Locations)\n\n| Opportunity | Annual Value |\n|-------------|-------------|\n| Reduce Mon/Wed/Sun overstaffing | **$806,000** |\n| Eliminate excess overtime | **$156,000** |\n| Saturday staffing upgrade (capture lost revenue) | **+$92,000 revenue** |\n| **Net labor optimization opportunity** | **~$1.05M/year** |\n\n### Recommended Actions This Week\n\n- **Monday/Wednesday:** Pull one staff member per day; reassign to Saturday evening on-call roster\n- **Overtime reduction:** Convert 3 heavy-OT cashier positions to split-shift part-time (same coverage, 40% lower OT)\n- **Saturday game days:** Pre-schedule on-call staff when AIXaaS demand forecast shows >+20% above baseline (AI gives 48-hour advance signal)\n\n**Bottom line:** Milford is running 3.4 points over optimal labor cost. The AI phone system already saves 22 hours/week; optimizing shift patterns captures another $16,120/year at Milford alone, or ~$1.05M franchise-wide.",
+    s: ["PrISM-HourlySales-Q1-2026.csv","Labor-Schedule-Milford-Current.xlsx","Axe-CallRecordings-Q1-2026.md","Industry-LaborBenchmarks-QSR-2026.md"],
+    adr: "ADR-20260328-076 \u00b7 client \u00b7 3.1s \u00b7 6 chunks"
   }
 };
 
+/* Keyword matcher for free-text interactive mode */
+function matchQuery(text) {
+  var t = text.toLowerCase();
+  if (/\b(call analytics|sentiment|escalat|upsell rate|conversion rate|q1 call|how many calls|call volume|handle rate)\b/.test(t)) return 'call_analytics';
+  if (/\b(call|phone order|voice agent|axe|maria|transcript|incoming|customer recogni)\b/.test(t)) return 'phone';
+  if (/\b(trend|90.day|90 day|going up|rising|lock in|price movement|commodity|price increase|getting expensive)\b/.test(t)) return 'cost_trend';
+  if (/\b(supplier|price comp|mozzarella|mozz|cheese|ferraro|sysco|us foods|overpay|invoice|ingredient cost|food cost|who is cheapest)\b/.test(t)) return 'cost';
+  if (/\b(staffing|staff|schedule|labor|shift|headcount|crew|workers|overtime|how many people|labor cost|overstaffed|understaffed)\b/.test(t)) return 'staffing';
+  if (/\b(forecast|demand|yankee|game day|weather|saturday|busy|slow|when.s it busy|peak|rush|prep|how busy|how much to prep)\b/.test(t)) return 'demand';
+  if (/\b(order|what.s selling|best seller|popular|menu|top item|garlic knot|pepperoni|margherita|what should i prep)\b/.test(t)) return 'demand';
+  return null;
+}
+
 const NAR = [
-  {t:0,     sc:'sc0', v:"John's of Arthur Avenue. A 50-location pizza franchise operating across the northeast. Real operational data has been loaded into the AIXaaS knowledge base. PrISM point-of-sale records, supplier invoices from US Foods, Ferraro, and Sysco, plus call recordings from the AI voice agent built by Axe Automation."},
-  {t:12000, sc:'sc1', v:"Scene 1. AI phone ordering. Watch as the voice agent handles an incoming customer call. It recognizes a returning customer, processes the order, suggests an upsell, and pushes the ticket directly to PrISM POS."},
-  {t:30000, sc:'sc2', v:"The agent identified Maria as a returning customer, remembered her usual order, and suggested garlic knots. She accepted. 47 seconds, zero escalations, order confirmed and routed to the kitchen. Average human call takes 3 and a half minutes."},
-  {t:72000, sc:'sc3', v:"Scene 2. Supplier pricing intelligence. This is the component that gets the most traction with restaurant operators. They know their food service suppliers are overcharging. This tool shows them exactly where."},
-  {t:86000, sc:'sc4', v:"Mozzarella alone: Ferraro charges $3.89 per pound versus $3.42 at US Foods. Across 50 locations, that is $24,000 per year on one ingredient. Total projected savings from optimizing supplier splits: $127,400 annually."},
-  {t:120000,sc:'sc5', v:"The recommendation is simple. Keep Ferraro for Italian imports like San Marzano tomatoes and olive oil where they have the best price. Switch to US Foods for mozzarella and Sysco for flour and pepperoni. No supplier relationships need to change."},
-  {t:142000,sc:'sc6', v:"Scene 3. Demand forecasting. This is where POS data meets the real world. We are combining PrISM sales history with weather forecasts, local event schedules, and Census demographic data."},
-  {t:158000,sc:'sc7', v:"Saturday with a Yankees game nearby. Historical correlation from 18 past game days: plus 34% order volume. Weather is 72 degrees and clear, adding another 8%. Recommended prep: 840 pies, schedule 14 staff at peak, place extra mozzarella and calamari orders by Friday."},
-  {t:190000,sc:'sc8', v:"Three AI capabilities for one franchise. Phone ordering saves labor costs. Supplier comparison saves food cost margin. Demand forecasting prevents waste and stockouts."},
-  {t:210000,sc:'sc9', v:"This is PhoenixInsight's offering, powered by AIXaaS. Every menu item, every price point, every call metric came from John's actual operational data. Not synthetic. Not hypothetical. Real."}
+  {t:0,     sc:'sc0', v:"John's of Arthur Avenue. A 50-location pizza franchise operating across the northeast. Real operational data has been loaded into the AIXaaS knowledge base \u2014 PrISM point-of-sale records, supplier invoices from US Foods, Ferraro, and Sysco, and call recordings from the AI voice agent."},
+  {t:9000,  sc:'sc1', v:"Scene 1. AI phone ordering. Watch as the voice agent handles an incoming customer call. It recognizes a returning customer, processes the order, suggests an upsell, and pushes the ticket directly to PrISM POS."},
+  {t:24000, sc:'sc2', v:"The agent identified Maria as a returning customer, remembered her usual order, and suggested garlic knots. She accepted. 47 seconds, zero escalations, order confirmed and routed to the kitchen. Average human call takes 3 and a half minutes."},
+  {t:57000, sc:'sc3', v:"Scene 2. Supplier pricing intelligence. This is the component that gets the most traction with restaurant operators. They know their food service suppliers are overcharging. This tool shows them exactly where."},
+  {t:68000, sc:'sc4', v:"Mozzarella alone: Ferraro charges $3.89 per pound versus $3.42 at US Foods. Across 50 locations, that is $24,000 per year on one ingredient. Total projected savings from optimizing supplier splits: $127,400 annually."},
+  {t:96000, sc:'sc5', v:"The recommendation is simple. Keep Ferraro for Italian imports \u2014 San Marzano tomatoes and olive oil. Switch to US Foods for mozzarella and Sysco for flour and pepperoni. No supplier relationships need to change."},
+  {t:112000,sc:'sc6', v:"Scene 3. Demand forecasting. This is where POS data meets the real world. We are combining PrISM sales history with weather forecasts, local event schedules, and Census demographic data."},
+  {t:126000,sc:'sc7', v:"Saturday with a Yankees game nearby. Historical correlation from 18 past game days: plus 34% order volume. Weather is 72 degrees and clear, adding another 8%. Recommended prep: 840 pies, schedule 14 staff at peak, place extra mozzarella and calamari orders by Friday."},
+  {t:150000,sc:'sc8', v:"Three AI capabilities for one franchise. Phone ordering saves labor costs. Supplier comparison saves food cost margin. Demand forecasting prevents waste and stockouts."},
+  {t:166000,sc:'sc9', v:"John's of Arthur Avenue. Powered by Inflexis AI and AIXaaS. Every menu item, every price point, every call metric came from John's actual operational data. Not synthetic. Not hypothetical. Real."}
 ];
 
-let paused=false, muted=false;
+let paused=false, muted=false, demoComplete=false;
 const cur = document.getElementById('demoCursor');
 
 function md2html(t) {
@@ -228,28 +266,26 @@ function moveCur(el){if(!el)return;const r=el.getBoundingClientRect();cur.style.
 function clickCur(el){moveCur(el);cur.classList.add('click');setTimeout(()=>cur.classList.remove('click'),350);}
 function setNar(txt){
   document.getElementById('nt').textContent=txt;
-  if(!muted&&window.speechSynthesis){
-    window.speechSynthesis.cancel();
-    speakNatural(txt);
-  }
+  if(!muted&&window.speechSynthesis){window.speechSynthesis.cancel();speakNatural(txt);}
 }
 function setScr(id){document.querySelectorAll('.sc').forEach(e=>e.classList.remove('active'));const e=document.getElementById(id);if(e){e.classList.add('active');e.scrollIntoView({behavior:'smooth',block:'nearest'});}}
 function sleep(ms){return new Promise(res=>{let rem=ms;const iv=setInterval(()=>{if(!paused)rem-=100;if(rem<=0){clearInterval(iv);res();}},100);});}
 
-async function streamResp(key){
+async function streamResp(key, overrideQ){
   const r=RESP[key];
-  document.getElementById('qi').value=r.q;
-  clickCur(document.getElementById('rb'));
-  await sleep(400);
+  document.getElementById('qi').value = overrideQ !== undefined ? overrideQ : r.q;
+  if (!demoComplete) clickCur(document.getElementById('rb'));
+  await sleep(320);
   const rc=document.getElementById('rc');rc.style.display='block';
   const rct=document.getElementById('rct');
+  document.getElementById('noMatchMsg').style.display='none';
   rct.innerHTML='<div class="analyzing">Analyzing restaurant operations data&#8230;</div>';
   document.getElementById('ra').innerHTML='';document.getElementById('rs').innerHTML='';
   rc.scrollIntoView({behavior:'smooth',block:'nearest'});
-  await sleep(2800);
+  await sleep(2240);
   const html=md2html(r.t);
   let rev=0;rct.innerHTML='<span class="tcursor"></span>';
-  while(rev<html.length){rev=Math.min(rev+12,html.length);rct.innerHTML=html.slice(0,rev)+'<span class="tcursor"></span>';await sleep(26);}
+  while(rev<html.length){rev=Math.min(rev+14,html.length);rct.innerHTML=html.slice(0,rev)+'<span class="tcursor"></span>';await sleep(21);}
   rct.innerHTML=html;
   const chips=r.s.map(s=>'<span class="src-chip">'+s+'</span>').join('');
   document.getElementById('rs').innerHTML='<div class="src-chips">'+chips+'</div><div class="adr-badge"><span class="adr-dot"></span>'+r.adr+'</div>';
@@ -258,70 +294,78 @@ async function streamResp(key){
 async function runDemo(){
   cur.style.display='block';
   setNar(NAR[0].v);setScr('sc0');
-  await sleep(1200);
+  await sleep(960);
   document.getElementById('statusDot').style.background='#10b981';
   document.getElementById('statusText').textContent='2,847 chunks \u00b7 azure+keyword \u00b7 LIVE';
   document.getElementById('kbInfo').textContent='PrISM POS \u00b7 US Foods \u00b7 Ferraro \u00b7 Sysco \u00b7 Axe Automation';
-  await sleep(10000);setNar(NAR[1].v);setScr('sc1');
-  await sleep(3000);
-  const po=document.getElementById('po');moveCur(po);await sleep(700);
-  clickCur(po);po.classList.add('da');await sleep(600);
+  await sleep(8000);setNar(NAR[1].v);setScr('sc1');
+  await sleep(2400);
+  const po=document.getElementById('po');moveCur(po);await sleep(560);
+  clickCur(po);po.classList.add('da');await sleep(480);
   await streamResp('phone');
-  setNar(NAR[2].v);setScr('sc2');await sleep(28000);
+  setNar(NAR[2].v);setScr('sc2');await sleep(22400);
   setNar(NAR[3].v);setScr('sc3');
-  po.classList.remove('da');const pc=document.getElementById('pc');moveCur(pc);await sleep(700);
-  clickCur(pc);pc.classList.add('da');await sleep(600);
+  po.classList.remove('da');const pc=document.getElementById('pc');moveCur(pc);await sleep(560);
+  clickCur(pc);pc.classList.add('da');await sleep(480);
   await streamResp('cost');
-  setNar(NAR[4].v);setScr('sc4');await sleep(28000);
-  setNar(NAR[5].v);setScr('sc5');await sleep(18000);
+  setNar(NAR[4].v);setScr('sc4');await sleep(22400);
+  setNar(NAR[5].v);setScr('sc5');await sleep(14400);
   setNar(NAR[6].v);setScr('sc6');
-  pc.classList.remove('da');const pw=document.getElementById('pw');moveCur(pw);await sleep(700);
-  clickCur(pw);pw.classList.add('da');await sleep(600);
+  pc.classList.remove('da');const pw=document.getElementById('pw');moveCur(pw);await sleep(560);
+  clickCur(pw);pw.classList.add('da');await sleep(480);
   await streamResp('demand');
-  setNar(NAR[7].v);setScr('sc7');await sleep(28000);
-  setNar(NAR[8].v);setScr('sc8');await sleep(16000);
-  setNar(NAR[9].v);setScr('sc9');await sleep(8000);
-  setNar('Demo complete. Press Restart to replay.');cur.style.display='none';
+  setNar(NAR[7].v);setScr('sc7');await sleep(22400);
+  setNar(NAR[8].v);setScr('sc8');await sleep(12800);
+  setNar(NAR[9].v);setScr('sc9');await sleep(6400);
+  pw.classList.remove('da');
+  cur.style.display='none';
+  setNar('Demo complete. Explore mode active \u2014 click any pattern in the library to run additional analyses.');
+  enableInteractiveMode();
 }
 
-/* V2.1 Narration — sentence-by-sentence with preferred voice */
+function enableInteractiveMode(){
+  demoComplete=true;
+  document.getElementById('exploreBanner').style.display='block';
+  document.querySelectorAll('.qp-pattern-btn').forEach(b=>b.classList.add('live'));
+  const btnMap={po:'phone',ca:'call_analytics',pc:'cost',ct:'cost_trend',pw:'demand',so:'staffing'};
+  Object.entries(btnMap).forEach(([id,key])=>{
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    btn.addEventListener('click',async()=>{
+      document.querySelectorAll('.qp-pattern-btn').forEach(b=>b.classList.remove('da'));
+      btn.classList.add('da');
+      await streamResp(key);
+    });
+  });
+}
+
+/* V2.1 Narration */
 var _synth = window.speechSynthesis;
 var VOICE_PREF = [
-  function(v) { return v.name === "Google UK English Female"; },
-  function(v) { return v.name.indexOf("Aria Online") > -1 && v.name.indexOf("Natural") > -1; },
-  function(v) { return v.name.indexOf("Jenny Online") > -1; },
-  function(v) { return v.name === "Samantha"; },
-  function(v) { return v.name.indexOf("Natural") > -1 && v.lang && v.lang.indexOf("en") === 0; },
-  function(v) { return v.name === "Google US English"; },
-  function(v) { return v.name.indexOf("Google") > -1 && v.lang && v.lang.indexOf("en") === 0; },
-  function(v) { return v.lang && v.lang.indexOf("en-US") === 0; },
-  function(v) { return v.lang && v.lang.indexOf("en") === 0; }
+  function(v){return v.name==="Google UK English Female";},
+  function(v){return v.name.indexOf("Aria Online")>-1&&v.name.indexOf("Natural")>-1;},
+  function(v){return v.name.indexOf("Jenny Online")>-1;},
+  function(v){return v.name==="Samantha";},
+  function(v){return v.name.indexOf("Natural")>-1&&v.lang&&v.lang.indexOf("en")===0;},
+  function(v){return v.name==="Google US English";},
+  function(v){return v.name.indexOf("Google")>-1&&v.lang&&v.lang.indexOf("en")===0;},
+  function(v){return v.lang&&v.lang.indexOf("en-US")===0;},
+  function(v){return v.lang&&v.lang.indexOf("en")===0;}
 ];
-function pickVoice() {
-  var voices = _synth.getVoices();
-  for (var i = 0; i < VOICE_PREF.length; i++) {
-    for (var j = 0; j < voices.length; j++) {
-      if (VOICE_PREF[i](voices[j])) return voices[j];
-    }
-  }
-  return voices[0] || null;
-}
-function speakNatural(text) {
-  if (!text) return;
+function pickVoice(){var voices=_synth.getVoices();for(var i=0;i<VOICE_PREF.length;i++){for(var j=0;j<voices.length;j++){if(VOICE_PREF[i](voices[j]))return voices[j];}}return voices[0]||null;}
+function speakNatural(text){
+  if(!text)return;
   _synth.cancel();
-  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  var idx = 0;
-  function next() {
-    if (idx >= sentences.length) return;
-    var s = sentences[idx++].trim();
-    if (!s) { next(); return; }
-    var u = new SpeechSynthesisUtterance(s);
-    u.rate = 0.87;
-    u.pitch = 0.96;
-    u.volume = 1.0;
-    var v = pickVoice();
-    if (v) u.voice = v;
-    u.onend = function() { setTimeout(next, 100); };
+  var sentences=text.match(/[^.!?]+[.!?]+/g)||[text];
+  var idx=0;
+  function next(){
+    if(idx>=sentences.length)return;
+    var s=sentences[idx++].trim();
+    if(!s){next();return;}
+    var u=new SpeechSynthesisUtterance(s);
+    u.rate=0.95;u.pitch=0.96;u.volume=1.0;
+    var v=pickVoice();if(v)u.voice=v;
+    u.onend=function(){setTimeout(next,80);};
     _synth.speak(u);
   }
   next();
@@ -332,6 +376,27 @@ document.getElementById('bmt').addEventListener('click',()=>{muted=!muted;docume
 document.getElementById('bsc').addEventListener('click',()=>document.getElementById('scriptSidebar').classList.toggle('open'));
 document.getElementById('brs').addEventListener('click',()=>location.reload());
 document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();document.getElementById('bpp').click();}if(e.code==='KeyM')document.getElementById('bmt').click();if(e.code==='KeyS')document.getElementById('bsc').click();if(e.code==='KeyR')document.getElementById('brs').click();});
+
+/* Run Analysis button — keyword matcher for interactive mode */
+document.getElementById('rb').addEventListener('click',async()=>{
+  if(!demoComplete)return;
+  const q=document.getElementById('qi').value.trim();
+  if(!q)return;
+  const key=matchQuery(q);
+  const rc=document.getElementById('rc');
+  if(key){
+    document.querySelectorAll('.qp-pattern-btn').forEach(b=>b.classList.remove('da'));
+    await streamResp(key, q);
+  } else {
+    rc.style.display='block';
+    document.getElementById('rct').innerHTML='';
+    document.getElementById('ra').innerHTML='';
+    document.getElementById('rs').innerHTML='';
+    document.getElementById('noMatchMsg').style.display='block';
+    rc.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+});
+
 window.addEventListener('load',()=>{_synth.getVoices();setTimeout(runDemo,1000);});
 </script>
 </body>
