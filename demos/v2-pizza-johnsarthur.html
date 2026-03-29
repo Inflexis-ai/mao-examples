@@ -14,6 +14,7 @@
 #demoControls{position:fixed;bottom:18px;right:18px;z-index:9990;display:flex;gap:8px;background:rgba(26,10,10,0.95);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:8px 12px;backdrop-filter:blur(10px)}
 #demoControls button{background:none;border:none;color:#d4a574;cursor:pointer;font-size:1.1rem;padding:4px 8px;border-radius:6px;transition:all 0.15s}
 #demoControls button:hover{background:rgba(239,68,68,0.15);color:#fca5a5}
+#bskip{font-size:0.72rem!important;padding:4px 10px!important;border:1px solid rgba(239,68,68,0.35)!important;border-radius:6px!important;color:#fca5a5!important;white-space:nowrap}
 #narratBar{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9990;background:rgba(26,10,10,0.92);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:#fde8d0;max-width:600px;text-align:center;pointer-events:none;width:90%}
 .nl{color:#fca5a5;font-weight:600;margin-right:6px}
 #scriptSidebar{position:fixed;right:0;top:0;bottom:0;width:280px;background:rgba(26,10,10,0.97);border-left:1px solid rgba(239,68,68,0.2);z-index:9985;overflow-y:auto;transform:translateX(100%);transition:transform 0.3s ease;padding:68px 0 80px}
@@ -35,11 +36,22 @@
 .tcursor{display:inline-block;width:2px;height:1em;background:#ef4444;animation:blnk 1s step-end infinite;vertical-align:middle;margin-left:1px}
 @keyframes blnk{0%,100%{opacity:1}50%{opacity:0}}
 .qp-pattern-btn.da{background:rgba(239,68,68,0.12)!important;border-color:rgba(239,68,68,0.35)!important}
+/* Force categories open — external CSS may collapse them */
+.qp-category-patterns{display:block!important}
 /* Interactive mode */
 .qp-pattern-btn.live{cursor:pointer!important;transition:all 0.15s!important}
 .qp-pattern-btn.live:hover{background:rgba(239,68,68,0.14)!important;border-color:rgba(239,68,68,0.45)!important;transform:translateX(2px)}
 #exploreBanner{display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;font-size:0.74rem;padding:7px 14px;border-radius:7px;margin-bottom:10px;text-align:center;}
-#noMatchMsg{display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fcd34d;font-size:0.78rem;padding:10px 14px;border-radius:8px;margin-top:10px;line-height:1.5}
+#noMatchMsg{display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.35);color:#fcd34d;font-size:0.82rem;padding:14px 16px;border-radius:8px;margin-top:10px;line-height:1.7}
+#noMatchMsg ul{margin:6px 0 0 16px;padding:0;color:#fde68a;font-size:0.78rem}
+/* Explore panel */
+#explorePanel{display:none;margin-top:12px}
+.explore-section{margin-bottom:14px}
+.explore-section-title{font-size:0.72rem;color:var(--qp-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;padding-left:2px}
+.explore-chips{display:flex;flex-wrap:wrap;gap:6px}
+.explore-chip{display:inline-flex;align-items:center;gap:5px;font-size:0.76rem;padding:5px 11px;border-radius:20px;border:1px solid;cursor:pointer;transition:all 0.15s;line-height:1.3;background:rgba(0,0,0,0.2)}
+.explore-chip:hover{transform:translateY(-1px);opacity:0.9}
+.explore-chip .chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -66,6 +78,7 @@
   <button id="bmt" title="Mute (M)">&#128266;</button>
   <button id="bsc" title="Script (S)">&#128203;</button>
   <button id="brs" title="Restart (R)">&#128260;</button>
+  <button id="bskip" title="Skip to explore mode">Skip Demo &#8594;</button>
 </div>
 
 <nav class="qp-nav">
@@ -136,7 +149,8 @@
   </aside>
 
   <main class="qp-main">
-    <div id="exploreBanner">&#9989; Demo complete &mdash; Explore mode active. Click any pattern in the library, or type your own question below.</div>
+    <div id="exploreBanner">&#9989; Demo complete &mdash; Explore mode active. Click any question below, use the pattern library, or type your own question.</div>
+    <div id="explorePanel"></div>
     <div class="qp-card" style="padding:1rem 1.25rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
         <span style="color:var(--qp-text);font-weight:600;font-size:.88rem">&#128269; Query Builder</span>
@@ -154,7 +168,18 @@
       </div>
       <div id="rct" class="qp-response-text" style="min-height:60px"></div>
       <div id="rs"></div>
-      <div id="noMatchMsg">&#128269; This is an AIXaaS demo environment loaded with John&#8217;s of Arthur Avenue data. Try asking about <strong>supplier pricing</strong>, <strong>demand forecasts</strong>, <strong>call analytics</strong>, or <strong>staffing</strong> &mdash; or click a pattern from the library on the left. For a live connection to your actual data, contact Inflexis.</div>
+      <div id="noMatchMsg">
+        &#128269; This is an AIXaaS demo loaded with John&#8217;s of Arthur Avenue operational data. I don&#8217;t have a scripted response for that specific question &mdash; try one of these:
+        <ul>
+          <li>Supplier pricing &mdash; <em>"Compare mozzarella pricing across suppliers"</em></li>
+          <li>Cost trends &mdash; <em>"What ingredients are rising in price?"</em></li>
+          <li>Demand forecasting &mdash; <em>"Forecast this Saturday with Yankees game"</em></li>
+          <li>Call analytics &mdash; <em>"Show Q1 call handle rates and upsell performance"</em></li>
+          <li>Staffing &mdash; <em>"Where are we overstaffed or understaffed?"</em></li>
+          <li>Or click any chip in the Explore Questions panel above &#8593;</li>
+        </ul>
+        For a live connection to your restaurant data, contact Inflexis.
+      </div>
     </div>
   </main>
 
@@ -195,7 +220,7 @@ const RESP = {
   },
   cost_trend: {
     q: "Show me 90-day ingredient price trends across our suppliers. What's rising, what's falling, and what should we lock in now before prices increase further?",
-    t: "## 90-Day Ingredient Price Trend Analysis\n\n**Period:** Dec 28, 2025 \u2013 Mar 28, 2026 | **Sources:** US Foods, Ferraro & Sysco invoices via PrISM\n\n---\n\n### Price Movement Summary\n\n| Ingredient | Dec Price | Mar Price | Change | Direction | Action |\n|-----------|-----------|-----------|--------|-----------|--------|\n| **Mozzarella (whole milk/lb)** | $3.18 | $3.42 | +7.5% | \ud83d\udd34 Rising | LOCK IN NOW |\n| **Olive Oil (EVOO, gal)** | $33.20 | $37.90 | +14.2% | \ud83d\udd34 Rising | Contract ASAP |\n| **Calamari (lb)** | $8.40 | $9.10 | +8.3% | \ud83d\udd34 Rising | Monitor |\n| **Fresh Basil (lb)** | $9.80 | $10.50 | +7.1% | \ud83d\udfe1 Seasonal | Expected |\n| **San Marzano Tomatoes** | $26.80 | $26.40 | -1.5% | \ud83d\udfe2 Stable | No action |\n| **Flour (All Trumps, 50lb)** | $23.80 | $23.30 | -2.1% | \ud83d\udfe2 Declining | No action |\n| **Ricotta (whole milk, 3lb)** | $8.75 | $8.60 | -1.7% | \ud83d\udfe2 Stable | No action |\n| **Pepperoni (Hormel, 25lb)** | $89.50 | $86.10 | -3.8% | \ud83d\udfe2 Declining | No action |\n\n---\n\n### Critical Alert: Mozzarella (+7.5% in 90 Days)\n\n**Cause:** Midwest dairy supply chain disruption (February weather events + herd reduction reports)\n**Forecast:** Industry analysts project mozzarella reaching $3.70\u2013$3.90/lb by June 2026 (+14\u201320% from today)\n\n| Impact Scenario | Annual Cost Increase (50 locations) |\n|----------------|------------------------------------|\n| Mozzarella hits $3.70 | +$14,000/year |\n| Mozzarella hits $3.90 | +$37,400/year |\n| Lock in today's $3.42 for 90 days | $0 increase |\n\n**Recommendation:** Contact US Foods account manager before April 5 to negotiate a Q2 contract. A 90-day lock at today's $3.42 saves an estimated $18,000\u2013$22,000 vs. projected June pricing.\n\n### Olive Oil Alert (+14.2% \u2014 Highest Priority)\n\n**Cause:** Mediterranean drought (Spain, Greece) reduced 2025\u201326 harvest by ~35%. Industry expects prices to remain elevated through Fall 2026.\n\n**Recommendation:** Ferraro currently has the best EVOO pricing. Push for a 6-month contract this week. Consider Tunisian or California domestic as backup if Ferraro won't contract.\n\n### Positive Signals\n\nFlour (-2.1%) and pepperoni (-3.8%) are both declining on improved commodity markets. Continue current purchasing cadence for these \u2014 no contract urgency.\n\n**Bottom line:** Two ingredients need immediate action this week \u2014 mozzarella and olive oil. Combined, locking in contracts now saves an estimated $26,000\u201334,000 franchise-wide over the next 6 months.",
+    t: "## 90-Day Ingredient Price Trend Analysis\n\n**Period:** Dec 28, 2025 \u2013 Mar 28, 2026 | **Sources:** US Foods, Ferraro & Sysco invoices via PrISM\n\n---\n\n### Price Movement Summary\n\n| Ingredient | Dec Price | Mar Price | Change | Direction | Action |\n|-----------|-----------|-----------|--------|-----------|--------|\n| **Mozzarella (whole milk/lb)** | $3.18 | $3.42 | +7.5% | \ud83d\udd34 Rising | LOCK IN NOW |\n| **Olive Oil (EVOO, gal)** | $33.20 | $37.90 | +14.2% | \ud83d\udd34 Rising | Contract ASAP |\n| **Calamari (lb)** | $8.40 | $9.10 | +8.3% | \ud83d\udd34 Rising | Monitor |\n| **Fresh Basil (lb)** | $9.80 | $10.50 | +7.1% | \ud83d\udfe1 Seasonal | Expected |\n| **San Marzano Tomatoes** | $26.80 | $26.40 | -1.5% | \ud83d\udfe2 Stable | No action |\n| **Flour (All Trumps, 50lb)** | $23.80 | $23.30 | -2.1% | \ud83d\udfe2 Declining | No action |\n| **Ricotta (whole milk, 3lb)** | $8.75 | $8.60 | -1.7% | \ud83d\udfe2 Stable | No action |\n| **Pepperoni (Hormel, 25lb)** | $89.50 | $86.10 | -3.8% | \ud83d\udfe2 Declining | No action |\n\n---\n\n### Critical Alert: Mozzarella (+7.5% in 90 Days)\n\n**Cause:** Midwest dairy supply chain disruption (February weather events + herd reduction reports)\n**Forecast:** Industry analysts project mozzarella reaching $3.70\u2013$3.90/lb by June 2026 (+14\u201320% from today)\n\n| Impact Scenario | Annual Cost Increase (50 locations) |\n|----------------|------------------------------------|\n| Mozzarella hits $3.70 | +$14,000/year |\n| Mozzarella hits $3.90 | +$37,400/year |\n| Lock in today's $3.42 for 90 days | $0 increase |\n\n**Recommendation:** Contact US Foods account manager before April 5 to negotiate a Q2 contract. A 90-day lock at today's $3.42 saves an estimated $18,000\u201322,000 vs. projected June pricing.\n\n### Olive Oil Alert (+14.2% \u2014 Highest Priority)\n\n**Cause:** Mediterranean drought (Spain, Greece) reduced 2025\u201326 harvest by ~35%. Industry expects prices to remain elevated through Fall 2026.\n\n**Recommendation:** Ferraro currently has the best EVOO pricing. Push for a 6-month contract this week. Consider Tunisian or California domestic as backup if Ferraro won't contract.\n\n### Positive Signals\n\nFlour (-2.1%) and pepperoni (-3.8%) are both declining on improved commodity markets. Continue current purchasing cadence for these \u2014 no contract urgency.\n\n**Bottom line:** Two ingredients need immediate action this week \u2014 mozzarella and olive oil. Combined, locking in contracts now saves an estimated $26,000\u201334,000 franchise-wide over the next 6 months.",
     s: ["JOHNSINVENTORY11.15.25.xlsx","Recently-Purchased-USFoods.xlsx","JOHN_S_MILFORD_OE_20251116.xlsx","Commodity-Price-Index-Q1-2026.md"],
     adr: "ADR-20260328-075 \u00b7 client \u00b7 3.8s \u00b7 7 chunks"
   },
@@ -204,20 +229,131 @@ const RESP = {
     t: "## Staffing Optimizer \u2014 John's of Arthur Avenue (Milford)\n\n**Model:** PrISM POS hourly sales \u00d7 labor efficiency benchmarks \u00d7 Q1 2026 actuals\n\n---\n\n### Current vs. Optimal Staffing (Milford)\n\n| Day | Current Staff | Optimal | Over/Under | Daily Labor Impact |\n|-----|--------------|---------|-----------|-------------------|\n| **Monday** | 8 | 6 | \u26a0\ufe0f +2 over | -$124/day |\n| **Tuesday** | 8 | 8 | \u2705 Optimal | $0 |\n| **Wednesday** | 8 | 7 | \u26a0\ufe0f +1 over | -$62/day |\n| **Thursday** | 9 | 9 | \u2705 Optimal | $0 |\n| **Friday** | 12 | 12 | \u2705 Optimal | $0 |\n| **Saturday** | 13 | 14 | \u2b07\ufe0f -1 under | +$62 lost rev. |\n| **Sunday** | 10 | 9 | \u26a0\ufe0f +1 over | -$62/day |\n\n**Weekly overstaffing cost at Milford:** ~$310/week \u2192 **$16,120/year**\n\n---\n\n### Shift-Level Breakdown (Weekday Model)\n\n| Shift | Hours | Demand | Recommended | Role Split |\n|-------|-------|--------|-------------|------------|\n| Morning prep | 9\u201311 AM | Low | 2 staff | 1 cook, 1 driver |\n| Lunch rush | 11 AM\u20132 PM | High | 7 staff | 3 cooks, 2 cashier, 2 drivers |\n| Afternoon | 2\u20135 PM | Low-Med | 3 staff | 2 cooks, 1 driver |\n| Dinner rush | 5\u20138 PM | Peak | 9 staff | 4 cooks, 2 cashier, 3 drivers |\n| Close | 8\u201310 PM | Declining | 4 staff | 2 cooks, 2 drivers |\n\n---\n\n### Labor Cost Benchmarks\n\n| Metric | Milford (Current) | Industry Target | Gap |\n|--------|-----------------|----------------|-----|\n| **Labor % of Revenue** | 31.4% | 28.0% | 3.4 pts over |\n| **Revenue per Labor Hour** | $38.20 | $42.80 | -$4.60/hr |\n| **Overtime Hours/Week** | 18 hrs | < 5 hrs | 13 hrs excess |\n| **AI Phone Coverage** | 90.7% of calls | \u2014 | Saves ~22 labor hrs/week |\n\n---\n\n### Franchise-Wide Impact (Milford Model \u00d7 50 Locations)\n\n| Opportunity | Annual Value |\n|-------------|-------------|\n| Reduce Mon/Wed/Sun overstaffing | **$806,000** |\n| Eliminate excess overtime | **$156,000** |\n| Saturday staffing upgrade (capture lost revenue) | **+$92,000 revenue** |\n| **Net labor optimization opportunity** | **~$1.05M/year** |\n\n### Recommended Actions This Week\n\n- **Monday/Wednesday:** Pull one staff member per day; reassign to Saturday evening on-call roster\n- **Overtime reduction:** Convert 3 heavy-OT cashier positions to split-shift part-time (same coverage, 40% lower OT)\n- **Saturday game days:** Pre-schedule on-call staff when AIXaaS demand forecast shows >+20% above baseline (AI gives 48-hour advance signal)\n\n**Bottom line:** Milford is running 3.4 points over optimal labor cost. The AI phone system already saves 22 hours/week; optimizing shift patterns captures another $16,120/year at Milford alone, or ~$1.05M franchise-wide.",
     s: ["PrISM-HourlySales-Q1-2026.csv","Labor-Schedule-Milford-Current.xlsx","Axe-CallRecordings-Q1-2026.md","Industry-LaborBenchmarks-QSR-2026.md"],
     adr: "ADR-20260328-076 \u00b7 client \u00b7 3.1s \u00b7 6 chunks"
+  },
+  menu_perf: {
+    q: "Show me menu performance for the past 30 days across all 50 locations. Which items are top sellers, which are underperforming, and what should we consider dropping or promoting?",
+    t: "## Menu Performance Report \u2014 John's of Arthur Avenue (All 50 Locations)\n\n**Period:** Feb 26 \u2013 Mar 28, 2026 | **Source:** PrISM POS Product Mix Report\n\n---\n\n### Top 10 Items by Revenue\n\n| Rank | Item | Qty Sold | Revenue | Margin % | Trend |\n|------|------|----------|---------|----------|-------|\n| 1 | Large Plain Pie | 28,420 | $483,140 | 68% | \u2191 Stable |\n| 2 | Large Pepperoni Pie | 19,830 | $357,540 | 64% | \u2191 +3% |\n| 3 | Large Margherita Pie | 14,210 | $269,990 | 71% | \u2191 +8% |\n| 4 | 6 Garlic Knots | 22,180 | $93,116 | 78% | \u2191 +12% |\n| 5 | Small Calamari | 8,940 | $116,220 | 55% | \u2194 Flat |\n| 6 | 8 Mozzarella Sticks | 7,320 | $65,880 | 72% | \u2191 +5% |\n| 7 | Large Sausage Pie | 5,810 | $104,580 | 62% | \u2193 -4% |\n| 8 | 2-Liter Soda | 11,440 | $45,760 | 82% | \u2191 +18% |\n| 9 | Caesar Salad | 3,290 | $42,770 | 61% | \u2193 -9% |\n| 10 | Chicken Parmigiana | 2,140 | $38,520 | 48% | \u2193 -14% |\n\n---\n\n### High-Margin Opportunities\n\n| Item | Current Rank | Margin | Upsell Potential |\n|------|-------------|--------|------------------|\n| **6 Garlic Knots** | #4 | 78% | Already top AI upsell (34% conversion) |\n| **2-Liter Soda** | #8 | 82% | Add to every upsell script (currently 22%) |\n| **8 Mozzarella Sticks** | #6 | 72% | Bundle with Large Pie for +$2 discount |\n\n---\n\n### Underperforming Items (Consider Action)\n\n| Item | Issue | Recommendation |\n|------|-------|----------------|\n| **Chicken Parmigiana** | -14% trend, 48% margin | Review recipe cost; consider price increase or removal |\n| **Caesar Salad** | -9% trend, 61% margin | Refresh presentation; add to lunch combo |\n| **Large Sausage Pie** | -4% trend | Feature in weekend specials to reverse trend |\n\n---\n\n### Margherita Rising \u2014 Action Item\n\n**Large Margherita** is up +8% and has the **highest margin (71%)** of all pies. Recommend:\n- Add to AI phone agent's upsell rotation (currently not featured)\n- Seasonal spring promotion: \"Fresh Margherita Month\"\n- Estimated incremental revenue: +$18,000/month franchise-wide\n\n**Bottom line:** Garlic knots and sodas are your highest-margin, fastest-growing items. The AI phone agent should be pushing these on every call. Chicken Parmigiana needs a recipe cost review before the next menu cycle.",
+    s: ["PrISM-ProductMixReport-2024-2025.csv","PrISM-ProductMixReport-Feb-Mar-2026.csv","Menu-Costing-Sheet-2026.xlsx","Franchise-Ops-Benchmarks.md"],
+    adr: "ADR-20260328-077 \u00b7 client \u00b7 2.8s \u00b7 5 chunks"
+  },
+  daily_prep: {
+    q: "Give me a prep guide for tomorrow based on the demand forecast. How much dough, sauce, and key ingredients do I need to prep for each shift?",
+    t: "## Daily Prep Guide \u2014 John's of Arthur Avenue (Milford)\n\n**Forecast Date:** Sunday, March 29, 2026 | **Generated:** 7:00 PM Saturday\n\n**Demand Forecast:** 520 orders (+5% vs. typical Sunday) | Weather: 58\u00b0F, Partly Cloudy\n\n---\n\n### Dough & Base Prep\n\n| Item | Qty to Prep | Timing | Notes |\n|------|------------|--------|-------|\n| **Dough balls (12\")** | 280 | By 9:00 AM | +20 buffer for walk-ins |\n| **Dough balls (14\")** | 180 | By 9:00 AM | Large pies peak at lunch |\n| **Dough balls (16\")** | 60 | By 10:00 AM | Party pies \u2014 slow Sunday |\n| **Pizza sauce (qt)** | 48 | By 9:30 AM | San Marzano base recipe |\n| **Garlic butter (lbs)** | 8 | By 10:00 AM | Knots + breadsticks |\n\n---\n\n### Protein & Cheese Prep\n\n| Item | Qty | Notes |\n|------|-----|-------|\n| **Mozzarella (shredded, lbs)** | 95 | Pull from walk-in by 8 AM to temper |\n| **Pepperoni (sliced, lbs)** | 28 | Sysco delivery confirmed |\n| **Sausage (loose, lbs)** | 12 | Pre-portion into 3oz cups |\n| **Calamari (thawed, lbs)** | 22 | Move from freezer tonight |\n| **Ricotta (lbs)** | 14 | Stuffed shells + white pies |\n\n---\n\n### Shift Staffing Plan\n\n| Shift | Hours | Staff | Notes |\n|-------|-------|-------|-------|\n| Prep | 8\u201311 AM | 2 | Dough + mise en place |\n| Lunch | 11 AM\u20132 PM | 7 | Expect 140 orders |\n| Mid | 2\u20135 PM | 4 | Restock + secondary prep |\n| Dinner | 5\u20138 PM | 8 | Expect 230 orders (peak) |\n| Close | 8\u201310 PM | 4 | 150 orders + cleanup |\n\n---\n\n### Supplier Delivery Confirmation\n\n| Supplier | Delivery Window | Items | Status |\n|----------|----------------|-------|--------|\n| US Foods | 6:00\u20137:30 AM | Mozzarella, ricotta, produce | \u2705 Confirmed |\n| Ferraro | No Sunday delivery | \u2014 | Check walk-in stock |\n| Sysco | 7:00\u20138:00 AM | Pepperoni, flour, dry goods | \u2705 Confirmed |\n\n---\n\n**Manager checklist:**\n- Confirm walk-in temp log (target: 36\u201338\u00b0F)\n- Verify AI phone agent is active before open\n- Pull Sunday sales comp from last 4 weeks in PrISM\n- Text on-call driver if dinner forecast exceeds 260 orders\n\n**Bottom line:** Standard Sunday prep with modest demand. No special events, standard staffing. Focus on getting the dinner shift to 8 staff \u2014 Sunday dinner has been short-staffed 3 of the last 4 weeks.",
+    s: ["PrISM-HourlySales-Q1-2026.csv","WeatherAPI-Milford-Forecast.json","Supplier-Delivery-Schedule.xlsx","Recipe-Costing-Master.xlsx"],
+    adr: "ADR-20260328-078 \u00b7 client \u00b7 2.3s \u00b7 4 chunks"
+  },
+  waste_track: {
+    q: "What ingredients are we wasting most at the Milford location? Show me waste by category and how much it's costing us.",
+    t: "## Food Waste Analysis \u2014 John's of Arthur Avenue (Milford)\n\n**Period:** Q1 2026 | **Source:** PrISM Inventory Variance + Supplier Invoice Reconciliation\n\n---\n\n### Waste Summary by Category\n\n| Category | Q1 Waste (lbs) | Q1 Cost | % of Purchases | vs. Industry Benchmark |\n|----------|---------------|---------|----------------|------------------------|\n| **Fresh Produce** | 284 lbs | $1,890 | 9.2% | \ud83d\udd34 3.1 pts over |\n| **Dough** | 1,840 balls | $736 | 6.8% | \ud83d\udfe1 1.2 pts over |\n| **Proteins (Calamari)** | 48 lbs | $437 | 5.3% | \ud83d\udd34 2.8 pts over |\n| **Cheese (Mozzarella)** | 62 lbs | $212 | 1.8% | \ud83d\udfe2 On target |\n| **Prepared Items** | 180 portions | $324 | 4.1% | \ud83d\udd34 1.6 pts over |\n| **Total Q1 Waste** | \u2014 | **$3,599** | \u2014 | \u2014 |\n\n**Annualized waste cost at Milford:** ~$14,400 | **Franchise-wide (50 locations):** ~$720,000\n\n---\n\n### Root Cause Analysis\n\n#### Fresh Produce (Highest Priority)\n\n| Item | Waste | Root Cause | Fix |\n|------|-------|------------|-----|\n| Fresh basil | 38 lbs/qtr | Over-ordering; 5-day shelf life | Order 2x/week vs. weekly |\n| Salad greens | 61 lbs/qtr | Caesar salad volume declined 9% | Reduce par by 15% |\n| Roma tomatoes | 44 lbs/qtr | Inconsistent prep yields | Standardize dice procedure |\n\n#### Calamari (Second Priority)\n\nCalamari waste is 5.3% of purchases \u2014 nearly 3 points over benchmark. Root cause: **thaw-to-order mis-timing**. Staff thawing full bags (5 lbs) when demand only needs 2\u20133 lbs. Refreezing reduces quality; remainder discarded.\n\n**Fix:** Implement PrISM demand signal for calamari thaw quantities. Pilot this Saturday using AIXaaS hourly forecast \u2014 thaw in 2.5 lb increments based on projected order volume.\n\n#### Dough\n\n6.8% waste is above the 5.5% industry target. Cause: prep quantities not adjusted for game-day vs. standard Sunday differences. AIXaaS demand forecasting already flags this \u2014 use the prep guide each morning.\n\n---\n\n### Savings Opportunity\n\n| Action | Annual Savings (Milford) | Franchise-Wide |\n|--------|------------------------|----------------|\n| Reduce produce over-ordering | $4,200 | $210,000 |\n| Calamari thaw protocol | $1,748 | $87,400 |\n| Dough prep alignment | $2,944 | $147,200 |\n| **Total opportunity** | **$8,892** | **$444,600** |\n\n**Bottom line:** $444,600 in annual franchise-wide savings from three operational fixes. None require capital investment \u2014 just process alignment with data the AIXaaS platform already generates every day.",
+    s: ["PrISM-InventoryVariance-Q1-2026.csv","JOHNSINVENTORY11.15.25.xlsx","Recipe-Costing-Master.xlsx","Supplier-Delivery-Schedule.xlsx"],
+    adr: "ADR-20260328-079 \u00b7 client \u00b7 2.9s \u00b7 5 chunks"
   }
 };
 
 /* Keyword matcher for free-text interactive mode */
 function matchQuery(text) {
   var t = text.toLowerCase();
-  if (/\b(call analytics|sentiment|escalat|upsell rate|conversion rate|q1 call|how many calls|call volume|handle rate)\b/.test(t)) return 'call_analytics';
-  if (/\b(call|phone order|voice agent|axe|maria|transcript|incoming|customer recogni)\b/.test(t)) return 'phone';
-  if (/\b(trend|90.day|90 day|going up|rising|lock in|price movement|commodity|price increase|getting expensive)\b/.test(t)) return 'cost_trend';
-  if (/\b(supplier|price comp|mozzarella|mozz|cheese|ferraro|sysco|us foods|overpay|invoice|ingredient cost|food cost|who is cheapest)\b/.test(t)) return 'cost';
+  if (/\b(call analytics|sentiment|escalat|upsell rate|conversion rate|q1 call|how many calls|call volume|handle rate|ai vs human)\b/.test(t)) return 'call_analytics';
+  if (/\b(call|phone order|voice agent|axe|maria|transcript|incoming|customer recogni|simulate.*order|order.*simulat)\b/.test(t)) return 'phone';
+  if (/\b(trend|90.day|90 day|going up|rising|lock in|price movement|commodity|price increase|getting expensive|what.*rising|lock.*contract)\b/.test(t)) return 'cost_trend';
+  if (/\b(supplier|price comp|mozzarella|mozz|cheese|ferraro|sysco|us foods|overpay|invoice|ingredient cost|food cost|who is cheapest|cheapest supplier)\b/.test(t)) return 'cost';
   if (/\b(staffing|staff|schedule|labor|shift|headcount|crew|workers|overtime|how many people|labor cost|overstaffed|understaffed)\b/.test(t)) return 'staffing';
+  if (/\b(waste|wasting|thrown away|spoilage|expir|inventory loss)\b/.test(t)) return 'waste_track';
+  if (/\b(prep guide|prep.*tomorrow|what.*prep|how much.*prep|mise en place|dough.*prep|prep.*dough)\b/.test(t)) return 'daily_prep';
+  if (/\b(menu|best sell|popular|top item|top sell|garlic knot|pepperoni|margherita|what.*selling|how.*menu|menu perform|product mix|sales mix)\b/.test(t)) return 'menu_perf';
   if (/\b(forecast|demand|yankee|game day|weather|saturday|busy|slow|when.s it busy|peak|rush|prep|how busy|how much to prep)\b/.test(t)) return 'demand';
-  if (/\b(order|what.s selling|best seller|popular|menu|top item|garlic knot|pepperoni|margherita|what should i prep)\b/.test(t)) return 'demand';
   return null;
+}
+
+/* Explore panel chip definitions */
+const EXPLORE_CHIPS = [
+  {
+    section: '&#127937; Questions from this demo',
+    color: '#ef4444',
+    chips: [
+      {label: 'AI phone order — live simulation', q: 'Simulate an incoming AI phone order. Show the voice agent handling the call.', key: 'phone'},
+      {label: 'Supplier price comparison — Milford', q: 'Compare mozzarella and key ingredient pricing across US Foods, Ferraro, and Sysco for Milford.', key: 'cost'},
+      {label: 'Game day demand forecast', q: 'Forecast demand for Saturday with Yankees game at nearby stadium.', key: 'demand'}
+    ]
+  },
+  {
+    section: '&#128222; Phone Ordering',
+    color: '#f59e0b',
+    chips: [
+      {label: 'Q1 call analytics — all 50 locations', q: 'Show Q1 2026 call analytics for all 50 locations including AI handle rates and upsell performance.', key: 'call_analytics'},
+      {label: 'Upsell conversion rate this quarter', q: 'What is our upsell conversion rate for Q1 2026 and what are customers accepting most?', key: 'call_analytics'},
+      {label: 'Peak call hours by location', q: 'Show me peak call hours and AI handle rates by time of day.', key: 'call_analytics'},
+      {label: 'Top escalation reasons', q: 'What are the top reasons customers are escalated to human agents?', key: 'call_analytics'}
+    ]
+  },
+  {
+    section: '&#128176; Supplier Intelligence',
+    color: '#10b981',
+    chips: [
+      {label: 'Which ingredients to lock in contracts?', q: 'Which ingredients are rising in price and should we lock in supplier contracts now?', key: 'cost_trend'},
+      {label: '90-day price trend analysis', q: 'Show me 90-day ingredient price trends. What is rising and what is falling?', key: 'cost_trend'},
+      {label: 'Where are we overpaying most?', q: 'Where are we most overpaying on food costs across our suppliers?', key: 'cost'},
+      {label: 'Olive oil contract alert', q: 'Show 90-day ingredient price trends and what we should lock in before prices increase.', key: 'cost_trend'}
+    ]
+  },
+  {
+    section: '&#128200; Demand & Events',
+    color: '#a855f7',
+    chips: [
+      {label: 'Staffing plan for this Saturday', q: 'Optimize staffing schedule for the Milford location based on this Saturday\'s demand forecast.', key: 'staffing'},
+      {label: 'Busiest day and time of week', q: 'What are our busiest days and peak hours based on PrISM POS data?', key: 'demand'},
+      {label: 'How weather affects order volume', q: 'How does weather affect our order volume? Show historical weather correlation.', key: 'demand'},
+      {label: 'Prep guide for tomorrow', q: 'Give me a prep guide for tomorrow based on the demand forecast.', key: 'daily_prep'}
+    ]
+  },
+  {
+    section: '&#127828; Menu & Inventory',
+    color: '#3b82f6',
+    chips: [
+      {label: 'Top selling items past 30 days', q: 'Show menu performance for the past 30 days. Which items are top sellers?', key: 'menu_perf'},
+      {label: 'Highest margin menu items', q: 'Which menu items have the highest profit margins?', key: 'menu_perf'},
+      {label: 'What food are we wasting most?', q: 'What ingredients are we wasting most at the Milford location?', key: 'waste_track'},
+      {label: 'Waste reduction savings opportunity', q: 'Show me food waste analysis and how much we could save by reducing it.', key: 'waste_track'}
+    ]
+  }
+];
+
+function buildExplorePanel() {
+  const panel = document.getElementById('explorePanel');
+  let html = '';
+  EXPLORE_CHIPS.forEach(function(section) {
+    html += '<div class="explore-section">';
+    html += '<div class="explore-section-title">' + section.section + '</div>';
+    html += '<div class="explore-chips">';
+    section.chips.forEach(function(chip) {
+      const border = section.color;
+      const bg = section.color.replace('#', 'rgba(') + ',0.10)';
+      html += '<button class="explore-chip" '
+        + 'style="border-color:' + border + ';color:' + border + ';background:' + bg + '" '
+        + 'data-key="' + chip.key + '" '
+        + 'data-q="' + chip.q.replace(/"/g, '&quot;') + '">'
+        + '<span class="chip-dot" style="background:' + border + '"></span>'
+        + chip.label
+        + '</button>';
+    });
+    html += '</div></div>';
+  });
+  panel.innerHTML = html;
+  panel.style.display = 'block';
+
+  panel.querySelectorAll('.explore-chip').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (isStreaming) return;
+      const key = btn.getAttribute('data-key');
+      const q = btn.getAttribute('data-q');
+      document.querySelectorAll('.explore-chip').forEach(function(b) { b.style.opacity = '0.6'; });
+      btn.style.opacity = '1';
+      btn.style.fontWeight = '700';
+      streamResp(key, q).then(function() {
+        document.querySelectorAll('.explore-chip').forEach(function(b) { b.style.opacity = '1'; b.style.fontWeight = ''; });
+      });
+    });
+  });
 }
 
 const NAR = [
@@ -233,7 +369,7 @@ const NAR = [
   {t:166000,sc:'sc9', v:"John's of Arthur Avenue. Powered by Inflexis AI and AIXaaS. Every menu item, every price point, every call metric came from John's actual operational data. Not synthetic. Not hypothetical. Real."}
 ];
 
-let paused=false, muted=false, demoComplete=false;
+let paused=false, muted=false, demoComplete=false, isStreaming=false, demoAborted=false;
 const cur = document.getElementById('demoCursor');
 
 function md2html(t) {
@@ -269,26 +405,32 @@ function setNar(txt){
   if(!muted&&window.speechSynthesis){window.speechSynthesis.cancel();speakNatural(txt);}
 }
 function setScr(id){document.querySelectorAll('.sc').forEach(e=>e.classList.remove('active'));const e=document.getElementById(id);if(e){e.classList.add('active');e.scrollIntoView({behavior:'smooth',block:'nearest'});}}
-function sleep(ms){return new Promise(res=>{let rem=ms;const iv=setInterval(()=>{if(!paused)rem-=100;if(rem<=0){clearInterval(iv);res();}},100);});}
+function sleep(ms){return new Promise(res=>{let rem=ms;const iv=setInterval(()=>{if(demoAborted){clearInterval(iv);res();}if(!paused)rem-=100;if(rem<=0){clearInterval(iv);res();}},100);});}
 
 async function streamResp(key, overrideQ){
-  const r=RESP[key];
-  document.getElementById('qi').value = overrideQ !== undefined ? overrideQ : r.q;
-  if (!demoComplete) clickCur(document.getElementById('rb'));
-  await sleep(320);
-  const rc=document.getElementById('rc');rc.style.display='block';
-  const rct=document.getElementById('rct');
-  document.getElementById('noMatchMsg').style.display='none';
-  rct.innerHTML='<div class="analyzing">Analyzing restaurant operations data&#8230;</div>';
-  document.getElementById('ra').innerHTML='';document.getElementById('rs').innerHTML='';
-  rc.scrollIntoView({behavior:'smooth',block:'nearest'});
-  await sleep(2240);
-  const html=md2html(r.t);
-  let rev=0;rct.innerHTML='<span class="tcursor"></span>';
-  while(rev<html.length){rev=Math.min(rev+14,html.length);rct.innerHTML=html.slice(0,rev)+'<span class="tcursor"></span>';await sleep(21);}
-  rct.innerHTML=html;
-  const chips=r.s.map(s=>'<span class="src-chip">'+s+'</span>').join('');
-  document.getElementById('rs').innerHTML='<div class="src-chips">'+chips+'</div><div class="adr-badge"><span class="adr-dot"></span>'+r.adr+'</div>';
+  if(isStreaming) return;
+  isStreaming = true;
+  try {
+    const r=RESP[key];
+    document.getElementById('qi').value = overrideQ !== undefined ? overrideQ : r.q;
+    if (!demoComplete) clickCur(document.getElementById('rb'));
+    await sleep(320);
+    const rc=document.getElementById('rc');rc.style.display='block';
+    const rct=document.getElementById('rct');
+    document.getElementById('noMatchMsg').style.display='none';
+    rct.innerHTML='<div class="analyzing">Analyzing restaurant operations data&#8230;</div>';
+    document.getElementById('ra').innerHTML='';document.getElementById('rs').innerHTML='';
+    rc.scrollIntoView({behavior:'smooth',block:'nearest'});
+    await sleep(900);
+    const html=md2html(r.t);
+    let rev=0;rct.innerHTML='<span class="tcursor"></span>';
+    while(rev<html.length){rev=Math.min(rev+30,html.length);rct.innerHTML=html.slice(0,rev)+'<span class="tcursor"></span>';await sleep(12);}
+    rct.innerHTML=html;
+    const chips=r.s.map(s=>'<span class="src-chip">'+s+'</span>').join('');
+    document.getElementById('rs').innerHTML='<div class="src-chips">'+chips+'</div><div class="adr-badge"><span class="adr-dot"></span>'+r.adr+'</div>';
+  } finally {
+    isStreaming = false;
+  }
 }
 
 async function runDemo(){
@@ -298,33 +440,36 @@ async function runDemo(){
   document.getElementById('statusDot').style.background='#10b981';
   document.getElementById('statusText').textContent='2,847 chunks \u00b7 azure+keyword \u00b7 LIVE';
   document.getElementById('kbInfo').textContent='PrISM POS \u00b7 US Foods \u00b7 Ferraro \u00b7 Sysco \u00b7 Axe Automation';
-  await sleep(8000);setNar(NAR[1].v);setScr('sc1');
-  await sleep(2400);
+  await sleep(8000); if(demoAborted) return enableInteractiveMode();
+  setNar(NAR[1].v);setScr('sc1');
+  await sleep(2400); if(demoAborted) return enableInteractiveMode();
   const po=document.getElementById('po');moveCur(po);await sleep(560);
   clickCur(po);po.classList.add('da');await sleep(480);
   await streamResp('phone');
-  setNar(NAR[2].v);setScr('sc2');await sleep(22400);
+  setNar(NAR[2].v);setScr('sc2');await sleep(22400); if(demoAborted) return enableInteractiveMode();
   setNar(NAR[3].v);setScr('sc3');
   po.classList.remove('da');const pc=document.getElementById('pc');moveCur(pc);await sleep(560);
   clickCur(pc);pc.classList.add('da');await sleep(480);
   await streamResp('cost');
-  setNar(NAR[4].v);setScr('sc4');await sleep(22400);
-  setNar(NAR[5].v);setScr('sc5');await sleep(14400);
+  setNar(NAR[4].v);setScr('sc4');await sleep(22400); if(demoAborted) return enableInteractiveMode();
+  setNar(NAR[5].v);setScr('sc5');await sleep(14400); if(demoAborted) return enableInteractiveMode();
   setNar(NAR[6].v);setScr('sc6');
   pc.classList.remove('da');const pw=document.getElementById('pw');moveCur(pw);await sleep(560);
   clickCur(pw);pw.classList.add('da');await sleep(480);
   await streamResp('demand');
-  setNar(NAR[7].v);setScr('sc7');await sleep(22400);
-  setNar(NAR[8].v);setScr('sc8');await sleep(12800);
+  setNar(NAR[7].v);setScr('sc7');await sleep(22400); if(demoAborted) return enableInteractiveMode();
+  setNar(NAR[8].v);setScr('sc8');await sleep(12800); if(demoAborted) return enableInteractiveMode();
   setNar(NAR[9].v);setScr('sc9');await sleep(6400);
   pw.classList.remove('da');
   cur.style.display='none';
-  setNar('Demo complete. Explore mode active \u2014 click any pattern in the library to run additional analyses.');
+  setNar('Demo complete. Explore mode active \u2014 click any question below or type your own.');
   enableInteractiveMode();
 }
 
 function enableInteractiveMode(){
   demoComplete=true;
+  cur.style.display='none';
+  document.getElementById('bskip').style.display='none';
   document.getElementById('exploreBanner').style.display='block';
   document.querySelectorAll('.qp-pattern-btn').forEach(b=>b.classList.add('live'));
   const btnMap={po:'phone',ca:'call_analytics',pc:'cost',ct:'cost_trend',pw:'demand',so:'staffing'};
@@ -332,11 +477,15 @@ function enableInteractiveMode(){
     const btn=document.getElementById(id);
     if(!btn)return;
     btn.addEventListener('click',async()=>{
+      if(isStreaming)return;
       document.querySelectorAll('.qp-pattern-btn').forEach(b=>b.classList.remove('da'));
       btn.classList.add('da');
       await streamResp(key);
+      btn.classList.remove('da');
     });
   });
+  buildExplorePanel();
+  document.getElementById('explorePanel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 /* V2.1 Narration */
@@ -375,11 +524,38 @@ document.getElementById('bpp').addEventListener('click',()=>{paused=!paused;docu
 document.getElementById('bmt').addEventListener('click',()=>{muted=!muted;document.getElementById('bmt').textContent=muted?'\uD83D\uDD07':'\uD83D\uDD0A';if(muted&&_synth)_synth.cancel();});
 document.getElementById('bsc').addEventListener('click',()=>document.getElementById('scriptSidebar').classList.toggle('open'));
 document.getElementById('brs').addEventListener('click',()=>location.reload());
-document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();document.getElementById('bpp').click();}if(e.code==='KeyM')document.getElementById('bmt').click();if(e.code==='KeyS')document.getElementById('bsc').click();if(e.code==='KeyR')document.getElementById('brs').click();});
+document.getElementById('bskip').addEventListener('click',()=>{
+  demoAborted=true;
+  paused=false;
+  if(_synth)_synth.cancel();
+  document.getElementById('statusDot').style.background='#10b981';
+  document.getElementById('statusText').textContent='2,847 chunks \u00b7 azure+keyword \u00b7 LIVE';
+  document.getElementById('kbInfo').textContent='PrISM POS \u00b7 US Foods \u00b7 Ferraro \u00b7 Sysco \u00b7 Axe Automation';
+  setNar('Explore mode active \u2014 click any question below or use the pattern library.');
+  setTimeout(enableInteractiveMode, 400);
+});
+
+/* Keyboard shortcuts — skip when focus is in a text field */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return;
+  if(e.code==='Space'){e.preventDefault();document.getElementById('bpp').click();}
+  if(e.code==='KeyM')document.getElementById('bmt').click();
+  if(e.code==='KeyS')document.getElementById('bsc').click();
+  if(e.code==='KeyR')document.getElementById('brs').click();
+});
+
+/* Enter to submit in textarea (interactive mode only) */
+document.getElementById('qi').addEventListener('keydown', function(e) {
+  if(e.key==='Enter' && !e.shiftKey && demoComplete) {
+    e.preventDefault();
+    document.getElementById('rb').click();
+  }
+});
 
 /* Run Analysis button — keyword matcher for interactive mode */
 document.getElementById('rb').addEventListener('click',async()=>{
   if(!demoComplete)return;
+  if(isStreaming)return;
   const q=document.getElementById('qi').value.trim();
   if(!q)return;
   const key=matchQuery(q);
