@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>AIXaaS — RAG Engine & Model Router Architecture</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    .page-layout {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: calc(100vh - 57px); padding: 32px 40px; gap: 24px;
+    }
+    .page-title {
+      font-size: 26px; font-weight: 700;
+      background: linear-gradient(135deg, var(--qp-blue), var(--qp-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    /* Architecture diagram */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 200px 60px 220px 60px 220px 60px 200px;
+      align-items: center;
+      gap: 0;
+    }
+    .arch-box {
+      padding: 18px 16px; border-radius: 12px;
+      text-align: center; opacity: 0.15; transition: all 0.6s;
+    }
+    .arch-box.active {
+      opacity: 1; transform: scale(1.02);
+    }
+    .arch-box .box-icon { font-size: 28px; margin-bottom: 6px; }
+    .arch-box .box-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .arch-box .box-detail { font-size: 11px; color: var(--qp-muted); line-height: 1.5; }
+    .box-query {
+      background: var(--qp-panel); border: 2px solid var(--qp-blue);
+      box-shadow: 0 0 16px var(--qp-glow);
+    }
+    .box-classifier {
+      background: var(--qp-panel); border: 2px solid var(--qp-purple);
+    }
+    .box-classifier.active { box-shadow: 0 0 16px rgba(168,85,247,0.3); }
+    .box-engine {
+      background: var(--qp-panel); border: 2px solid var(--qp-cyan);
+    }
+    .box-engine.active { box-shadow: 0 0 16px rgba(34,211,238,0.3); }
+    .box-response {
+      background: var(--qp-panel); border: 2px solid var(--qp-green);
+    }
+    .box-response.active { box-shadow: 0 0 16px rgba(16,185,129,0.3); }
+    .arch-arrow {
+      text-align: center; font-size: 24px;
+      color: var(--qp-dim); opacity: 0.15; transition: all 0.5s;
+    }
+    .arch-arrow.active { opacity: 1; color: var(--qp-cyan); }
+    /* Engine details row */
+    .engine-row {
+      display: flex; gap: 16px; width: 100%; max-width: 900px;
+    }
+    .engine-card {
+      flex: 1; padding: 16px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      border-radius: 10px; opacity: 0; transition: all 0.5s;
+    }
+    .engine-card.visible { opacity: 1; }
+    .engine-card.highlighted { border-color: var(--qp-cyan); box-shadow: 0 0 12px rgba(34,211,238,0.15); }
+    .engine-card .card-icon { font-size: 22px; margin-bottom: 6px; }
+    .engine-card .card-title { font-size: 14px; font-weight: 700; color: var(--qp-text); margin-bottom: 4px; }
+    .engine-card .card-desc { font-size: 12px; color: var(--qp-muted); line-height: 1.5; }
+    .engine-card .card-badge {
+      display: inline-block; font-size: 10px; padding: 2px 8px;
+      border-radius: 4px; font-weight: 600; margin-top: 6px;
+    }
+    .badge-zt { background: rgba(245,158,11,0.15); color: var(--qp-amber); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-api { background: rgba(59,130,246,0.15); color: var(--qp-blue); border: 1px solid rgba(59,130,246,0.3); }
+    .badge-local { background: rgba(16,185,129,0.15); color: var(--qp-green); border: 1px solid rgba(16,185,129,0.3); }
+    /* Model router */
+    .router-section {
+      display: flex; gap: 12px; align-items: center;
+      opacity: 0; transition: opacity 0.5s;
+    }
+    .router-section.visible { opacity: 1; }
+    .model-box {
+      padding: 12px 18px; border-radius: 10px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      text-align: center; opacity: 0.3; transition: all 0.4s;
+    }
+    .model-box.active { opacity: 1; }
+    .model-box.primary { border-color: var(--qp-blue); box-shadow: 0 0 12px var(--qp-glow); }
+    .model-box .model-name { font-size: 13px; font-weight: 700; }
+    .model-box .model-tier { font-size: 11px; color: var(--qp-muted); }
+    .router-arrow { font-size: 18px; color: var(--qp-dim); }
+    .router-label {
+      font-size: 12px; color: var(--qp-muted);
+      background: var(--qp-deep); padding: 6px 14px;
+      border-radius: 6px; border: 1px solid var(--qp-border);
+    }
+    .controls-hint {
+      position: fixed; top: 8px; right: 8px;
+      font-size: 11px; color: var(--qp-dim); z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls-hint">SPACE = play/pause &nbsp;|&nbsp; R = restart</div>
+
+  <div class="brand-bar">
+    <img src="../img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">AIXaaS Intelligence Platform</span>
+    <span class="subtitle">RAG Engine & Model Router</span>
+  </div>
+
+  <div class="page-layout">
+    <div class="page-title">RAG Engine & Model Router Architecture</div>
+
+    <!-- Architecture flow -->
+    <div class="arch-grid">
+      <div class="arch-box box-query" id="box-query">
+        <div class="box-icon">&#128172;</div>
+        <div class="box-title">User Query</div>
+        <div class="box-detail">Natural language question<br>from any namespace</div>
+      </div>
+      <div class="arch-arrow" id="arr1">&#10132;</div>
+      <div class="arch-box box-classifier" id="box-classifier">
+        <div class="box-icon">&#129504;</div>
+        <div class="box-title">Query Classifier</div>
+        <div class="box-detail">Factual / Navigation /<br>Analytical / Exploratory</div>
+      </div>
+      <div class="arch-arrow" id="arr2">&#10132;</div>
+      <div class="arch-box box-engine" id="box-engine">
+        <div class="box-icon">&#9881;&#65039;</div>
+        <div class="box-title">Engine Selection</div>
+        <div class="box-detail">Zero-token path or<br>RAG + LLM synthesis</div>
+      </div>
+      <div class="arch-arrow" id="arr3">&#10132;</div>
+      <div class="arch-box box-response" id="box-response">
+        <div class="box-icon">&#10004;&#65039;</div>
+        <div class="box-title">Governed Response</div>
+        <div class="box-detail">Grounded, cited,<br>ADR-audited</div>
+      </div>
+    </div>
+
+    <!-- Engine detail cards -->
+    <div class="engine-row">
+      <div class="engine-card" id="eng-zt">
+        <div class="card-icon">&#9889;</div>
+        <div class="card-title">Zero-Token Engine</div>
+        <div class="card-desc">Deterministic pattern matching for compliance detection, PII scanning, and factual lookups. No LLM call needed.</div>
+        <div class="card-badge badge-zt">$0 API Cost</div>
+      </div>
+      <div class="engine-card" id="eng-rag">
+        <div class="card-icon">&#128269;</div>
+        <div class="card-title">RAG + LLM Synthesis</div>
+        <div class="card-desc">4-tier knowledge base search, chunk retrieval, context window construction, LLM grounded response generation.</div>
+        <div class="card-badge badge-api">API Call</div>
+      </div>
+      <div class="engine-card" id="eng-cache">
+        <div class="card-icon">&#128200;</div>
+        <div class="card-title">Semantic Cache</div>
+        <div class="card-desc">Embedding-based query matching. If a similar question was answered recently, return cached response instantly.</div>
+        <div class="card-badge badge-local">Cached</div>
+      </div>
+    </div>
+
+    <!-- Model router -->
+    <div class="router-section" id="router-section">
+      <div class="router-label">Model Router</div>
+      <div class="router-arrow">&#10132;</div>
+      <div class="model-box" id="model-sonnet">
+        <div class="model-name" style="color:var(--qp-blue);">Claude Sonnet 4</div>
+        <div class="model-tier">Primary &bull; Enterprise</div>
+      </div>
+      <div class="router-arrow">&#10132;</div>
+      <div class="model-box" id="model-haiku">
+        <div class="model-name" style="color:var(--qp-cyan);">Claude Haiku</div>
+        <div class="model-tier">Fallback &bull; Budget</div>
+      </div>
+      <div class="router-arrow">&#10132;</div>
+      <div class="model-box" id="model-local">
+        <div class="model-name" style="color:var(--qp-green);">Local Ollama</div>
+        <div class="model-tier">Budget Gate &bull; $0</div>
+      </div>
+      <div class="router-arrow">&#10132;</div>
+      <div class="model-box" id="model-azure">
+        <div class="model-name" style="color:var(--qp-purple);">Azure OpenAI</div>
+        <div class="model-tier">Data Residency</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="demo_animations.js"></script>
+  <script>
+    demo.setTimeline([
+      { time: 0, action: 'narrate', text: 'How AIXaaS processes every query. Four stages from question to governed response \u2014 with intelligent routing that minimizes cost.', timestamp: '0:00' },
+
+      // Query enters
+      { time: 3, action: 'addClass', target: '#box-query', className: 'active' },
+      { time: 4, action: 'narrate', text: 'A user asks a question. It could be about compliance, financial data, operational metrics \u2014 anything in their knowledge base.', timestamp: '0:04' },
+
+      // Classifier
+      { time: 7, action: 'addClass', target: '#arr1', className: 'active' },
+      { time: 8, action: 'addClass', target: '#box-classifier', className: 'active' },
+      { time: 8.5, action: 'narrate', text: 'The Query Classifier determines intent. Factual questions get instant answers. Analytical queries route to the RAG engine. Navigation queries get zero-token responses.', timestamp: '0:08' },
+
+      // Engine selection
+      { time: 12, action: 'addClass', target: '#arr2', className: 'active' },
+      { time: 13, action: 'addClass', target: '#box-engine', className: 'active' },
+      { time: 13.5, action: 'narrate', text: 'Engine Selection \u2014 the critical routing decision. Can we answer this without an API call? If yes, the zero-token path fires. If no, RAG retrieves and the LLM synthesizes.', timestamp: '0:13' },
+
+      // Show engine cards
+      { time: 17, action: 'show', target: '#eng-zt', className: 'visible' },
+      { time: 17.5, action: 'show', target: '#eng-rag', className: 'visible' },
+      { time: 18, action: 'show', target: '#eng-cache', className: 'visible' },
+
+      { time: 18.5, action: 'narrate', text: 'Three engine paths. The Zero-Token engine handles compliance and PII at zero cost. The RAG engine grounds responses in your data. The Semantic Cache returns instant hits for repeat queries.', timestamp: '0:18' },
+
+      // Highlight zero-token
+      { time: 22, action: 'addClass', target: '#eng-zt', className: 'highlighted' },
+      { time: 22.5, action: 'narrate', text: 'The zero-token engine is our innovation. 23 compliance frameworks detected using deterministic pattern matching. No LLM call, no API cost, no hallucination risk.', timestamp: '0:22' },
+      { time: 26, action: 'removeClass', target: '#eng-zt', className: 'highlighted' },
+
+      // Response
+      { time: 27, action: 'addClass', target: '#arr3', className: 'active' },
+      { time: 28, action: 'addClass', target: '#box-response', className: 'active' },
+      { time: 28.5, action: 'narrate', text: 'Every response is governed. Grounded in source data, cited with references, logged to the ADR audit trail. No unverified claims ever reach the user.', timestamp: '0:28' },
+
+      // Model router
+      { time: 32, action: 'show', target: '#router-section' },
+      { time: 33, action: 'narrate', text: 'The Model Router adds another layer of intelligence. Claude Sonnet for enterprise queries, Haiku for budget-conscious tasks, local Ollama when API budgets are exhausted, Azure OpenAI for data residency requirements.', timestamp: '0:33' },
+
+      { time: 35, action: 'addClass', target: '#model-sonnet', className: 'active' },
+      { time: 35, action: 'addClass', target: '#model-sonnet', className: 'primary' },
+      { time: 36, action: 'addClass', target: '#model-haiku', className: 'active' },
+      { time: 37, action: 'addClass', target: '#model-local', className: 'active' },
+      { time: 38, action: 'addClass', target: '#model-azure', className: 'active' },
+
+      { time: 40, action: 'narrate', text: 'Model-agnostic by design. When a better model launches, we swap it in without changing a single line of client code. The governance layer stays constant.', timestamp: '0:40' },
+    ]);
+
+    setTimeout(() => demo.play(), 1000);
+  </script>
+</body>
+</html>

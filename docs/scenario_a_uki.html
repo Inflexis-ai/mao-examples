@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>AIXaaS Demo — Scenario A: UKI Education Data</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr 280px;
+      height: calc(100vh - 57px);
+      gap: 0;
+    }
+    /* Left sidebar */
+    .sidebar-left {
+      background: var(--qp-deep);
+      border-right: 1px solid var(--qp-border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .sidebar-left .section-title {
+      font-size: 11px;
+      color: var(--qp-dim);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 16px 0 8px;
+    }
+    .sidebar-left .section-title:first-child { margin-top: 0; }
+    /* Center */
+    .center-main {
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .domain-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .domain-chip {
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      background: var(--qp-card);
+      border: 1px solid var(--qp-border);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .domain-chip.active {
+      background: rgba(59,130,246,0.15);
+      border-color: var(--qp-blue);
+      color: var(--qp-blue);
+    }
+    .query-section { display: flex; flex-direction: column; gap: 8px; }
+    .query-label { font-size: 12px; color: var(--qp-muted); }
+    .send-btn {
+      align-self: flex-end;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, var(--qp-blue), var(--qp-purple));
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.3s;
+    }
+    .send-btn.active { opacity: 1; box-shadow: 0 0 16px var(--qp-glow); }
+    /* Right sidebar */
+    .sidebar-right {
+      background: var(--qp-deep);
+      border-left: 1px solid var(--qp-border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .agent-tab-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .agent-tab {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--qp-dim);
+      cursor: pointer;
+    }
+    .agent-tab.active { background: var(--qp-card); color: var(--qp-cyan); }
+    .kb-status-mini {
+      background: var(--qp-card);
+      border: 1px solid var(--qp-border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 12px;
+    }
+    .kb-row { display: flex; justify-content: space-between; margin: 4px 0; }
+    .kb-value { color: var(--qp-cyan); font-weight: 600; font-family: monospace; }
+    .streaming-toggle {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--qp-muted);
+    }
+    .toggle-switch {
+      width: 32px; height: 18px;
+      background: var(--qp-card);
+      border: 1px solid var(--qp-border);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-switch .knob {
+      width: 14px; height: 14px;
+      background: var(--qp-dim);
+      border-radius: 50%;
+      position: absolute;
+      top: 1px; left: 1px;
+      transition: all 0.3s;
+    }
+    .toggle-switch.on .knob {
+      left: 15px;
+      background: var(--qp-cyan);
+    }
+    /* Response extras */
+    .response-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--qp-muted);
+      margin-top: 8px;
+    }
+    .sources-list {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    .source-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(30,58,95,0.3);
+    }
+    .source-score { color: var(--qp-green); font-family: monospace; }
+    .controls-hint {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      font-size: 11px;
+      color: var(--qp-dim);
+      z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls-hint">SPACE = play/pause &nbsp;|&nbsp; R = restart</div>
+
+  <!-- Brand bar -->
+  <div class="brand-bar">
+    <img src="../img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">AIXaaS Intelligence Platform</span>
+    <div class="streaming-toggle">
+      <span>Streaming</span>
+      <div class="toggle-switch on"><div class="knob"></div></div>
+    </div>
+    <span class="subtitle">josh (demo) &bull; Foundation Demo</span>
+  </div>
+
+  <div class="demo-layout">
+    <!-- Left sidebar: Pattern Library -->
+    <div class="sidebar-left">
+      <div class="section-title">Knowledge Domains</div>
+      <div id="domain-demo" class="sidebar-item selected">Foundation Demo</div>
+      <div class="sidebar-item">Documents</div>
+      <div class="sidebar-item">Structured Data</div>
+      <div class="sidebar-item">Compliance</div>
+
+      <div class="section-title">Pattern Library</div>
+      <div id="pattern-cost" class="sidebar-item">Cost Variance Analysis</div>
+      <div id="pattern-anomaly" class="sidebar-item">Anomaly Detection</div>
+      <div id="pattern-compliance" class="sidebar-item">Compliance Gap Scan</div>
+      <div id="pattern-exec" class="sidebar-item">Executive Summary</div>
+      <div id="pattern-inventory" class="sidebar-item">Knowledge Inventory</div>
+      <div id="pattern-trend" class="sidebar-item">Trend Analysis</div>
+    </div>
+
+    <!-- Center: Query + Response -->
+    <div class="center-main">
+      <div class="query-section">
+        <div class="query-label">Query Builder</div>
+        <div class="typing-area" id="query-box"><span class="typing-cursor"></span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="badge-row">
+            <div class="compliance-badge nist" id="badge-nist">NIST-CSF</div>
+            <div class="compliance-badge iso" id="badge-iso">ISO-27001</div>
+            <div class="compliance-badge sox" id="badge-sox">SOX</div>
+          </div>
+          <button class="send-btn" id="send-btn">Analyze</button>
+        </div>
+      </div>
+
+      <div class="panel" id="response-panel" style="display:none;">
+        <div class="panel-header"><div class="dot"></div> Response</div>
+        <div class="response-area" id="response-area"></div>
+        <div class="response-meta" id="response-meta" style="display:none;">
+          <span>Model: <strong style="color:var(--qp-cyan)">claude-sonnet-4</strong></span>
+          <span>Chunks: <strong id="chunks-count">0</strong></span>
+          <span>Namespace: <strong>demo</strong></span>
+          <div class="adr-pill" id="adr-pill">ADR-0042 logged</div>
+        </div>
+        <div class="sources-list" id="sources-list" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Right sidebar: AI Navigator -->
+    <div class="sidebar-right">
+      <div class="panel-header"><div class="dot"></div> AI Navigator</div>
+      <div class="agent-tab-bar">
+        <div class="agent-tab active">Explore</div>
+        <div class="agent-tab">Analyst</div>
+        <div class="agent-tab">Execute</div>
+        <div class="agent-tab">Govern</div>
+      </div>
+      <div style="font-size:13px; color:var(--qp-muted); margin-bottom:12px;">
+        Suggested follow-up actions will appear here after your query.
+      </div>
+      <div id="agent-suggestions" style="display:none;">
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Drill down: top 3 cost centers</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Compare Q3 vs Q4 variance</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Generate executive brief PDF</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Flag anomalies for review</div>
+      </div>
+      <div class="kb-status-mini">
+        <div style="font-size:11px; color:var(--qp-dim); margin-bottom:6px;">KB STATUS</div>
+        <div class="kb-row"><span>Chunks</span><span class="kb-value" id="kb-chunks">27</span></div>
+        <div class="kb-row"><span>Mode</span><span class="kb-value">azure+keyword</span></div>
+        <div class="kb-row"><span>Ready</span><span class="kb-value" style="color:var(--qp-green);">true</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="demo_animations.js"></script>
+  <script>
+    const RESPONSE_HTML = `
+<h3>Cost Variance Analysis &mdash; Foundation Demo</h3>
+<p>Based on the ingested UKI operational data, I identified <span class="finding">3 significant cost variances</span> totaling <span class="finding">$88,500</span> in potential recovery:</p>
+
+<p><strong>1. Facilities Management &mdash; $42,300 overrun (18.2% above budget)</strong></p>
+<p>The Q4 facilities spend exceeded projections driven by unplanned HVAC maintenance across two campuses. Vendor invoices show <span class="finding">$28,100 in emergency repair charges</span> that were not pre-approved through the standard procurement workflow. <span class="citation">UKI-ops-facilities-q4.csv</span></p>
+
+<p><strong>2. Professional Development &mdash; $31,200 variance (24.7% above budget)</strong></p>
+<p>Training and certification costs exceeded budget due to a bulk enrollment in cloud architecture certifications. While strategically valuable, the <span class="finding">$31,200 spend was not captured in the annual L&D forecast</span>. <span class="citation">UKI-ops-hr-training.csv</span></p>
+
+<p><strong>3. IT Infrastructure &mdash; $15,000 under-utilization</strong></p>
+<p>Reserved cloud compute capacity shows <span class="finding">37% average utilization</span> across Q3-Q4, indicating $15,000 in recoverable spend through right-sizing. <span class="citation">UKI-ops-it-infra.csv</span></p>
+
+<h3>Recommended Actions</h3>
+<p>1. Implement pre-approval gates for facilities spend exceeding $5,000<br>
+2. Consolidate L&D budgets under centralized quarterly planning<br>
+3. Initiate cloud right-sizing review &mdash; projected annual savings: <span class="finding">$60,000</span></p>`;
+
+    const SOURCES_HTML = `
+      <div class="source-item"><span>UKI-ops-facilities-q4.csv</span><span class="source-score">94%</span></div>
+      <div class="source-item"><span>UKI-ops-hr-training.csv</span><span class="source-score">91%</span></div>
+      <div class="source-item"><span>UKI-ops-it-infra.csv</span><span class="source-score">87%</span></div>
+      <div class="source-item"><span>UKI-platform-overview.md</span><span class="source-score">72%</span></div>
+    `;
+
+    demo.setTimeline([
+      // 0:00 — Narrate intro
+      { time: 0, action: 'narrate', text: 'Welcome to AIXaaS. This is the Intelligence Platform query interface \u2014 where enterprise data becomes actionable insight.', timestamp: '0:00' },
+
+      // 0:03 — Mouse moves to Pattern Library
+      { time: 3, action: 'moveTo', target: '#pattern-cost' },
+      { time: 4, action: 'narrate', text: 'The Pattern Library contains pre-built analytical templates. Watch as we select Cost Variance Analysis.', timestamp: '0:04' },
+
+      // 0:06 — Click pattern
+      { time: 6, action: 'click', target: '#pattern-cost' },
+      { time: 6.5, action: 'addClass', target: '#pattern-cost', className: 'selected' },
+
+      // 0:08 — Type query
+      { time: 8, action: 'narrate', text: 'The query auto-populates. The system will search the UKI knowledge base for cost variance data.', timestamp: '0:08' },
+      { time: 9, action: 'type', target: '#query-box', text: 'Identify the top cost variances across UKI operational departments and quantify recovery opportunities', speed: 35 },
+
+      // 0:15 — Click send
+      { time: 15, action: 'addClass', target: '#send-btn', className: 'active' },
+      { time: 16, action: 'click', target: '#send-btn' },
+      { time: 16.5, action: 'narrate', text: 'The query hits the RAG engine. It searches 27 knowledge chunks, retrieves the most relevant, and sends them to Claude for synthesis.', timestamp: '0:16' },
+
+      // 0:18 — Show response panel
+      { time: 18, action: 'custom', fn: () => { document.getElementById('response-panel').style.display = 'block'; document.getElementById('response-panel').classList.add('fade-in'); }},
+
+      // 0:19 — Stream response
+      { time: 19, action: 'streamResponse', target: '#response-area', html: RESPONSE_HTML, speed: 6 },
+
+      // 0:35 — Show compliance badges
+      { time: 35, action: 'narrate', text: 'Notice the compliance badges \u2014 the zero-token engine detected NIST-CSF, ISO-27001, and SOX relevance without a single API call.', timestamp: '0:35' },
+      { time: 36, action: 'show', target: '#badge-nist' },
+      { time: 36.5, action: 'show', target: '#badge-iso' },
+      { time: 37, action: 'show', target: '#badge-sox' },
+
+      // 0:40 — Show response meta + ADR
+      { time: 40, action: 'custom', fn: () => { document.getElementById('response-meta').style.display = 'flex'; }},
+      { time: 40.5, action: 'counter', target: '#chunks-count', from: 0, to: 27, duration: 800 },
+      { time: 41.5, action: 'show', target: '#adr-pill' },
+      { time: 42, action: 'narrate', text: 'Every query generates an ADR \u2014 Architectural Decision Record. This is the audit trail that enterprises need for compliance and governance.', timestamp: '0:42' },
+
+      // 0:46 — Show sources
+      { time: 46, action: 'custom', fn: () => {
+        const sl = document.getElementById('sources-list');
+        sl.style.display = 'block';
+        sl.innerHTML = SOURCES_HTML;
+        sl.classList.add('fade-in');
+      }},
+      { time: 47, action: 'narrate', text: 'Source citations show exactly where every finding came from \u2014 with relevance scores. The platform found $88,500 in recoverable costs in under 90 seconds.', timestamp: '0:47' },
+
+      // 0:52 — Show agent suggestions
+      { time: 52, action: 'moveTo', target: '.sidebar-right .panel-header' },
+      { time: 53, action: 'custom', fn: () => { document.getElementById('agent-suggestions').style.display = 'block'; document.getElementById('agent-suggestions').classList.add('fade-in'); }},
+      { time: 54, action: 'narrate', text: 'The AI Navigator suggests follow-up actions \u2014 drill deeper, compare periods, or generate an executive brief. This is governance-first AI at work.', timestamp: '0:54' },
+
+      // 0:60 — Final
+      { time: 60, action: 'narrate', text: 'That\'s AIXaaS \u2014 your data, your rules, our orchestration. Every insight grounded. Every action audited.', timestamp: '1:00' },
+    ]);
+
+    // Auto-play after 1 second
+    setTimeout(() => demo.play(), 1000);
+  </script>
+</body>
+</html>

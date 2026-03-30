@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>AIXaaS Demo — Scenario C: Enterprise Financial Services</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr 280px;
+      height: calc(100vh - 57px);
+    }
+    .sidebar-left {
+      background: var(--qp-deep); border-right: 1px solid var(--qp-border);
+      padding: 16px; overflow-y: auto;
+    }
+    .section-title {
+      font-size: 11px; color: var(--qp-dim);
+      text-transform: uppercase; letter-spacing: 1.5px; margin: 16px 0 8px;
+    }
+    .section-title:first-child { margin-top: 0; }
+    .center-main {
+      display: flex; flex-direction: column;
+      padding: 16px 20px; gap: 12px; overflow-y: auto;
+    }
+    .query-label { font-size: 12px; color: var(--qp-muted); }
+    .send-btn {
+      align-self: flex-end; padding: 8px 20px;
+      background: linear-gradient(135deg, var(--qp-blue), var(--qp-purple));
+      border: none; border-radius: 8px; color: white;
+      font-size: 13px; font-weight: 600; opacity: 0.5; transition: all 0.3s;
+    }
+    .send-btn.active { opacity: 1; box-shadow: 0 0 16px var(--qp-glow); }
+    .sidebar-right {
+      background: var(--qp-deep); border-left: 1px solid var(--qp-border);
+      padding: 16px; overflow-y: auto;
+    }
+    .kb-status-mini {
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      border-radius: 8px; padding: 10px; margin-top: 12px; font-size: 12px;
+    }
+    .kb-row { display: flex; justify-content: space-between; margin: 4px 0; }
+    .kb-value { color: var(--qp-cyan); font-weight: 600; font-family: monospace; }
+    .response-meta {
+      display: flex; gap: 12px; align-items: center;
+      font-size: 11px; color: var(--qp-muted); margin-top: 8px;
+    }
+    .source-item {
+      display: flex; justify-content: space-between;
+      padding: 4px 0; border-bottom: 1px solid rgba(30,58,95,0.3); font-size: 12px;
+    }
+    .source-score { color: var(--qp-green); font-family: monospace; }
+    .controls-hint {
+      position: fixed; top: 8px; right: 8px;
+      font-size: 11px; color: var(--qp-dim); z-index: 10000;
+    }
+    /* Upload animation */
+    .upload-zone {
+      border: 2px dashed var(--qp-border); border-radius: 10px;
+      padding: 20px; text-align: center; transition: all 0.5s;
+      background: var(--qp-card);
+    }
+    .upload-zone.active {
+      border-color: var(--qp-cyan);
+      background: rgba(34,211,238,0.05);
+      box-shadow: 0 0 20px rgba(34,211,238,0.1);
+    }
+    .upload-zone.complete {
+      border-color: var(--qp-green);
+      background: rgba(16,185,129,0.05);
+    }
+    .upload-icon { font-size: 28px; margin-bottom: 6px; }
+    .upload-filename {
+      font-size: 13px; color: var(--qp-cyan); font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .upload-filename.visible { opacity: 1; }
+    .pipeline-section {
+      background: var(--qp-panel); border: 1px solid var(--qp-border);
+      border-radius: 10px; padding: 16px; display: none;
+    }
+    .pipeline-section.visible { display: block; }
+    .anomaly-table {
+      width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px;
+    }
+    .anomaly-table th {
+      text-align: left; padding: 6px 8px; color: var(--qp-dim);
+      border-bottom: 1px solid var(--qp-border); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .anomaly-table td {
+      padding: 6px 8px; border-bottom: 1px solid rgba(30,58,95,0.3);
+    }
+    .risk-high { color: var(--qp-red); font-weight: 600; }
+    .risk-medium { color: var(--qp-amber); font-weight: 600; }
+    .amount { font-family: monospace; color: var(--qp-cyan); }
+  </style>
+</head>
+<body>
+  <div class="controls-hint">SPACE = play/pause &nbsp;|&nbsp; R = restart</div>
+
+  <div class="brand-bar">
+    <img src="../img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">AIXaaS Intelligence Platform</span>
+    <span class="subtitle">enterprise-client (client) &bull; Structured Data</span>
+  </div>
+
+  <div class="demo-layout">
+    <!-- Left sidebar -->
+    <div class="sidebar-left">
+      <div class="section-title">Knowledge Domains</div>
+      <div class="sidebar-item">Foundation Demo</div>
+      <div class="sidebar-item">Documents</div>
+      <div class="sidebar-item selected" id="domain-struct">Structured Data</div>
+      <div class="sidebar-item">Compliance</div>
+
+      <div class="section-title">Ingested Data</div>
+      <div id="file-indicator" class="doc-preview" style="background:var(--qp-card); border:1px solid var(--qp-border); border-radius:8px; padding:10px; font-size:12px; opacity:0.3;">
+        <div style="color:var(--qp-muted);">No files uploaded yet</div>
+      </div>
+
+      <div class="section-title">Pattern Library</div>
+      <div id="pattern-anomaly" class="sidebar-item">Anomaly Detection</div>
+      <div id="pattern-variance" class="sidebar-item">Cost Variance Analysis</div>
+      <div id="pattern-risk" class="sidebar-item">Risk Assessment</div>
+      <div id="pattern-exec" class="sidebar-item">Executive Summary</div>
+      <div id="pattern-trend" class="sidebar-item">Trend Analysis</div>
+    </div>
+
+    <!-- Center -->
+    <div class="center-main">
+      <!-- Upload zone -->
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">&#128196;</div>
+        <div style="font-size:13px; color:var(--qp-muted);">Drop files here or click to upload</div>
+        <div class="upload-filename" id="upload-filename">Meridian_Capital_Q4_2025_Transactions.csv</div>
+        <div class="progress-wrap" style="margin-top:10px;">
+          <div class="progress-fill" id="upload-progress"></div>
+        </div>
+      </div>
+
+      <!-- Pipeline animation -->
+      <div class="pipeline-section" id="pipeline-section">
+        <div class="panel-header"><div class="dot"></div> Ingestion Pipeline</div>
+        <div class="pipeline">
+          <div class="stage" id="stage-parse"><span class="stage-icon">&#128196;</span><span class="stage-label">Parse</span><span class="stage-time" id="time-parse"></span></div>
+          <div class="stage-arrow" id="arrow-1">&#10132;</div>
+          <div class="stage" id="stage-pii"><span class="stage-icon">&#128274;</span><span class="stage-label">PII Mask</span><span class="stage-time" id="time-pii"></span></div>
+          <div class="stage-arrow" id="arrow-2">&#10132;</div>
+          <div class="stage" id="stage-compliance"><span class="stage-icon">&#9989;</span><span class="stage-label">Compliance</span><span class="stage-time" id="time-compliance"></span></div>
+          <div class="stage-arrow" id="arrow-3">&#10132;</div>
+          <div class="stage" id="stage-chunk"><span class="stage-icon">&#128230;</span><span class="stage-label">Chunk</span><span class="stage-time" id="time-chunk"></span></div>
+          <div class="stage-arrow" id="arrow-4">&#10132;</div>
+          <div class="stage" id="stage-store"><span class="stage-icon">&#128451;</span><span class="stage-label">4-Tier Store</span><span class="stage-time" id="time-store"></span></div>
+        </div>
+        <div class="metrics-grid" id="pipeline-metrics" style="display:none;">
+          <div class="metric-card"><div class="metric-value" id="m-rows">0</div><div class="metric-label">Rows Processed</div></div>
+          <div class="metric-card"><div class="metric-value" id="m-chunks">0</div><div class="metric-label">Chunks Created</div></div>
+          <div class="metric-card"><div class="metric-value" id="m-pii">0</div><div class="metric-label">PII Fields Masked</div></div>
+          <div class="metric-card"><div class="metric-value" id="m-frameworks">0</div><div class="metric-label">Frameworks Detected</div></div>
+        </div>
+      </div>
+
+      <!-- Query + Response -->
+      <div id="query-section" style="display:none;">
+        <div class="query-label">Query Builder</div>
+        <div class="typing-area" id="query-box"><span class="typing-cursor"></span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <div class="badge-row">
+            <div class="compliance-badge sox" id="badge-sox">SOX</div>
+            <div class="compliance-badge nist" id="badge-glba">GLBA</div>
+            <div class="compliance-badge iso" id="badge-basel">BASEL-III</div>
+          </div>
+          <button class="send-btn" id="send-btn">Analyze</button>
+        </div>
+      </div>
+
+      <div class="panel" id="response-panel" style="display:none;">
+        <div class="panel-header"><div class="dot"></div> Anomaly Detection Results</div>
+        <div class="response-area" id="response-area"></div>
+        <div class="response-meta" id="response-meta" style="display:none;">
+          <span>Model: <strong style="color:var(--qp-cyan)">claude-sonnet-4</strong></span>
+          <span>Engine: <strong style="color:var(--qp-amber)">zero-token + RAG</strong></span>
+          <span>Chunks: <strong id="chunks-count">0</strong></span>
+          <div class="adr-pill" id="adr-pill">ADR-0128 logged</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="sidebar-right">
+      <div class="panel-header"><div class="dot"></div> AI Navigator</div>
+      <div style="font-size:13px; color:var(--qp-muted); margin-bottom:12px;">
+        Upload financial data to begin analysis. The platform will automatically detect anomalies, compliance requirements, and risk signals.
+      </div>
+      <div id="agent-suggestions" style="display:none;">
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Escalate flagged transactions</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Generate SAR narrative draft</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Cross-reference with watchlists</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Export audit package (SOX)</div>
+      </div>
+      <div class="kb-status-mini">
+        <div style="font-size:11px; color:var(--qp-dim); margin-bottom:6px;">KB STATUS</div>
+        <div class="kb-row"><span>Chunks</span><span class="kb-value" id="kb-chunks">0</span></div>
+        <div class="kb-row"><span>Mode</span><span class="kb-value">azure+keyword</span></div>
+        <div class="kb-row"><span>Ready</span><span class="kb-value" style="color:var(--qp-amber);" id="kb-ready">ingesting...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="demo_animations.js"></script>
+  <script>
+    const RESPONSE_HTML = `
+<h3>Transaction Anomaly Report &mdash; Meridian Capital Q4 2025</h3>
+<p>Statistical analysis of 14,847 transactions identified <span class="finding">7 anomalous entries</span> exceeding 2 standard deviations from the Q4 baseline. Combined exposure: <span class="finding">$2.34M</span>.</p>
+
+<table class="anomaly-table">
+<tr><th>Date</th><th>Entity</th><th>Amount</th><th>&sigma; Score</th><th>Risk</th></tr>
+<tr><td>2025-12-18</td><td>Apex Shore Holdings Ltd</td><td class="amount">$847,200</td><td>4.2&sigma;</td><td class="risk-high">HIGH</td></tr>
+<tr><td>2025-12-22</td><td>Clearwater Bridge Capital</td><td class="amount">$612,500</td><td>3.8&sigma;</td><td class="risk-high">HIGH</td></tr>
+<tr><td>2025-11-30</td><td>Pacific Rim Ventures LLC</td><td class="amount">$398,000</td><td>3.1&sigma;</td><td class="risk-high">HIGH</td></tr>
+<tr><td>2025-12-05</td><td>Summit Creek Partners</td><td class="amount">$224,100</td><td>2.7&sigma;</td><td class="risk-medium">MEDIUM</td></tr>
+<tr><td>2025-11-15</td><td>Irongate Financial Group</td><td class="amount">$118,400</td><td>2.4&sigma;</td><td class="risk-medium">MEDIUM</td></tr>
+<tr><td>2025-12-28</td><td>Northfield Asset Mgmt</td><td class="amount">$89,200</td><td>2.2&sigma;</td><td class="risk-medium">MEDIUM</td></tr>
+<tr><td>2025-12-31</td><td>Cascade Equity Partners</td><td class="amount">$51,600</td><td>2.1&sigma;</td><td class="risk-medium">MEDIUM</td></tr>
+</table>
+
+<h3>Key Findings</h3>
+<p><strong>1. Year-end clustering:</strong> 5 of 7 anomalies occur in final 2 weeks of Q4 &mdash; consistent with <span class="finding">window-dressing or wash-trading patterns</span>. <span class="citation">Meridian_Capital_Q4_2025_Transactions.csv</span></p>
+
+<p><strong>2. Entity concentration:</strong> Apex Shore Holdings and Clearwater Bridge represent <span class="finding">62% of flagged exposure ($1.46M)</span>. Both entities have offshore registration patterns requiring enhanced due diligence under GLBA. <span class="citation">Meridian_Capital_Q4_2025_Transactions.csv</span></p>
+
+<p><strong>3. Velocity anomaly:</strong> Apex Shore Holdings executed <span class="finding">$847,200 across 3 transactions in a single trading session</span> (Dec 18) &mdash; the highest single-day concentration in the dataset. <span class="citation">Meridian_Capital_Q4_2025_Transactions.csv</span></p>
+
+<h3>Recommended Actions</h3>
+<p>1. Initiate Enhanced Due Diligence (EDD) for Apex Shore Holdings and Clearwater Bridge<br>
+2. File Suspicious Activity Report (SAR) for the Dec 18 cluster &mdash; meets FinCEN threshold<br>
+3. Freeze year-end batch processing pending compliance review<br>
+4. Estimated regulatory exposure if unaddressed: <span class="finding">$4.7M in potential fines (SOX + GLBA)</span></p>`;
+
+    demo.setTimeline([
+      // Upload phase
+      { time: 0, action: 'narrate', text: 'Now let\'s see what happens when an enterprise client uploads raw financial transaction data. Watch the full pipeline in action.', timestamp: '0:00' },
+
+      { time: 3, action: 'moveTo', target: '#upload-zone' },
+      { time: 4, action: 'click', target: '#upload-zone' },
+      { time: 4.5, action: 'addClass', target: '#upload-zone', className: 'active' },
+      { time: 5, action: 'show', target: '#upload-filename' },
+      { time: 5.5, action: 'narrate', text: 'A CSV with 14,847 financial transactions from Meridian Capital \u2014 Q4 2025 trading activity. The 5-stage pipeline activates immediately.', timestamp: '0:05' },
+
+      // Upload progress
+      { time: 7, action: 'progress', target: '#upload-progress', value: 25 },
+      { time: 8, action: 'progress', target: '#upload-progress', value: 60 },
+      { time: 9, action: 'progress', target: '#upload-progress', value: 100 },
+      { time: 9.5, action: 'addClass', target: '#upload-zone', className: 'complete' },
+      { time: 9.5, action: 'removeClass', target: '#upload-zone', className: 'active' },
+
+      // Pipeline animation
+      { time: 10, action: 'show', target: '#pipeline-section', className: 'visible' },
+      { time: 10.5, action: 'narrate', text: 'Stage 1: Parse. The CSV is validated, headers extracted, data types inferred. 14,847 rows confirmed.', timestamp: '0:10' },
+      { time: 11, action: 'addClass', target: '#stage-parse', className: 'active' },
+      { time: 12.5, action: 'addClass', target: '#stage-parse', className: 'complete' },
+      { time: 12.5, action: 'removeClass', target: '#stage-parse', className: 'active' },
+      { time: 12.5, action: 'custom', fn: () => { document.getElementById('time-parse').textContent = '340ms'; }},
+      { time: 12.5, action: 'addClass', target: '#arrow-1', className: 'active' },
+
+      { time: 13, action: 'addClass', target: '#stage-pii', className: 'active' },
+      { time: 13.5, action: 'narrate', text: 'Stage 2: PII Mask. Deterministic pattern matching scans every cell \u2014 account numbers, SSNs, routing numbers. 23 fields masked. Zero API cost.', timestamp: '0:13' },
+      { time: 15.5, action: 'addClass', target: '#stage-pii', className: 'complete' },
+      { time: 15.5, action: 'removeClass', target: '#stage-pii', className: 'active' },
+      { time: 15.5, action: 'custom', fn: () => { document.getElementById('time-pii').textContent = '180ms'; }},
+      { time: 15.5, action: 'addClass', target: '#arrow-2', className: 'active' },
+
+      { time: 16, action: 'addClass', target: '#stage-compliance', className: 'active' },
+      { time: 16.5, action: 'narrate', text: 'Stage 3: Compliance Scan. The zero-token engine detects SOX, GLBA, and Basel III relevance \u2014 23 frameworks checked in 12 milliseconds.', timestamp: '0:16' },
+      { time: 18.5, action: 'addClass', target: '#stage-compliance', className: 'complete' },
+      { time: 18.5, action: 'removeClass', target: '#stage-compliance', className: 'active' },
+      { time: 18.5, action: 'custom', fn: () => { document.getElementById('time-compliance').textContent = '12ms'; }},
+      { time: 18.5, action: 'addClass', target: '#arrow-3', className: 'active' },
+
+      { time: 19, action: 'addClass', target: '#stage-chunk', className: 'active' },
+      { time: 19.5, action: 'narrate', text: 'Stage 4: Chunk. The data is split into optimally-sized segments for vector search \u2014 742 chunks created.', timestamp: '0:19' },
+      { time: 21.5, action: 'addClass', target: '#stage-chunk', className: 'complete' },
+      { time: 21.5, action: 'removeClass', target: '#stage-chunk', className: 'active' },
+      { time: 21.5, action: 'custom', fn: () => { document.getElementById('time-chunk').textContent = '520ms'; }},
+      { time: 21.5, action: 'addClass', target: '#arrow-4', className: 'active' },
+
+      { time: 22, action: 'addClass', target: '#stage-store', className: 'active' },
+      { time: 22.5, action: 'narrate', text: 'Stage 5: 4-Tier Storage. Keyword index, semantic vectors, Pinecone cloud, and Azure Search \u2014 redundancy at every layer.', timestamp: '0:22' },
+      { time: 24.5, action: 'addClass', target: '#stage-store', className: 'complete' },
+      { time: 24.5, action: 'removeClass', target: '#stage-store', className: 'active' },
+      { time: 24.5, action: 'custom', fn: () => { document.getElementById('time-store').textContent = '890ms'; }},
+
+      // Show metrics
+      { time: 25, action: 'custom', fn: () => { document.getElementById('pipeline-metrics').style.display = 'grid'; document.getElementById('pipeline-metrics').classList.add('fade-in'); }},
+      { time: 25.5, action: 'counter', target: '#m-rows', from: 0, to: 14847, duration: 1200 },
+      { time: 25.5, action: 'counter', target: '#m-chunks', from: 0, to: 742, duration: 1000 },
+      { time: 25.5, action: 'counter', target: '#m-pii', from: 0, to: 23, duration: 800 },
+      { time: 25.5, action: 'counter', target: '#m-frameworks', from: 0, to: 3, duration: 600 },
+
+      // Update KB status
+      { time: 27, action: 'custom', fn: () => {
+        document.getElementById('kb-chunks').textContent = '742';
+        document.getElementById('kb-ready').textContent = 'true';
+        document.getElementById('kb-ready').style.color = 'var(--qp-green)';
+        document.getElementById('file-indicator').style.opacity = '1';
+        document.getElementById('file-indicator').innerHTML = '<div style="color:var(--qp-cyan); font-weight:600;">Meridian_Capital_Q4.csv</div><div style="color:var(--qp-dim); font-size:11px;">14,847 rows &bull; 742 chunks &bull; SOX/GLBA</div>';
+      }},
+
+      // Query phase
+      { time: 28, action: 'custom', fn: () => { document.getElementById('query-section').style.display = 'block'; document.getElementById('query-section').classList.add('fade-in'); }},
+      { time: 29, action: 'narrate', text: 'The data is live. Total pipeline time: 1.9 seconds for 14,847 transactions. Now let\'s run anomaly detection.', timestamp: '0:29' },
+
+      { time: 31, action: 'click', target: '#pattern-anomaly' },
+      { time: 31.5, action: 'addClass', target: '#pattern-anomaly', className: 'selected' },
+
+      { time: 33, action: 'type', target: '#query-box', text: 'Flag anomalous transactions exceeding 2 standard deviations from Q4 baseline with risk scoring', speed: 30 },
+
+      { time: 40, action: 'addClass', target: '#send-btn', className: 'active' },
+      { time: 41, action: 'click', target: '#send-btn' },
+      { time: 41.5, action: 'narrate', text: 'The anomaly detection engine runs first \u2014 zero-token statistical analysis. Then the LLM synthesizes findings with context from the ingested data.', timestamp: '0:41' },
+
+      { time: 43, action: 'custom', fn: () => { document.getElementById('response-panel').style.display = 'block'; document.getElementById('response-panel').classList.add('fade-in'); }},
+      { time: 44, action: 'streamResponse', target: '#response-area', html: RESPONSE_HTML, speed: 4 },
+
+      // Badges + meta
+      { time: 65, action: 'show', target: '#badge-sox' },
+      { time: 65.3, action: 'show', target: '#badge-glba' },
+      { time: 65.6, action: 'show', target: '#badge-basel' },
+
+      { time: 67, action: 'custom', fn: () => { document.getElementById('response-meta').style.display = 'flex'; }},
+      { time: 67.5, action: 'counter', target: '#chunks-count', from: 0, to: 12, duration: 600 },
+      { time: 68.5, action: 'show', target: '#adr-pill' },
+
+      { time: 70, action: 'narrate', text: 'Seven anomalous transactions flagged. $2.34 million in exposure identified. $4.7 million in potential regulatory fines prevented. All in under two minutes from raw data to actionable intelligence.', timestamp: '1:10' },
+
+      { time: 75, action: 'custom', fn: () => { document.getElementById('agent-suggestions').style.display = 'block'; document.getElementById('agent-suggestions').classList.add('fade-in'); }},
+      { time: 76, action: 'narrate', text: 'From raw CSV to flagged transactions with risk scores, compliance mapping, and recommended actions. This is what governed AI looks like at enterprise scale.', timestamp: '1:16' },
+    ]);
+
+    setTimeout(() => demo.play(), 1000);
+  </script>
+</body>
+</html>

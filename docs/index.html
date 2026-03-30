@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAO Platform — Interactive Demos Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .demos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .demo-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 10px 30px rgba(96, 165, 250, 0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.95));
+        }
+
+        .demo-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #93c5fd;
+        }
+
+        .demo-description {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        .demo-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .demo-link:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateX(2px);
+        }
+
+        .category {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 2px solid rgba(148, 163, 184, 0.2);
+            color: #64748b;
+            margin-top: 3rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(96, 165, 250, 0.2);
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .demos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MAO Platform</h1>
+            <p class="subtitle">Interactive Demos & Visualizations</p>
+            <p style="color: #cbd5e1; margin-top: 1rem;">Explore the Multi-Agent Orchestration system through interactive demonstrations, architecture visualizations, and real-world scenarios.</p>
+        </header>
+
+        <section class="category">
+            <h2 class="category-title">🏗️ Architecture & Pipeline</h2>
+            <div class="demos-grid">
+                <a href="01_pipeline_animation.html" class="demo-card">
+                    <div class="demo-icon">⚙️</div>
+                    <h3 class="demo-title">5-Stage Ingestion Pipeline</h3>
+                    <p class="demo-description">Animated walkthrough of the MAO data ingestion pipeline, showing how documents flow through parsing, chunking, embedding, and storage stages.</p>
+                    <span class="badge">Animation</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+
+                <a href="02_engine_architecture.html" class="demo-card">
+                    <div class="demo-icon">🔧</div>
+                    <h3 class="demo-title">Engine Architecture</h3>
+                    <p class="demo-description">Deep dive into the core MAO engine architecture, illustrating the 5 agents, 6 production modules, and 8-layer system design.</p>
+                    <span class="badge">Architecture</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+
+                <a href="llm_landscape.html" class="demo-card">
+                    <div class="demo-icon">🌐</div>
+                    <h3 class="demo-title">LLM Landscape</h3>
+                    <p class="demo-description">Visual overview of the modern LLM ecosystem, positioning MAO within the broader AI infrastructure landscape.</p>
+                    <span class="badge">Overview</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2 class="category-title">🎯 Use Case Scenarios</h2>
+            <div class="demos-grid">
+                <a href="scenario_a_uki.html" class="demo-card">
+                    <div class="demo-icon">🏥</div>
+                    <h3 class="demo-title">Scenario A: UKI Healthcare</h3>
+                    <p class="demo-description">Interactive demonstration of how MAO handles healthcare data ingestion, compliance verification, and clinical query resolution.</p>
+                    <span class="badge">Healthcare</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+
+                <a href="scenario_b_compliance.html" class="demo-card">
+                    <div class="demo-icon">⚖️</div>
+                    <h3 class="demo-title">Scenario B: Compliance & Auditing</h3>
+                    <p class="demo-description">Walk through compliance scanning, audit trail generation, and real-time policy enforcement in a regulated enterprise environment.</p>
+                    <span class="badge">Compliance</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+
+                <a href="scenario_c_enterprise.html" class="demo-card">
+                    <div class="demo-icon">🏢</div>
+                    <h3 class="demo-title">Scenario C: Enterprise Integration</h3>
+                    <p class="demo-description">End-to-end demonstration of enterprise deployment, multi-tenant isolation, cost optimization, and operational observability.</p>
+                    <span class="badge">Enterprise</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2 class="category-title">📊 Presentations & Walkthroughs</h2>
+            <div class="demos-grid">
+                <a href="josh_script.html" class="demo-card">
+                    <div class="demo-icon">🎤</div>
+                    <h3 class="demo-title">Sales & Product Walkthrough</h3>
+                    <p class="demo-description">Comprehensive presentation covering MAO capabilities, ROI metrics, competitive advantages, and customer success stories.</p>
+                    <span class="badge">Presentation</span>
+                    <span class="demo-link">View Demo →</span>
+                </a>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>MAO Platform Demos</strong> — Interactive demonstrations for understanding the Multi-Agent Orchestration system</p>
+            <p style="margin-top: 1rem; color: #475569;">For more information, visit <a href="https://github.com/inflexis-ai/mao-examples" style="color: #60a5fa; text-decoration: none;">the examples repository</a> or <a href="https://github.com/inflexis-ai/aixaas-docs" style="color: #60a5fa; text-decoration: none;">platform documentation</a></p>
+        </footer>
+    </div>
+</body>
+</html>

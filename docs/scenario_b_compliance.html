@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>AIXaaS Demo — Scenario B: Compliance & Governance Data</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr 280px;
+      height: calc(100vh - 57px);
+    }
+    .sidebar-left {
+      background: var(--qp-deep);
+      border-right: 1px solid var(--qp-border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .section-title {
+      font-size: 11px; color: var(--qp-dim);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin: 16px 0 8px;
+    }
+    .section-title:first-child { margin-top: 0; }
+    .center-main {
+      display: flex; flex-direction: column;
+      padding: 16px 20px; gap: 12px; overflow-y: auto;
+    }
+    .domain-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .domain-chip {
+      padding: 5px 12px; border-radius: 16px; font-size: 12px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      cursor: pointer; transition: all 0.3s;
+    }
+    .domain-chip.active {
+      background: rgba(59,130,246,0.15);
+      border-color: var(--qp-blue); color: var(--qp-blue);
+    }
+    .query-label { font-size: 12px; color: var(--qp-muted); }
+    .send-btn {
+      align-self: flex-end; padding: 8px 20px;
+      background: linear-gradient(135deg, var(--qp-blue), var(--qp-purple));
+      border: none; border-radius: 8px; color: white;
+      font-size: 13px; font-weight: 600; opacity: 0.5; transition: all 0.3s;
+    }
+    .send-btn.active { opacity: 1; box-shadow: 0 0 16px var(--qp-glow); }
+    .sidebar-right {
+      background: var(--qp-deep);
+      border-left: 1px solid var(--qp-border);
+      padding: 16px; overflow-y: auto;
+    }
+    .kb-status-mini {
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      border-radius: 8px; padding: 10px; margin-top: 12px; font-size: 12px;
+    }
+    .kb-row { display: flex; justify-content: space-between; margin: 4px 0; }
+    .kb-value { color: var(--qp-cyan); font-weight: 600; font-family: monospace; }
+    .response-meta {
+      display: flex; gap: 12px; align-items: center;
+      font-size: 11px; color: var(--qp-muted); margin-top: 8px;
+    }
+    .source-item {
+      display: flex; justify-content: space-between;
+      padding: 4px 0; border-bottom: 1px solid rgba(30,58,95,0.3);
+      font-size: 12px;
+    }
+    .source-score { color: var(--qp-green); font-family: monospace; }
+    .controls-hint {
+      position: fixed; top: 8px; right: 8px;
+      font-size: 11px; color: var(--qp-dim); z-index: 10000;
+    }
+    .doc-preview {
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      border-radius: 8px; padding: 10px; font-size: 12px; margin-top: 8px;
+    }
+    .doc-name { color: var(--qp-cyan); font-weight: 600; }
+    .doc-meta { color: var(--qp-dim); font-size: 11px; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="controls-hint">SPACE = play/pause &nbsp;|&nbsp; R = restart</div>
+
+  <div class="brand-bar">
+    <img src="../img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">AIXaaS Intelligence Platform</span>
+    <span class="subtitle">mike (founder) &bull; Documents</span>
+  </div>
+
+  <div class="demo-layout">
+    <!-- Left sidebar -->
+    <div class="sidebar-left">
+      <div class="section-title">Knowledge Domains</div>
+      <div class="sidebar-item" id="domain-demo">Foundation Demo</div>
+      <div class="sidebar-item selected" id="domain-docs">Documents</div>
+      <div class="sidebar-item" id="domain-struct">Structured Data</div>
+      <div class="sidebar-item" id="domain-compliance">Compliance</div>
+
+      <div class="section-title">Mike's Knowledge Base</div>
+      <div class="doc-preview">
+        <div class="doc-name">ACP-Full-Core-Prod-KB</div>
+        <div class="doc-meta">AI Compliance Platform &bull; 897 chunks</div>
+      </div>
+      <div class="doc-preview" style="margin-top:6px;">
+        <div class="doc-name">EAR-Full-NO-Trade-Secrets</div>
+        <div class="doc-meta">Export Admin Regulations &bull; 1,249 chunks</div>
+      </div>
+
+      <div class="section-title">Pattern Library</div>
+      <div id="pattern-compliance" class="sidebar-item">Compliance Gap Scan</div>
+      <div id="pattern-governance" class="sidebar-item">AI Governance Review</div>
+      <div id="pattern-risk" class="sidebar-item">Risk Assessment</div>
+      <div id="pattern-exec" class="sidebar-item">Executive Summary</div>
+    </div>
+
+    <!-- Center -->
+    <div class="center-main">
+      <div class="domain-bar">
+        <span style="font-size:12px; color:var(--qp-dim);">Active Domain:</span>
+        <div class="domain-chip" id="chip-demo">Foundation Demo</div>
+        <div class="domain-chip active" id="chip-docs">Documents</div>
+        <div class="domain-chip" id="chip-struct">Structured Data</div>
+      </div>
+
+      <div>
+        <div class="query-label">Query Builder</div>
+        <div class="typing-area" id="query-box"><span class="typing-cursor"></span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <div class="badge-row">
+            <div class="compliance-badge nist" id="badge-nist">NIST-CSF</div>
+            <div class="compliance-badge iso" id="badge-iso">ISO-27001</div>
+            <div class="compliance-badge gdpr" id="badge-gdpr">GDPR</div>
+            <div class="compliance-badge hipaa" id="badge-hipaa">HIPAA</div>
+            <div class="compliance-badge sox" id="badge-sox">SOX</div>
+          </div>
+          <button class="send-btn" id="send-btn">Analyze</button>
+        </div>
+      </div>
+
+      <div class="panel" id="response-panel" style="display:none;">
+        <div class="panel-header"><div class="dot"></div> Response &mdash; Documents Namespace</div>
+        <div class="response-area" id="response-area"></div>
+        <div class="response-meta" id="response-meta" style="display:none;">
+          <span>Model: <strong style="color:var(--qp-cyan)">claude-sonnet-4</strong></span>
+          <span>Chunks: <strong id="chunks-count">0</strong>/2,146</span>
+          <span>Owner: <strong>mike</strong></span>
+          <div class="adr-pill" id="adr-pill">ADR-0087 logged</div>
+        </div>
+        <div id="sources-list" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="sidebar-right">
+      <div class="panel-header"><div class="dot"></div> AI Navigator</div>
+      <div style="font-size:13px; color:var(--qp-muted); margin-bottom:12px;">
+        Mike's sandbox is isolated to his two reference documents. All responses are grounded exclusively in ACP and EAR content.
+      </div>
+      <div id="agent-suggestions" style="display:none;">
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Deep dive: NIST-CSF mapping</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Compare ACP vs EAR requirements</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Generate compliance gap report</div>
+        <div class="sidebar-item" style="font-size:12px; margin:4px 0;">Export findings to PDF</div>
+      </div>
+      <div class="kb-status-mini">
+        <div style="font-size:11px; color:var(--qp-dim); margin-bottom:6px;">KB STATUS</div>
+        <div class="kb-row"><span>Chunks</span><span class="kb-value" id="kb-chunks">2,146</span></div>
+        <div class="kb-row"><span>Sources</span><span class="kb-value">2 docs</span></div>
+        <div class="kb-row"><span>Owner</span><span class="kb-value">mike</span></div>
+        <div class="kb-row"><span>Mode</span><span class="kb-value">azure+keyword</span></div>
+        <div class="kb-row"><span>Isolated</span><span class="kb-value" style="color:var(--qp-green);">true</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="demo_animations.js"></script>
+  <script>
+    const RESPONSE_HTML = `
+<h3>AI Governance Compliance Requirements &mdash; Regulatory Analysis</h3>
+<p>Based on analysis of your ACP and EAR knowledge bases, here are the <span class="finding">key compliance requirements for AI governance in regulated industries</span>:</p>
+
+<p><strong>1. Fail-Closed Architecture (NIST-CSF Aligned)</strong></p>
+<p>The ACP framework mandates that all AI-driven workflows operate on a <span class="finding">fail-closed principle</span> &mdash; if any validation gate fails, execution halts completely. This ensures AI systems remain governable, defensible, and reproducible. Unlike fail-open architectures where errors propagate silently, fail-closed gates enforce <span class="finding">mandatory human review at every decision boundary</span>. <span class="citation">ACP-Full-Core-Prod-KB-260226.txt</span></p>
+
+<p><strong>2. Export Control Classification (EAR Compliance)</strong></p>
+<p>AI models processing controlled technical data must maintain <span class="finding">Export Classification Control Numbers (ECCNs)</span> for all outputs. The EAR framework requires that AI systems handling dual-use technology implement <span class="finding">automated classification screening</span> before any data leaves the governance boundary. This includes model outputs, embeddings, and derived analytics. <span class="citation">EAR-Full-NO-Trade-Secrets-110326.txt</span></p>
+
+<p><strong>3. Audit Trail Requirements (SOX / ISO-27001)</strong></p>
+<p>Every AI-generated insight must produce an <span class="finding">immutable audit record</span> (ADR) capturing: input query, retrieved context, model used, confidence score, and compliance frameworks detected. The ACP specifies that these records must be <span class="finding">retained for minimum 7 years</span> with tamper-evident storage. <span class="citation">ACP-Full-Core-Prod-KB-260226.txt</span></p>
+
+<p><strong>4. PII Masking and Data Residency</strong></p>
+<p>All ingested documents must pass through PII detection before entering the knowledge base. The ACP requires <span class="finding">deterministic pattern matching (not LLM-based)</span> for PII detection to ensure zero false negatives on SSN, credit card, and health record patterns. Data residency must be enforced at the storage tier level. <span class="citation">ACP-Full-Core-Prod-KB-260226.txt</span></p>
+
+<h3>Compliance Coverage Summary</h3>
+<p>Your knowledge base references requirements from: <span class="finding">NIST-CSF, ISO-27001, SOX, EAR, ITAR, GDPR, HIPAA, GLBA, FERPA, and CCPA</span> &mdash; 10 of the 23 frameworks detected by the zero-token compliance engine.</p>`;
+
+    const SOURCES_HTML = `
+      <div class="source-item"><span>ACP-Full-Core-Prod-KB-260226.txt</span><span class="source-score">97%</span></div>
+      <div class="source-item"><span>EAR-Full-NO-Trade-Secrets-110326.txt</span><span class="source-score">94%</span></div>
+      <div class="source-item"><span>ACP-Full-Core-Prod-KB-260226.txt</span><span class="source-score">91%</span></div>
+      <div class="source-item"><span>EAR-Full-NO-Trade-Secrets-110326.txt</span><span class="source-score">88%</span></div>
+    `;
+
+    demo.setTimeline([
+      { time: 0, action: 'narrate', text: 'This is Mike\'s isolated sandbox. His knowledge base contains exactly two reference documents \u2014 the AI Compliance Platform guide and Export Administration Regulations.', timestamp: '0:00' },
+
+      { time: 4, action: 'moveTo', target: '#domain-docs' },
+      { time: 5, action: 'narrate', text: 'The Documents domain is selected. Mike\'s founder account scopes all queries to his own data \u2014 no cross-contamination with shared content.', timestamp: '0:05' },
+
+      { time: 8, action: 'click', target: '#pattern-governance' },
+      { time: 8.5, action: 'addClass', target: '#pattern-governance', className: 'selected' },
+
+      { time: 10, action: 'type', target: '#query-box', text: 'What are the key compliance requirements for AI governance in regulated industries?', speed: 35 },
+
+      { time: 16, action: 'addClass', target: '#send-btn', className: 'active' },
+      { time: 17, action: 'click', target: '#send-btn' },
+      { time: 17.5, action: 'narrate', text: 'The engine searches Mike\'s 2,146 chunks. Owner-based filtering ensures only his ACP and EAR content is retrieved \u2014 tenant isolation at the data layer.', timestamp: '0:17' },
+
+      { time: 20, action: 'custom', fn: () => { document.getElementById('response-panel').style.display = 'block'; document.getElementById('response-panel').classList.add('fade-in'); }},
+      { time: 21, action: 'streamResponse', target: '#response-area', html: RESPONSE_HTML, speed: 5 },
+
+      { time: 40, action: 'narrate', text: 'Every finding cites the exact source document. The response is 100% grounded in Mike\'s two reference files \u2014 no hallucination, no bleed from other users\' data.', timestamp: '0:40' },
+
+      { time: 43, action: 'show', target: '#badge-nist' },
+      { time: 43.3, action: 'show', target: '#badge-iso' },
+      { time: 43.6, action: 'show', target: '#badge-gdpr' },
+      { time: 43.9, action: 'show', target: '#badge-hipaa' },
+      { time: 44.2, action: 'show', target: '#badge-sox' },
+
+      { time: 46, action: 'custom', fn: () => { document.getElementById('response-meta').style.display = 'flex'; }},
+      { time: 46.5, action: 'counter', target: '#chunks-count', from: 0, to: 8, duration: 600 },
+      { time: 47.5, action: 'show', target: '#adr-pill' },
+      { time: 48, action: 'narrate', text: 'The zero-token compliance engine detected 10 regulatory frameworks \u2014 NIST, ISO, SOX, EAR, ITAR, GDPR, HIPAA, GLBA, FERPA, CCPA \u2014 at zero API cost.', timestamp: '0:48' },
+
+      { time: 52, action: 'custom', fn: () => {
+        document.getElementById('sources-list').style.display = 'block';
+        document.getElementById('sources-list').innerHTML = SOURCES_HTML;
+        document.getElementById('sources-list').classList.add('fade-in');
+      }},
+
+      { time: 55, action: 'custom', fn: () => { document.getElementById('agent-suggestions').style.display = 'block'; document.getElementById('agent-suggestions').classList.add('fade-in'); }},
+      { time: 56, action: 'narrate', text: 'Mike\'s sandbox is clean, isolated, and producing governance-grade responses from his exact reference documents. This is enterprise AI done right.', timestamp: '0:56' },
+    ]);
+
+    setTimeout(() => demo.play(), 1000);
+  </script>
+</body>
+</html>
