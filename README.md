@@ -20,6 +20,28 @@
 
 ---
 
+## Interactive Demos (No Setup Required)
+
+**Start here if you're non-technical.** All demos run directly in your browser — no installation, no server, no dependencies.
+
+| | |
+|---|---|
+| [**Open Demo Hub →**](https://inflexis-ai.github.io/mao-examples/demos/) | Browse all demos, architecture visualizations, and presenter tools online |
+| [**Download Everything (ZIP) →**](https://github.com/Inflexis-ai/mao-examples/archive/refs/heads/main.zip) | Download the full package, extract, and double-click any `.html` file to open in Chrome |
+
+### V2 Narrated Demos
+
+| Demo | Vertical | Description |
+|---|---|---|
+| [UKI Education](https://inflexis-ai.github.io/mao-examples/demos/v2-uki-education.html) | Higher Ed | AI-assisted curriculum alignment, FERPA compliance, and cost variance analysis |
+| [Mike's Compliance Sandbox](https://inflexis-ai.github.io/mao-examples/demos/v2-mike-real.html) | Compliance | Real compliance detection with ACP + EAR frameworks using live MAO API |
+| [FRENOS Industrial OT](https://inflexis-ai.github.io/mao-examples/demos/v2-frenos-ot.html) | OT Security | OT/ICS threat intelligence — SCADA and CVE analysis for industrial cybersecurity |
+| [TACenergy CFO](https://inflexis-ai.github.io/mao-examples/demos/v2-tacenergy-cfo.html) | Energy | Governed AI for oil pricing intelligence replacing ungoverned ChatGPT usage |
+| [FedShark GovCon](https://inflexis-ai.github.io/mao-examples/demos/v2-fedshark-gov.html) | Gov Contracting | Federal bid intelligence, SAM.gov scanning, and DISA competitive analysis |
+| [John's of Arthur Avenue](https://inflexis-ai.github.io/mao-examples/demos/v2-pizza-johnsarthur.html) | Food Service | AI phone ordering, supplier cost analysis, and demand forecasting for a 50-location pizza franchise |
+
+---
+
 ## Overview
 
 This repository contains **integration examples, Python scripts, and Jupyter notebooks** for the MAO Platform (AIXaaS™). All examples interact with the public REST API — no internal platform code is exposed or required.
@@ -248,6 +270,15 @@ Found a bug in an example? Have a use case that's not covered? PRs and issues ar
 
 MAO Platform credentials are required to run these examples. Request access:
 📧 [bryan.shaw@inflexis.ai](mailto:bryan.shaw@inflexis.ai) · 🌐 [inflexis.ai](https://inflexis.ai)
+
+---
+
+## What's New — March 2026
+
+- **Interactive Demo Hub** — [inflexis-ai.github.io/mao-examples/demos/](https://inflexis-ai.github.io/mao-examples/demos/) with 6 narrated V2 demos, 3 scenario demos, architecture visualizations, and presenter tools
+- **John's of Arthur Avenue** — New food service demo: AI phone ordering, supplier cost comparison, and demand forecasting with PrISM POS data
+- **V2.1 Narration** — Improved voice synthesis with sentence-by-sentence delivery and soothing UK English narration
+- **ZIP Download** — Non-programmers can [download everything](https://github.com/Inflexis-ai/mao-examples/archive/refs/heads/main.zip) and run demos locally in Chrome
 
 ---
 

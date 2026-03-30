@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIXaaS&#8482; Demo &#8212; TACenergy CFO Intelligence Platform</title>
+<link rel="stylesheet" href="https://app.inflexis.ai/static/css/query_panel.css">
+<style>
+#demoTitle{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#0a1630,#0e1e3a);border-bottom:2px solid #10b981;padding:6px 16px;font-size:0.78rem;color:#34d399;display:flex;align-items:center;gap:10px}
+#demoTitle span{color:#7a9bc8}
+#demoCursor{position:fixed;width:18px;height:18px;border-radius:50%;background:rgba(16,185,129,0.9);box-shadow:0 0 0 4px rgba(16,185,129,0.25),0 0 18px rgba(16,185,129,0.5);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.7s cubic-bezier(.4,0,.2,1),top 0.6s cubic-bezier(.4,0,.2,1);display:none}
+#demoCursor.click{animation:cc 0.3s ease-out}
+@keyframes cc{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(0.6)}100%{transform:translate(-50%,-50%) scale(1)}}
+#demoControls{position:fixed;bottom:18px;right:18px;z-index:9990;display:flex;gap:8px;background:rgba(7,15,36,0.95);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:8px 12px;backdrop-filter:blur(10px)}
+#demoControls button{background:none;border:none;color:#7a9bc8;cursor:pointer;font-size:1.1rem;padding:4px 8px;border-radius:6px;transition:all 0.15s}
+#demoControls button:hover{background:rgba(16,185,129,0.15);color:#34d399}
+#narratBar{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9990;background:rgba(7,15,36,0.92);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:8px 18px;font-size:0.8rem;color:#dde8f8;max-width:600px;text-align:center;pointer-events:none;width:90%}
+.nl{color:#34d399;font-weight:600;margin-right:6px}
+#scriptSidebar{position:fixed;right:0;top:0;bottom:0;width:280px;background:rgba(4,11,26,0.97);border-left:1px solid rgba(16,185,129,0.2);z-index:9985;overflow-y:auto;transform:translateX(100%);transition:transform 0.3s ease;padding:68px 0 80px}
+#scriptSidebar.open{transform:translateX(0)}
+#scriptSidebar h3{color:#34d399;font-size:0.8rem;padding:0 14px 10px;border-bottom:1px solid rgba(16,185,129,0.15);margin:0 0 8px}
+.sc{padding:8px 14px;border-left:2px solid transparent;transition:all 0.2s}
+.sc.active{border-left-color:#34d399;background:rgba(16,185,129,0.06)}
+.sc .ts{font-size:0.68rem;color:#10b981;font-family:monospace;display:block;margin-bottom:3px}
+.sc .tx{font-size:0.75rem;color:#7a9bc8;line-height:1.4}
+.sc.active .tx{color:#dde8f8}
+.analyzing{display:flex;align-items:center;gap:8px;color:#7a9bc8;padding:16px;font-size:0.84rem}
+.analyzing::before{content:'';width:14px;height:14px;border:2px solid #10b981;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.src-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(59,130,246,0.15)}
+.src-chip{font-size:0.68rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#34d399;padding:2px 8px;border-radius:10px}
+.adr-badge{display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#34d399;padding:3px 10px;border-radius:8px;margin-top:8px}
+.adr-dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:pd 1.5s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:0.3}}
+.tcursor{display:inline-block;width:2px;height:1em;background:#10b981;animation:blnk 1s step-end infinite;vertical-align:middle;margin-left:1px}
+@keyframes blnk{0%,100%{opacity:1}50%{opacity:0}}
+.qp-pattern-btn.da{background:rgba(16,185,129,0.12)!important;border-color:rgba(16,185,129,0.35)!important}
+</style>
+</head>
+<body>
+<div id="demoTitle">&#127916; LIVE DEMO &#8212; TACenergy LLC &middot; $7.5B Fuel Distributor &middot; CFO Intelligence Platform <span>| Powered by AIXaaS&#8482; | Inflexis Technologies</span></div>
+<div id="demoCursor"></div>
+<div id="narratBar"><span class="nl">Demo &#8212;</span><span id="nt">Loading AIXaaS CFO Intelligence Platform&#8230;</span></div>
+
+<div id="scriptSidebar">
+  <h3>&#128203; Presenter Script</h3>
+  <div class="sc" id="sc0"><span class="ts">0:00</span><span class="tx">TACenergy &#8212; $7.5B revenue. CFO uses ChatGPT with no audit trail. This is governed AI.</span></div>
+  <div class="sc" id="sc1"><span class="ts">0:18</span><span class="tx">2,341 chunks: Q1 pricing feeds, purchase ledger, supplier contracts, NYMEX benchmarks. All private. All governed.</span></div>
+  <div class="sc" id="sc2"><span class="ts">0:25</span><span class="tx">First question: where are we seeing margin compression in Q1?</span></div>
+  <div class="sc" id="sc3"><span class="ts">0:48</span><span class="tx">$412K margin compression. Basis differential widening. NOT flagged in manual review &#8212; platform found it vs 90-day rolling average.</span></div>
+  <div class="sc" id="sc4"><span class="ts">1:18</span><span class="tx">$180K hedging opportunity on 12M gallons. On the table right now.</span></div>
+  <div class="sc" id="sc5"><span class="ts">1:30</span><span class="tx">Anomaly detection &#8212; 14,847 transactions. What did the manual process miss?</span></div>
+  <div class="sc" id="sc6"><span class="ts">1:52</span><span class="tx">Supplier C-7: $400K overcharges. Duplicate invoices: $193K. 4.2 seconds, 14,847 transactions.</span></div>
+  <div class="sc" id="sc7"><span class="ts">2:28</span><span class="tx">$775K identified. Annualized: $2.3M. Manual review covered 200 transactions. AIXaaS covered all 14,847.</span></div>
+  <div class="sc" id="sc8"><span class="ts">2:40</span><span class="tx">CFO Executive Briefing &#8212; ready to present to the board today.</span></div>
+  <div class="sc" id="sc9"><span class="ts">3:00</span><span class="tx">3 critical risks. 4 Q2 recommendations with dollar amounts. 6 seconds to generate.</span></div>
+  <div class="sc" id="sc10"><span class="ts">3:20</span><span class="tx">$620K&#8211;$820K Q2 improvement. That is the ROI of governed AI over ChatGPT.</span></div>
+</div>
+
+<div id="demoControls">
+  <button id="bpp" title="Play/Pause (Space)">&#9208;</button>
+  <button id="bmt" title="Mute (M)">&#128266;</button>
+  <button id="bsc" title="Script (S)">&#128203;</button>
+  <button id="brs" title="Restart (R)">&#128260;</button>
+</div>
+
+<nav class="qp-nav">
+  <div class="qp-nav-brand">
+    <img src="https://app.inflexis.ai/static/img/aixaas-badge.png" class="qp-brand-badge" alt="AIXaaS" onerror="this.style.display='none'">
+  </div>
+  <div class="qp-nav-center">
+    <div class="qp-domain-select-wrap">
+      <span class="qp-domain-select-label">Knowledge Domain</span>
+      <select id="domainSelect" class="qp-domain-select">
+        <option value="structured_data" selected>Finance Knowledge Base</option>
+        <option value="documents">Document Library</option>
+      </select>
+    </div>
+    <div class="qp-status-indicator">
+      <span class="qp-status-dot" id="statusDot" style="background:#f59e0b"></span>
+      <span class="qp-status-text" id="statusText">Connecting to Knowledge Base&#8230;</span>
+    </div>
+  </div>
+  <div class="qp-nav-right">
+    <span class="qp-user-chip">tacenergy <span class="qp-role-badge">demo</span></span>
+  </div>
+</nav>
+
+<div class="qp-partner-bar">
+  <div class="qp-partner-left">
+    <div class="qp-partner-avatar">RS</div>
+    <div class="qp-partner-info">
+      <span class="qp-partner-name">Ryan Singer</span>
+      <span class="qp-partner-org">TACenergy LLC &middot; VP Finance &amp; Analytics &middot; The Arnold Companies</span>
+    </div>
+  </div>
+  <div class="qp-partner-right">
+    <div class="qp-kb-status-panel">
+      <span class="qp-kb-status-label">&#128218; Knowledge Base</span>
+      <span class="qp-kb-status-item" id="kbInfo">Connecting&#8230;</span>
+    </div>
+  </div>
+</div>
+
+<div class="qp-layout">
+  <aside class="qp-sidebar">
+    <div class="qp-sidebar-inner">
+      <div class="qp-sidebar-header"><span class="qp-sidebar-icon">&#9889;</span><span class="qp-sidebar-title">Pattern Library</span></div>
+      <p class="qp-section-hint">Click any pattern to load it into the query builder</p>
+      <div class="qp-pattern-category">
+        <button class="qp-category-header"><span class="qp-category-icon">&#128200;</span><span class="qp-category-label">Fuel Pricing Intelligence</span><span class="qp-category-chevron">&#9660;</span></button>
+        <div class="qp-category-patterns">
+          <button class="qp-pattern-btn" id="pm"><span class="qp-pattern-dot" style="background:#10b981"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Margin Compression Analysis</span><span class="qp-pattern-desc">Rack price trends &amp; basis differentials</span></span></button>
+          <button class="qp-pattern-btn" id="pa"><span class="qp-pattern-dot" style="background:#ef4444"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Anomaly Detection</span><span class="qp-pattern-desc">Purchase price vs benchmark scan</span></span></button>
+          <button class="qp-pattern-btn" id="pb"><span class="qp-pattern-dot" style="background:#3b82f6"></span><span class="qp-pattern-content"><span class="qp-pattern-name">CFO Executive Briefing</span><span class="qp-pattern-desc">Q1 performance &amp; Q2 roadmap</span></span></button>
+          <button class="qp-pattern-btn"><span class="qp-pattern-dot" style="background:#8b5cf6"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Q2 Hedging Analysis</span><span class="qp-pattern-desc">Forward strip &amp; exposure</span></span></button>
+          <button class="qp-pattern-btn"><span class="qp-pattern-dot" style="background:#f59e0b"></span><span class="qp-pattern-content"><span class="qp-pattern-name">Supplier Cost Audit</span><span class="qp-pattern-desc">Vendor overcharge analysis</span></span></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="qp-main">
+    <div class="qp-card" style="padding:1rem 1.25rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <span style="color:var(--qp-text);font-weight:600;font-size:.88rem">&#128269; Query Builder</span>
+        <span style="font-size:.72rem;color:var(--qp-muted)">Finance KB &middot; 2,341 chunks</span>
+      </div>
+      <textarea id="qi" class="qp-query-textarea" rows="3" placeholder="Ask anything about your fuel pricing data&#8230;" style="min-height:72px"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:.6rem">
+        <button id="rb" class="qp-btn-primary" style="padding:.45rem 1.1rem;font-size:.85rem">&#9654; Run Analysis</button>
+      </div>
+    </div>
+    <div class="qp-card" id="rc" style="display:none;padding:1rem 1.25rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap">
+        <span style="color:var(--qp-text);font-weight:600;font-size:.88rem">&#128161; Analysis Result</span>
+        <span id="ra"></span>
+      </div>
+      <div id="rct" class="qp-response-text" style="min-height:60px"></div>
+      <div id="rs"></div>
+    </div>
+  </main>
+
+  <aside class="qp-agent-panel">
+    <div class="qp-agent-header"><span>&#127775;</span><span>AI Navigator</span></div>
+    <div class="qp-agent-domain-bar"><span style="font-size:.72rem;color:var(--qp-muted)">Finance Knowledge Base</span></div>
+    <div class="qp-agent-messages">
+      <div class="qp-agent-msg qp-agent-ai"><span>&#129302;</span><div class="qp-agent-msg-body" style="font-size:.78rem">Ready to analyze TACenergy fuel pricing intelligence. Ask me about margins, supplier pricing, or hedging.</div></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const RESP = {
+  margin: {
+    q: "What are the current crude oil and rack price trends, and where are we seeing the biggest margin compression in Q1 2026?",
+    t: "## TACenergy Fuel Pricing Intelligence\u2014Q1 2026\n\n### Crude Oil Benchmark Summary\n\nBased on Q1 2026 pricing data [TAC-Pricing-Daily-Q1-2026.csv]:\n\n| Benchmark | Q1 2026 Avg | QoQ Change |\n|-----------|------------|------------|\n| **WTI Crude (Cushing)** | $74.82/bbl | -$3.41 (-4.4%) |\n| **Brent Crude** | $78.15/bbl | -$2.87 (-3.5%) |\n| **NYMEX RBOB Gasoline** | $2.387/gal | +$0.143 (+6.4%) |\n\n### Gulf Coast Terminal\u2014COMPRESSION WARNING\n\nThe platform identified **significant basis differential compression** [TAC-Rack-Pricing-Regional.md]:\n\n- **Dallas Group 3 basis:** +$0.0312/gal vs. 90-day average of +$0.0089/gal\n- **Margin impact: -$184,800** on 8.4M gallons sold in January\n- **NOT flagged in manual review**\u2014platform detected via rolling baseline comparison\n\n### Key Finding\n\n**Total identified margin compression: -$412,000** across Gulf Coast and Permian Basin regions\n\n**Hedging Opportunity:** Current strip suggests **+$0.015/gal** on 12M gallons before April 15 = **+$180,000 gross margin recovery** [TAC-Hedging-Positions.md]",
+    s: ["TAC-Pricing-Daily-Q1-2026.csv","TAC-Rack-Pricing-Regional.md","TAC-Hedging-Positions.md"],
+    adr: "ADR-20260326-041 \u00b7 structured_data \u00b7 4.2s \u00b7 5 chunks"
+  },
+  anomaly: {
+    q: "Flag any statistical anomalies in our purchase price data versus market benchmarks for Q1. Quantify the financial exposure.",
+    t: "## Purchase Price Anomaly Detection\u2014Q1 2026\n\n**Scan:** 2-sigma threshold | **14,847 transactions analyzed** | 3 anomaly categories identified\n\n### Anomaly 1: Supplier Premium Outliers\u2014HIGH PRIORITY (3.2\u03c3)\n\n| Supplier | Product | Volume | Premium | Impact |\n|---------|---------|--------|---------|--------|\n| **Supplier C-7** | Diesel ULSD | 1,240,000 gal | +$0.057/gal | **-$70,680** |\n| **Supplier C-7** | Diesel ULSD | 980,000 gal | +$0.055/gal | **-$53,900** |\n| **Supplier F-2** | Gasoline Regular | 2,100,000 gal | +$0.044/gal | **-$92,400** |\n| *(20 additional transactions)* | | | | **-$183,600** |\n| **Subtotal** | | | | **-$400,580** |\n\n**Pattern:** Supplier C-7 accounts for 61% of premium transactions during January 14\u201331.\n\n### Anomaly 2: Purchase Timing Misses\u2014MEDIUM\n\n8 purchases executed at daily high vs low\u2014**-$181,200 total**\n\n### Anomaly 3: Potential Duplicate Invoicing\u2014URGENT\n\n| Invoice Pair | Supplier | Amount | Status |\n|-------------|---------|--------|--------|\n| INV-Q1-04471 / INV-Q1-04839 | Supplier B-3 | $126,450 | **REVIEW BEFORE MAR 31** |\n| INV-Q1-07213 / INV-Q1-07601 | Supplier F-2 | $66,864 | **REVIEW BEFORE MAR 31** |\n| **Total at risk** | | **$193,314** | **URGENT** |\n\n---\n\n## Total Financial Exposure\n\n| Category | Q1 2026 | Annualized |\n|---------|---------|------------|\n| Supplier overcharges | -$400,580 | **-$1.6M** |\n| Timing inefficiencies | -$181,200 | **-$724K** |\n| Duplicate invoices | **-$193,314** | Review needed |\n| **Total identified** | **-$775,094** | **-$2.3M+** |\n\n**Analysis completed in 4.2 seconds** across 14,847 transactions. Previous manual review covered 200 transactions per quarter.",
+    s: ["TAC-Purchase-Ledger-Q1-2026.csv","NYMEX-Settlement-Data.md","TAC-Supplier-Contracts.md"],
+    adr: "ADR-20260326-042 \u00b7 structured_data \u00b7 4.2s \u00b7 7 chunks"
+  },
+  briefing: {
+    q: "Generate an executive summary for the CFO on Q1 2026 performance, key risks, and Q2 recommendations.",
+    t: "## TACenergy Q1 2026\u2014CFO Executive Briefing\n\n**Generated:** AIXaaS Intelligence Platform | March 26, 2026 | 2,341 document chunks\n\n### Q1 2026 Performance Snapshot\n\n| Metric | Q1 2026 | Q4 2025 | Change |\n|-------|---------|---------|--------|\n| Total volume | 38.7M gallons | 41.2M gallons | -6.1% |\n| Gross margin | $0.087/gal | $0.094/gal | -7.4% |\n| Total gross margin | $3.37M | $3.87M | -$500K |\n\n**Tracking 3.2% below Q1 plan**\n\n### 3 Critical Risks Requiring Immediate Action\n\n**Risk 1: Supplier C-7 Overcharging\u2014ACT NOW**\n- $400,580 in Q1 premium overcharges identified\n- Supplier priced 61% above market during Jan 14\u201331\n- Supplier D-4 quoted $0.038/gal below C-7 current pricing\n- **Q2 savings potential: $280K\u2013$360K**\n\n**Risk 2: Duplicate Invoices\u2014$193K at Risk Before March 31**\n- 2 suspected duplicate invoice pairs totaling $193,314\n- Not caught in current AP review process\n- **Recovery probability: 95%+ if identified before payment cycle**\n\n**Risk 3: Gulf Coast Basis Compression**\n- Group 3 basis at $0.0312/gal vs $0.0089 90-day average\n- **Hedging upside: +$180,000 gross margin** if locked before April 15\n\n### Q2 2026 Recommendations\n\n1. Initiate Supplier C-7 contract audit; evaluate switch to Supplier D-4\n2. Deploy automated duplicate invoice detection (zero marginal cost, runs weekly)\n3. Forward lock Gulf Coast Q2 volumes before April 15 basis reset\n4. Daily rack comparison alerts to procurement team for timing optimization\n\n**Estimated Q2 impact: +$620,000\u2013$820,000 gross margin improvement**\n\n---\n\n*Generated in 6.1 seconds from 2,341 indexed chunks. All figures grounded in source data\u2014zero hallucination.*",
+    s: ["TAC-Purchase-Ledger-Q1-2026.csv","TAC-Pricing-Daily-Q1-2026.csv","TAC-Supplier-Contracts.md"],
+    adr: "ADR-20260326-043 \u00b7 structured_data \u00b7 6.1s \u00b7 8 chunks"
+  }
+};
+
+const NAR = [
+  {t:0,     sc:'sc0', v:"TACenergy. 7.5 billion in revenue. 38 million gallons distributed per quarter. Right now, their CFO is using ChatGPT to analyze fuel pricing with no audit trail and no data governance. This is what governed AI looks like."},
+  {t:8000,  sc:'sc1', v:"The knowledge base holds their Q1 pricing data, purchase ledger, supplier contracts, and NYMEX benchmark feeds. 2,341 chunks. All private. All governed."},
+  {t:16000, sc:'sc2', v:"First question: where are we seeing margin compression in Q1?"},
+  {t:42000, sc:'sc3', v:"$412,000 in identified margin compression. Basis differential widening on Group 3 pricing. This was not flagged in the manual pricing review process. The platform found it by comparing daily rack feeds against the 90-day rolling baseline."},
+  {t:72000, sc:'sc4', v:"A $0.015 per gallon hedging opportunity on 12 million gallons. That is $180,000 in recoverable gross margin sitting on the table right now."},
+  {t:90000, sc:'sc5', v:"Now the anomaly detection. 14,847 transactions. What did the manual process miss?"},
+  {t:112000,sc:'sc6', v:"Supplier C-7: $400,000 in overcharges in one quarter. Potential duplicate invoices: $193,000. This is what happens when you run 14,000 transactions against benchmarks in 4 seconds."},
+  {t:148000,sc:'sc7', v:"$775,000 in identified exposure. Annualized: $2.3 million. The CFO's quarterly manual review covered 200 transactions. AIXaaS covered all 14,847."},
+  {t:160000,sc:'sc8', v:"Now give the CFO something they can actually present to the board today."},
+  {t:182000,sc:'sc9', v:"Three critical risks ranked by priority. Four Q2 recommendations with dollar estimates. Generated in 6 seconds from 2,341 indexed chunks. Grounded in source data."},
+  {t:212000,sc:'sc10',v:"$620,000 to $820,000 in Q2 margin improvement from implementing the recommendations. That is the ROI of governed AI over ChatGPT."}
+];
+
+let paused=false, muted=false;
+const cur = document.getElementById('demoCursor');
+
+function md2html(t) {
+  let h = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/## ([^\n]+)/g,'<h3 style="color:var(--qp-blue);margin:14px 0 6px;font-size:.95rem">$1</h3>')
+    .replace(/### ([^\n]+)/g,'<h4 style="color:var(--qp-blue-light);margin:12px 0 5px;font-size:.87rem">$1</h4>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  const tblRx = /((?:\|[^\n]+\|\n?)+)/g;
+  h = h.replace(tblRx, m => {
+    const rows = m.trim().split('\n').filter(r=>r.trim());
+    let out = '<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:.78rem">';
+    rows.forEach((r,i) => {
+      if(r.replace(/[\s\-|]/g,'') === '') return;
+      const cells = r.split('|').filter((_,ci,a)=>ci>0&&ci<a.length-1);
+      const tag = i===0 ? 'th' : 'td';
+      const s = i===0 ? 'background:rgba(59,130,246,0.1);color:var(--qp-blue-light);padding:5px 8px;text-align:left;border-bottom:1px solid rgba(59,130,246,0.2)' : 'padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--qp-text)';
+      out += '<tr>'+cells.map(c=>`<${tag} style="${s}">${c.trim().replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')}</${tag}>`).join('')+'</tr>';
+    });
+    return out+'</table>';
+  });
+  return h.replace(/^- (.+)$/gm,'<li style="margin:3px 0">$1</li>')
+    .replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g,m=>'<ul style="margin:8px 0 8px 16px;padding:0">'+m+'</ul>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid rgba(59,130,246,0.15);margin:10px 0">')
+    .replace(/\[([^\]]+)\]/g,'<span style="font-size:.68rem;background:rgba(59,130,246,0.1);color:var(--qp-blue-light);padding:1px 5px;border-radius:4px;border:1px solid rgba(59,130,246,0.2)">$1</span>')
+    .replace(/\n\n/g,'</p><p style="margin:5px 0">');
+}
+
+function moveCur(el) { if(!el)return; const r=el.getBoundingClientRect(); cur.style.left=(r.left+r.width/2)+'px'; cur.style.top=(r.top+r.height/2)+'px'; }
+function clickCur(el) { moveCur(el); cur.classList.add('click'); setTimeout(()=>cur.classList.remove('click'),350); }
+function setNar(txt) {
+  document.getElementById('nt').textContent = txt;
+  if(!muted && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.rate=0.92; u.pitch=1.0;
+    const vs = window.speechSynthesis.getVoices();
+    const pv = vs.find(v=>v.name.includes('Google US English')||v.lang==='en-US');
+    if(pv) u.voice=pv;
+    window.speechSynthesis.speak(u);
+  }
+}
+function setScr(id) {
+  document.querySelectorAll('.sc').forEach(e=>e.classList.remove('active'));
+  const e=document.getElementById(id);
+  if(e){ e.classList.add('active'); e.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+function sleep(ms) {
+  return new Promise(res=>{
+    let rem=ms;
+    const iv=setInterval(()=>{ if(!paused) rem-=100; if(rem<=0){clearInterval(iv);res();} },100);
+  });
+}
+
+async function streamResp(key) {
+  const r = RESP[key];
+  document.getElementById('qi').value = r.q;
+  clickCur(document.getElementById('rb'));
+  await sleep(400);
+  const rc=document.getElementById('rc');
+  rc.style.display='block';
+  const rct=document.getElementById('rct');
+  rct.innerHTML='<div class="analyzing">Analyzing 2,341 pricing documents&#8230;</div>';
+  document.getElementById('ra').innerHTML='';
+  document.getElementById('rs').innerHTML='';
+  rc.scrollIntoView({behavior:'smooth',block:'nearest'});
+  await sleep(2800);
+  const html=md2html(r.t);
+  let rev=0;
+  rct.innerHTML='<span class="tcursor"></span>';
+  while(rev < html.length) {
+    rev = Math.min(rev+12, html.length);
+    rct.innerHTML = html.slice(0,rev)+'<span class="tcursor"></span>';
+    await sleep(26);
+  }
+  rct.innerHTML = html;
+  const chips = r.s.map(s=>'<span class="src-chip">'+s+'</span>').join('');
+  document.getElementById('rs').innerHTML='<div class="src-chips">'+chips+'</div><div class="adr-badge"><span class="adr-dot"></span>'+r.adr+'</div>';
+}
+
+async function runDemo() {
+  cur.style.display='block';
+  setNar(NAR[0].v); setScr('sc0');
+  await sleep(1200);
+  document.getElementById('statusDot').style.background='#10b981';
+  document.getElementById('statusText').textContent='2,341 chunks \u00b7 azure+keyword \u00b7 LIVE';
+  document.getElementById('kbInfo').textContent='Q1 2026 Pricing \u00b7 Purchase Ledger \u00b7 NYMEX Benchmarks';
+  await sleep(6800); setNar(NAR[1].v); setScr('sc1');
+  await sleep(5000);
+  const pm=document.getElementById('pm'); moveCur(pm);
+  await sleep(700); setNar(NAR[2].v); setScr('sc2'); clickCur(pm); pm.classList.add('da');
+  await sleep(600);
+  await streamResp('margin');
+  setNar(NAR[3].v); setScr('sc3'); await sleep(22000);
+  setNar(NAR[4].v); setScr('sc4'); await sleep(16000);
+  setNar(NAR[5].v); setScr('sc5');
+  pm.classList.remove('da');
+  const pa=document.getElementById('pa'); moveCur(pa);
+  await sleep(700); clickCur(pa); pa.classList.add('da'); await sleep(600);
+  await streamResp('anomaly');
+  setNar(NAR[6].v); setScr('sc6'); await sleep(30000);
+  setNar(NAR[7].v); setScr('sc7'); await sleep(10000);
+  setNar(NAR[8].v); setScr('sc8');
+  pa.classList.remove('da');
+  const pb=document.getElementById('pb'); moveCur(pb);
+  await sleep(700); clickCur(pb); pb.classList.add('da'); await sleep(600);
+  await streamResp('briefing');
+  setNar(NAR[9].v); setScr('sc9'); await sleep(25000);
+  setNar(NAR[10].v); setScr('sc10'); await sleep(8000);
+  setNar('Demo complete. Press Restart to replay.'); cur.style.display='none';
+}
+
+document.getElementById('bpp').addEventListener('click',()=>{
+  paused=!paused;
+  document.getElementById('bpp').textContent=paused?'\u25B6':'\u23F8';
+  if(paused&&window.speechSynthesis) window.speechSynthesis.pause();
+  else if(window.speechSynthesis) window.speechSynthesis.resume();
+});
+document.getElementById('bmt').addEventListener('click',()=>{
+  muted=!muted;
+  document.getElementById('bmt').textContent=muted?'\uD83D\uDD07':'\uD83D\uDD0A';
+  if(muted&&window.speechSynthesis) window.speechSynthesis.cancel();
+});
+document.getElementById('bsc').addEventListener('click',()=>document.getElementById('scriptSidebar').classList.toggle('open'));
+document.getElementById('brs').addEventListener('click',()=>location.reload());
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();document.getElementById('bpp').click();}
+  if(e.code==='KeyM') document.getElementById('bmt').click();
+  if(e.code==='KeyS') document.getElementById('bsc').click();
+  if(e.code==='KeyR') document.getElementById('brs').click();
+});
+window.addEventListener('load',()=>{ window.speechSynthesis.getVoices(); setTimeout(runDemo,1000); });
+</script>
+
+<!-- ===== NARRATION IMPROVEMENTS (v2.1) ===== -->
+<style>
+#narration-bar { transition: height 0.2s ease, opacity 0.2s ease; overflow: hidden; }
+#narration-bar.narr-hidden { height: 0 !important; opacity: 0; border-top: none; }
+body.narr-collapsed #app-wrapper { bottom: var(--demo-bar-h) !important; }
+#narr-toggle-btn {
+  background: none; border: 1px solid rgba(34,211,238,.3);
+  color: #22d3ee; font-size: 11px; padding: 3px 9px;
+  border-radius: 12px; cursor: pointer; white-space: nowrap;
+  transition: background .15s; margin-right: 4px;
+}
+#narr-toggle-btn:hover { background: rgba(34,211,238,.12); }
+</style>
+<script>
+(function() {
+  var _synth = window.speechSynthesis;
+  var VOICE_PREF = [
+    function(v) { return v.name === "Google UK English Female"; },
+    function(v) { return v.name.indexOf("Aria Online") > -1 && v.name.indexOf("Natural") > -1; },
+    function(v) { return v.name.indexOf("Jenny Online") > -1; },
+    function(v) { return v.name === "Samantha"; },
+    function(v) { return v.name.indexOf("Natural") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.name === "Google US English"; },
+    function(v) { return v.name.indexOf("Google") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en-US") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en") === 0; }
+  ];
+  function pickVoice() {
+    var voices = _synth.getVoices();
+    for (var i = 0; i < VOICE_PREF.length; i++) {
+      for (var j = 0; j < voices.length; j++) {
+        if (VOICE_PREF[i](voices[j])) return voices[j];
+      }
+    }
+    return voices[0] || null;
+  }
+  function speakNatural(text, rm) {
+    if (!text) return;
+    _synth.cancel();
+    rm = rm || 1.0;
+    var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    var idx = 0;
+    function next() {
+      if (idx >= sentences.length) return;
+      var s = sentences[idx++].trim();
+      if (!s) { next(); return; }
+      var u = new SpeechSynthesisUtterance(s);
+      u.rate = 0.87 * rm;
+      u.pitch = 0.96;
+      u.volume = 1.0;
+      var v = pickVoice();
+      if (v) u.voice = v;
+      u.onend = function() { setTimeout(next, 100); };
+      _synth.speak(u);
+    }
+    next();
+  }
+  if (typeof window.speak === "function") {
+    window.speak = function(text, rate) {
+      var isMuted = (typeof muted !== "undefined" && muted);
+      var isDisabled = (typeof speechEnabled !== "undefined" && !speechEnabled);
+      if (isMuted || isDisabled) return;
+      var sm = (typeof speedMultiplier !== "undefined" ? speedMultiplier : 1.0);
+      speakNatural(text, (rate || 1.0) * sm);
+    };
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    var bar = document.getElementById("narration-bar");
+    var demoBar = document.getElementById("demo-bar");
+    var narr_visible = false;
+    if (bar) bar.classList.add("narr-hidden");
+    document.body.classList.add("narr-collapsed");
+    var btn = document.createElement("button");
+    btn.id = "narr-toggle-btn";
+    btn.title = "Show/hide narration text bar";
+    btn.textContent = "Captions: Off";
+    btn.onclick = function() {
+      narr_visible = !narr_visible;
+      if (bar) bar.classList.toggle("narr-hidden", !narr_visible);
+      document.body.classList.toggle("narr-collapsed", !narr_visible);
+      btn.textContent = narr_visible ? "Captions: On" : "Captions: Off";
+    };
+    if (demoBar) {
+      var muteBtn = demoBar.querySelector("#mute-btn");
+      if (muteBtn) { demoBar.insertBefore(btn, muteBtn); }
+      else { demoBar.appendChild(btn); }
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

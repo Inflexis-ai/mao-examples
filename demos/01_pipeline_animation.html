@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>AIXaaS — 5-Stage Ingestion Pipeline</title>
+  <link rel="stylesheet" href="demo_common.css">
+  <style>
+    .page-layout {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: calc(100vh - 57px); padding: 40px;
+      gap: 32px;
+    }
+    .page-title {
+      font-size: 28px; font-weight: 700;
+      background: linear-gradient(135deg, var(--qp-blue), var(--qp-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    .page-subtitle {
+      font-size: 14px; color: var(--qp-muted); text-align: center;
+      max-width: 600px; line-height: 1.6;
+    }
+    /* Big pipeline */
+    .big-pipeline {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .big-stage {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px; padding: 24px 28px;
+      background: var(--qp-panel); border: 2px solid var(--qp-border);
+      border-radius: 14px; min-width: 150px;
+      opacity: 0.2; transition: all 0.6s ease;
+    }
+    .big-stage.active {
+      opacity: 1; border-color: var(--qp-blue);
+      box-shadow: 0 0 24px var(--qp-glow);
+      transform: translateY(-4px);
+    }
+    .big-stage.complete {
+      opacity: 1; border-color: var(--qp-green);
+      box-shadow: 0 0 16px rgba(16,185,129,0.2);
+    }
+    .big-stage .icon { font-size: 36px; }
+    .big-stage .label { font-size: 15px; font-weight: 600; }
+    .big-stage .detail {
+      font-size: 12px; color: var(--qp-muted);
+      text-align: center; line-height: 1.4;
+    }
+    .big-stage .timing {
+      font-size: 18px; font-weight: 700; color: var(--qp-cyan);
+      font-family: monospace; opacity: 0; transition: opacity 0.3s;
+    }
+    .big-stage .timing.visible { opacity: 1; }
+    .big-stage .zero-token-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 4px;
+      background: rgba(245,158,11,0.15); color: var(--qp-amber);
+      border: 1px solid rgba(245,158,11,0.3);
+      font-weight: 600; text-transform: uppercase;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .big-stage .zero-token-badge.visible { opacity: 1; }
+    .big-arrow {
+      font-size: 28px; color: var(--qp-dim);
+      opacity: 0.2; transition: all 0.5s;
+    }
+    .big-arrow.active { opacity: 1; color: var(--qp-blue); }
+    /* Storage tiers */
+    .storage-section {
+      display: flex; gap: 16px; opacity: 0; transition: opacity 0.5s;
+    }
+    .storage-section.visible { opacity: 1; }
+    .storage-tier {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding: 16px 20px;
+      background: var(--qp-card); border: 1px solid var(--qp-border);
+      border-radius: 10px; min-width: 140px;
+      opacity: 0.3; transition: all 0.4s;
+    }
+    .storage-tier.active {
+      opacity: 1; border-color: var(--qp-purple);
+      box-shadow: 0 0 12px rgba(168,85,247,0.2);
+    }
+    .storage-tier .tier-icon { font-size: 24px; }
+    .storage-tier .tier-name { font-size: 13px; font-weight: 600; }
+    .storage-tier .tier-desc { font-size: 11px; color: var(--qp-muted); text-align: center; }
+    .storage-tier .tier-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      font-weight: 600;
+    }
+    .tier-always { background: rgba(16,185,129,0.15); color: var(--qp-green); border: 1px solid rgba(16,185,129,0.3); }
+    .tier-lazy { background: rgba(59,130,246,0.15); color: var(--qp-blue); border: 1px solid rgba(59,130,246,0.3); }
+    .tier-cloud { background: rgba(168,85,247,0.15); color: var(--qp-purple); border: 1px solid rgba(168,85,247,0.3); }
+    /* Total time */
+    .total-time {
+      font-size: 20px; color: var(--qp-text);
+      background: var(--qp-panel); border: 1px solid var(--qp-border);
+      border-radius: 10px; padding: 12px 32px;
+      opacity: 0; transition: opacity 0.5s;
+    }
+    .total-time.visible { opacity: 1; }
+    .total-time strong {
+      font-size: 28px; color: var(--qp-green); font-family: monospace;
+    }
+    .controls-hint {
+      position: fixed; top: 8px; right: 8px;
+      font-size: 11px; color: var(--qp-dim); z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls-hint">SPACE = play/pause &nbsp;|&nbsp; R = restart</div>
+
+  <div class="brand-bar">
+    <img src="img/aixaas-badge.png" alt="AIXaaS">
+    <span class="title">AIXaaS Intelligence Platform</span>
+    <span class="subtitle">5-Stage Ingestion Pipeline</span>
+  </div>
+
+  <div class="page-layout">
+    <div class="page-title">5-Stage Ingestion Pipeline</div>
+    <div class="page-subtitle">
+      Every document passes through five governed stages before entering the knowledge base.
+      Compliance scanning and PII masking happen at zero API cost.
+    </div>
+
+    <div class="big-pipeline">
+      <div class="big-stage" id="s1">
+        <span class="icon">&#128196;</span>
+        <span class="label">Parse</span>
+        <span class="detail">20+ file types<br>PDF, DOCX, CSV, Audio</span>
+        <span class="timing" id="t1">340ms</span>
+      </div>
+      <div class="big-arrow" id="a1">&#10132;</div>
+      <div class="big-stage" id="s2">
+        <span class="icon">&#128274;</span>
+        <span class="label">PII Mask</span>
+        <span class="detail">SSN, credit cards<br>health records, PII</span>
+        <span class="timing" id="t2">180ms</span>
+        <span class="zero-token-badge" id="zt2">Zero-Token</span>
+      </div>
+      <div class="big-arrow" id="a2">&#10132;</div>
+      <div class="big-stage" id="s3">
+        <span class="icon">&#9989;</span>
+        <span class="label">Compliance</span>
+        <span class="detail">23 frameworks<br>NIST, ISO, SOX, GDPR...</span>
+        <span class="timing" id="t3">12ms</span>
+        <span class="zero-token-badge" id="zt3">Zero-Token</span>
+      </div>
+      <div class="big-arrow" id="a3">&#10132;</div>
+      <div class="big-stage" id="s4">
+        <span class="icon">&#128230;</span>
+        <span class="label">Chunk</span>
+        <span class="detail">Optimal sizing<br>for vector search</span>
+        <span class="timing" id="t4">520ms</span>
+      </div>
+      <div class="big-arrow" id="a4">&#10132;</div>
+      <div class="big-stage" id="s5">
+        <span class="icon">&#128451;</span>
+        <span class="label">4-Tier Store</span>
+        <span class="detail">Redundant storage<br>across all tiers</span>
+        <span class="timing" id="t5">890ms</span>
+      </div>
+    </div>
+
+    <div class="storage-section" id="storage-section">
+      <div class="storage-tier" id="tier1">
+        <span class="tier-icon">&#128269;</span>
+        <span class="tier-name">Keyword</span>
+        <span class="tier-desc">BM25 on disk<br>Always available</span>
+        <span class="tier-badge tier-always">Always On</span>
+      </div>
+      <div class="storage-tier" id="tier2">
+        <span class="tier-icon">&#129504;</span>
+        <span class="tier-name">Semantic</span>
+        <span class="tier-desc">Qdrant + embeddings<br>Local vectors</span>
+        <span class="tier-badge tier-lazy">Lazy Init</span>
+      </div>
+      <div class="storage-tier" id="tier3">
+        <span class="tier-icon">&#9729;&#65039;</span>
+        <span class="tier-name">Pinecone</span>
+        <span class="tier-desc">Cloud vectors<br>Global scale</span>
+        <span class="tier-badge tier-cloud">Cloud</span>
+      </div>
+      <div class="storage-tier" id="tier4">
+        <span class="tier-icon">&#9878;&#65039;</span>
+        <span class="tier-name">Azure Search</span>
+        <span class="tier-desc">Enterprise search<br>+ Blob storage</span>
+        <span class="tier-badge tier-cloud">Cloud</span>
+      </div>
+    </div>
+
+    <div class="total-time" id="total-time">
+      Total pipeline time: <strong>1.94s</strong> &nbsp;&bull;&nbsp; Zero API cost for PII + Compliance
+    </div>
+  </div>
+
+  <script src="demo_animations.js"></script>
+  <script>
+    demo.setTimeline([
+      { time: 0, action: 'narrate', text: 'The AIXaaS 5-Stage Ingestion Pipeline. Every document goes through five governed stages before it becomes searchable knowledge.', timestamp: '0:00' },
+
+      // Stage 1: Parse
+      { time: 3, action: 'addClass', target: '#s1', className: 'active' },
+      { time: 3.5, action: 'narrate', text: 'Stage 1: Parse. The platform handles 20+ file types natively \u2014 PDF, Word, Excel, PowerPoint, CSV, audio, video, even Apple formats.', timestamp: '0:03' },
+      { time: 6, action: 'show', target: '#t1' },
+      { time: 6.5, action: 'addClass', target: '#s1', className: 'complete' },
+      { time: 6.5, action: 'removeClass', target: '#s1', className: 'active' },
+      { time: 6.5, action: 'addClass', target: '#a1', className: 'active' },
+
+      // Stage 2: PII Mask
+      { time: 7.5, action: 'addClass', target: '#s2', className: 'active' },
+      { time: 8, action: 'narrate', text: 'Stage 2: PII Masking. Deterministic pattern matching catches SSNs, credit cards, health records \u2014 no LLM needed. Zero tokens consumed.', timestamp: '0:08' },
+      { time: 11, action: 'show', target: '#t2' },
+      { time: 11.5, action: 'show', target: '#zt2' },
+      { time: 12, action: 'addClass', target: '#s2', className: 'complete' },
+      { time: 12, action: 'removeClass', target: '#s2', className: 'active' },
+      { time: 12, action: 'addClass', target: '#a2', className: 'active' },
+
+      // Stage 3: Compliance
+      { time: 13, action: 'addClass', target: '#s3', className: 'active' },
+      { time: 13.5, action: 'narrate', text: 'Stage 3: Compliance Scan. 23 regulatory frameworks checked in 12 milliseconds. NIST, ISO, SOX, GDPR, HIPAA, EAR, ITAR \u2014 all at zero API cost.', timestamp: '0:13' },
+      { time: 16.5, action: 'show', target: '#t3' },
+      { time: 17, action: 'show', target: '#zt3' },
+      { time: 17.5, action: 'addClass', target: '#s3', className: 'complete' },
+      { time: 17.5, action: 'removeClass', target: '#s3', className: 'active' },
+      { time: 17.5, action: 'addClass', target: '#a3', className: 'active' },
+
+      // Stage 4: Chunk
+      { time: 18.5, action: 'addClass', target: '#s4', className: 'active' },
+      { time: 19, action: 'narrate', text: 'Stage 4: Chunking. Documents are split into optimally-sized segments for vector search. Chunk size adapts to content type and structure.', timestamp: '0:19' },
+      { time: 22, action: 'show', target: '#t4' },
+      { time: 22.5, action: 'addClass', target: '#s4', className: 'complete' },
+      { time: 22.5, action: 'removeClass', target: '#s4', className: 'active' },
+      { time: 22.5, action: 'addClass', target: '#a4', className: 'active' },
+
+      // Stage 5: Store
+      { time: 23.5, action: 'addClass', target: '#s5', className: 'active' },
+      { time: 24, action: 'narrate', text: 'Stage 5: 4-Tier Storage. Aviation-grade redundancy \u2014 every chunk written to four independent storage tiers. No single point of failure.', timestamp: '0:24' },
+      { time: 27, action: 'show', target: '#t5' },
+      { time: 27.5, action: 'addClass', target: '#s5', className: 'complete' },
+      { time: 27.5, action: 'removeClass', target: '#s5', className: 'active' },
+
+      // Storage tiers
+      { time: 29, action: 'show', target: '#storage-section' },
+      { time: 30, action: 'addClass', target: '#tier1', className: 'active' },
+      { time: 30.5, action: 'narrate', text: 'Tier 1: Keyword search \u2014 always on, always local. Tier 2: Semantic vectors with embeddings. Tier 3: Pinecone cloud. Tier 4: Azure enterprise search.', timestamp: '0:30' },
+      { time: 31, action: 'addClass', target: '#tier2', className: 'active' },
+      { time: 32, action: 'addClass', target: '#tier3', className: 'active' },
+      { time: 33, action: 'addClass', target: '#tier4', className: 'active' },
+
+      // Total
+      { time: 35, action: 'show', target: '#total-time' },
+      { time: 36, action: 'narrate', text: 'Total pipeline time: under 2 seconds. PII masking and compliance detection at zero token cost. This is governed data ingestion.', timestamp: '0:36' },
+    ]);
+
+    setTimeout(() => demo.play(), 1000);
+  </script>
+</body>
+</html>

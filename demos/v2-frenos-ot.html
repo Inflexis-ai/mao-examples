@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRENOS x AIXaaS — OT Cybersecurity Intelligence Demo</title>
+<link rel="stylesheet" href="https://app.inflexis.ai/static/css/query_panel.css">
+<style>
+  /* ── Demo overlay controls ───────────────────────────────────────────── */
+  body { margin: 0; overflow-x: hidden; }
+
+  #demo-title-bar {
+    background: linear-gradient(90deg, #1a0a00 0%, #2d1200 40%, #1a1a2e 100%);
+    color: #ff6b35;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 7px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #ff6b35;
+    z-index: 1000;
+    position: relative;
+  }
+  #demo-title-bar .pulse-dot {
+    width: 9px; height: 9px;
+    background: #ff3b3b;
+    border-radius: 50%;
+    animation: pulse-red 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-red {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,59,59,0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(255,59,59,0); }
+  }
+
+  /* ── Cursor ──────────────────────────────────────────────────────────── */
+  #demo-cursor {
+    position: fixed;
+    width: 18px; height: 18px;
+    background: radial-gradient(circle, #ff6b35 30%, rgba(255,107,53,0.0) 80%);
+    border: 2px solid #ff6b35;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: left 0.6s cubic-bezier(0.4,0,0.2,1), top 0.6s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 12px 4px rgba(255,107,53,0.5);
+    opacity: 0;
+  }
+  #demo-cursor.visible { opacity: 1; }
+  #demo-cursor.clicking {
+    animation: cursor-click 0.25s ease;
+  }
+  @keyframes cursor-click {
+    0% { transform: translate(-50%,-50%) scale(1); }
+    40% { transform: translate(-50%,-50%) scale(0.6); box-shadow: 0 0 20px 8px rgba(255,107,53,0.8); }
+    100% { transform: translate(-50%,-50%) scale(1); }
+  }
+
+  /* ── Floating controls ───────────────────────────────────────────────── */
+  #demo-controls {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 9998;
+    background: rgba(10,10,20,0.85);
+    border: 1px solid rgba(255,107,53,0.4);
+    border-radius: 10px;
+    padding: 8px 12px;
+    backdrop-filter: blur(8px);
+  }
+  #demo-controls button {
+    background: rgba(255,107,53,0.15);
+    border: 1px solid rgba(255,107,53,0.5);
+    color: #ff9a6c;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  #demo-controls button:hover {
+    background: rgba(255,107,53,0.35);
+    color: #fff;
+  }
+  #demo-progress {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,107,53,0.15);
+    z-index: 9997;
+  }
+  #demo-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #ff3b3b);
+    width: 0%;
+    transition: width 0.5s linear;
+  }
+
+  /* ── Script sidebar ──────────────────────────────────────────────────── */
+  #script-sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 280px;
+    background: rgba(10,10,20,0.93);
+    border-right: 1px solid rgba(255,107,53,0.25);
+    z-index: 9990;
+    transform: translateX(-260px);
+    transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+    backdrop-filter: blur(10px);
+  }
+  #script-sidebar:hover, #script-sidebar.expanded {
+    transform: translateX(0);
+  }
+  #script-sidebar-tab {
+    position: absolute;
+    right: -28px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    background: rgba(255,107,53,0.8);
+    color: #fff;
+    font-size: 10px;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 4px 10px;
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  #script-sidebar-inner {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 11.5px;
+    color: #ccc;
+    line-height: 1.6;
+  }
+  #script-sidebar-inner h4 {
+    color: #ff6b35;
+    font-size: 12px;
+    margin: 0 0 10px 0;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,107,53,0.2);
+    padding-bottom: 6px;
+  }
+  .script-cue {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-left: 3px solid rgba(255,107,53,0.25);
+    background: rgba(255,255,255,0.03);
+    border-radius: 0 4px 4px 0;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .script-cue.active {
+    border-left-color: #ff6b35;
+    background: rgba(255,107,53,0.08);
+    color: #fff;
+  }
+  .script-cue .cue-time {
+    font-weight: 700;
+    color: #ff9a6c;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  /* ── Processing indicator ────────────────────────────────────────────── */
+  .processing-msg {
+    color: #ff9a6c;
+    font-style: italic;
+    font-size: 13px;
+    padding: 12px 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spin {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Source chips ────────────────────────────────────────────────────── */
+  .source-chips {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .source-chip {
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.35);
+    color: #ff9a6c;
+    font-size: 11px;
+    font-family: monospace;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+
+  /* ── ADR badge ───────────────────────────────────────────────────────── */
+  .adr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: #93c5fd;
+    font-size: 10.5px;
+    font-family: monospace;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+  .adr-badge .adr-dot {
+    width: 6px; height: 6px;
+    background: #3b82f6;
+    border-radius: 50%;
+  }
+
+  /* ── Response content markdown styling ──────────────────────────────── */
+  .qp-response-content h1 { color: #e2e8f0; font-size: 1.15em; margin: 0 0 12px 0; border-bottom: 1px solid rgba(255,107,53,0.2); padding-bottom: 8px; }
+  .qp-response-content h2 { color: #cbd5e1; font-size: 1.05em; margin: 14px 0 8px 0; }
+  .qp-response-content h3 { color: #94a3b8; font-size: 0.98em; margin: 10px 0 6px 0; }
+  .qp-response-content ul, .qp-response-content ol { margin: 6px 0 8px 18px; }
+  .qp-response-content li { margin-bottom: 4px; line-height: 1.55; }
+  .qp-response-content strong { color: #f1f5f9; }
+  .qp-response-content table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 12px; }
+  .qp-response-content th { background: rgba(255,107,53,0.12); color: #ff9a6c; padding: 7px 10px; text-align: left; border: 1px solid rgba(255,255,255,0.08); }
+  .qp-response-content td { padding: 6px 10px; border: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; }
+  .qp-response-content tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .qp-response-content code { background: rgba(255,107,53,0.08); color: #fca5a5; padding: 1px 5px; border-radius: 3px; font-size: 11.5px; }
+  .qp-response-content hr { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 12px 0; }
+
+  /* ── Sidebar pattern highlight ───────────────────────────────────────── */
+  .qp-pattern-item.active-pattern {
+    background: rgba(255,107,53,0.12) !important;
+    border-left: 3px solid #ff6b35 !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Title bar -->
+<div id="demo-title-bar">
+  <div class="pulse-dot"></div>
+  <span>LIVE DEMO — FRENOS &times; AIXaaS &nbsp;·&nbsp; Industrial OT Cybersecurity Intelligence</span>
+</div>
+
+<!-- Animated cursor -->
+<div id="demo-cursor"></div>
+
+<!-- Script sidebar -->
+<div id="script-sidebar">
+  <div id="script-sidebar-tab">SCRIPT</div>
+  <div id="script-sidebar-inner">
+    <h4>Narrator Cues</h4>
+    <div class="script-cue" id="cue-0">
+      <span class="cue-time">0:00</span>
+      FRENOS delivers OT threat intelligence for industrial enterprises. Behind their product — the AIXaaS platform handling AI orchestration and compliance governance. This is a real client scenario — a chemical plant running Rockwell DCS.
+    </div>
+    <div class="script-cue" id="cue-1">
+      <span class="cue-time">0:18</span>
+      The knowledge base holds 1,847 chunks of OT threat data, ICS vulnerability advisories, NERC CIP standards, and FRENOS's own assessment methodology.
+    </div>
+    <div class="script-cue" id="cue-2">
+      <span class="cue-time">0:25</span>
+      First question — what's the actual threat landscape for a chemical facility right now?
+    </div>
+    <div class="script-cue" id="cue-3">
+      <span class="cue-time">0:48</span>
+      VOLT SPARROW. Active campaign targeting chemical production scheduling. CVSS 9.8 RCE on Siemens SIMATIC. These are real threats, grounded in FRENOS's live threat database.
+    </div>
+    <div class="script-cue" id="cue-4">
+      <span class="cue-time">1:15</span>
+      IEC 62443. NERC CIP-007. CFATS Tier 2. The platform identified compliance exposure across four regulatory frameworks automatically — no manual framework mapping required.
+    </div>
+    <div class="script-cue" id="cue-5">
+      <span class="cue-time">1:30</span>
+      Now let's run a risk assessment for this specific facility — Tier 2 chemical, legacy Rockwell DCS.
+    </div>
+    <div class="script-cue" id="cue-6">
+      <span class="cue-time">1:52</span>
+      Three million dollars in annualized exposure. Two critical CVEs on the Rockwell historian and Studio 5000. Fourteen Level-1 devices reachable from the business network. This is what $2 million in risk reduction looks like.
+    </div>
+    <div class="script-cue" id="cue-7">
+      <span class="cue-time">2:28</span>
+      67% risk reduction from the integrated FRENOS plus AIXaaS deployment. That's the business case in one number.
+    </div>
+    <div class="script-cue" id="cue-8">
+      <span class="cue-time">2:40</span>
+      Last one — NERC CIP gaps. The stuff that keeps the CISO up at night.
+    </div>
+    <div class="script-cue" id="cue-9">
+      <span class="cue-time">3:00</span>
+      Four active gaps. $330 million in theoretical maximum penalty. Realistic exposure $3 to $8 million. Six weeks to remediation. The platform identified every gap automatically — zero manual audit hours.
+    </div>
+    <div class="script-cue" id="cue-10">
+      <span class="cue-time">3:20</span>
+      This is why FRENOS partnered with Inflexis. The threat intelligence is theirs. The governance layer, the compliance engine, the audit trail — that's MAO. Together, it's a complete OT security product.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     REAL APP STRUCTURE
+═══════════════════════════════════════════════════════════════════════════ -->
+
+<nav class="qp-nav">
+  <div class="qp-nav-left">
+    <span class="qp-nav-logo">AIXaaS™</span>
+    <span class="qp-nav-sep">|</span>
+    <span class="qp-nav-title">Query Panel</span>
+  </div>
+  <div class="qp-nav-right">
+    <span class="qp-nav-domain" id="nav-domain">Compliance &amp; Risk</span>
+    <span class="qp-nav-user">frenos-demo</span>
+    <span class="qp-nav-role">demo</span>
+  </div>
+</nav>
+
+<div class="qp-partner-bar">
+  <div class="qp-partner-avatar">FR</div>
+  <div class="qp-partner-info">
+    <div class="qp-partner-name">FRENOS Security Intelligence</div>
+    <div class="qp-partner-sub">OT/ICS Threat Intelligence &nbsp;&middot;&nbsp; Industrial Cybersecurity</div>
+  </div>
+  <div class="qp-kb-stats">
+    <span class="qp-kb-chunks">1,847 chunks</span>
+    <span class="qp-kb-label">OT Threat Intelligence &nbsp;&middot;&nbsp; ICS/SCADA Vulnerability Database</span>
+  </div>
+</div>
+
+<div class="qp-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="qp-sidebar">
+    <div class="qp-sidebar-section">
+      <div class="qp-sidebar-heading">Knowledge Domain</div>
+      <div class="qp-domain-list">
+        <div class="qp-domain-item active" id="domain-compliance">
+          <span class="qp-domain-dot" style="background:#ef4444"></span>
+          Compliance &amp; Risk
+        </div>
+        <div class="qp-domain-item" id="domain-threat">
+          <span class="qp-domain-dot" style="background:#f97316"></span>
+          OT Threat Intel
+        </div>
+        <div class="qp-domain-item" id="domain-vuln">
+          <span class="qp-domain-dot" style="background:#eab308"></span>
+          ICS Vulnerabilities
+        </div>
+        <div class="qp-domain-item" id="domain-incident">
+          <span class="qp-domain-dot" style="background:#22c55e"></span>
+          Incident Response
+        </div>
+        <div class="qp-domain-item" id="domain-vendor">
+          <span class="qp-domain-dot" style="background:#3b82f6"></span>
+          Vendor Advisories
+        </div>
+      </div>
+    </div>
+
+    <div class="qp-sidebar-section">
+      <div class="qp-sidebar-heading">Pattern Library</div>
+      <div class="qp-pattern-list" id="pattern-list">
+        <div class="qp-pattern-item" id="pat-0" data-label="OT Threat Landscape">
+          <span class="qp-pattern-dot" style="background:#ef4444"></span>
+          <span class="qp-pattern-label">OT Threat Landscape</span>
+        </div>
+        <div class="qp-pattern-item" id="pat-1" data-label="Facility Risk Assessment">
+          <span class="qp-pattern-dot" style="background:#f97316"></span>
+          <span class="qp-pattern-label">Facility Risk Assessment</span>
+        </div>
+        <div class="qp-pattern-item" id="pat-2" data-label="NERC CIP Gap Analysis">
+          <span class="qp-pattern-dot" style="background:#eab308"></span>
+          <span class="qp-pattern-label">NERC CIP Gap Analysis</span>
+        </div>
+        <div class="qp-pattern-item" id="pat-3" data-label="IEC 62443 Compliance">
+          <span class="qp-pattern-dot" style="background:#3b82f6"></span>
+          <span class="qp-pattern-label">IEC 62443 Compliance</span>
+        </div>
+        <div class="qp-pattern-item" id="pat-4" data-label="Incident Response Playbook">
+          <span class="qp-pattern-dot" style="background:#a855f7"></span>
+          <span class="qp-pattern-label">Incident Response Playbook</span>
+        </div>
+        <div class="qp-pattern-item" id="pat-5" data-label="Vendor Risk Advisory">
+          <span class="qp-pattern-dot" style="background:#06b6d4"></span>
+          <span class="qp-pattern-label">Vendor Risk Advisory</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="qp-center">
+    <div class="qp-query-builder">
+      <div class="qp-query-label">Query Builder</div>
+      <div class="qp-query-input-wrap">
+        <textarea
+          id="qp-query-input"
+          class="qp-query-input"
+          placeholder="Enter your OT intelligence query..."
+          rows="2"
+        ></textarea>
+      </div>
+      <div class="qp-query-actions">
+        <button class="qp-btn-primary" id="qp-run-btn">Run Query</button>
+        <button class="qp-btn-secondary" id="qp-clear-btn">Clear</button>
+      </div>
+    </div>
+
+    <div class="qp-response-area" id="qp-response-area">
+      <div class="qp-response-placeholder" id="qp-placeholder">
+        <div class="qp-placeholder-icon">&#128737;</div>
+        <div class="qp-placeholder-text">Ready to analyze OT threat data for your facility</div>
+        <div class="qp-placeholder-sub">Select a pattern or enter a query to begin</div>
+      </div>
+      <div class="qp-response-content" id="qp-response-content" style="display:none"></div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL — Knowledge Agent -->
+  <aside class="qp-right-panel">
+    <div class="qp-right-panel-header">
+      <span class="qp-right-panel-title">Knowledge Agent</span>
+      <span class="qp-right-panel-badge">FRENOS KB</span>
+    </div>
+    <div class="qp-right-panel-body" id="agent-panel-body">
+      <div class="qp-agent-msg qp-agent-msg-system">
+        OT Security Intelligence agent ready. I can cross-reference FRENOS threat advisories, NERC CIP standards, IEC 62443 requirements, and CVE databases.
+      </div>
+      <div class="qp-agent-msg qp-agent-msg-system" id="agent-status">
+        Knowledge base loaded: 1,847 chunks across OT Threat Intelligence, ICS/SCADA Vulnerability Database, NERC CIP Standards, and FRENOS Assessment Methodology.
+      </div>
+    </div>
+    <div class="qp-right-panel-footer">
+      <div class="qp-agent-namespace-tag">namespace: compliance</div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Floating controls -->
+<div id="demo-controls">
+  <button id="btn-playpause">⏸ Pause</button>
+  <button id="btn-mute">🔇 Mute</button>
+  <button id="btn-restart">&#8635; Restart</button>
+</div>
+<div id="demo-progress"><div id="demo-progress-bar"></div></div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     DEMO ENGINE
+═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ── Markdown → HTML (minimal) ─────────────────────────────────────────── */
+function mdToHtml(md) {
+  let h = md;
+  // code blocks (not needed here but safe)
+  h = h.replace(/```[\s\S]*?```/g, m => '<pre><code>' + m.slice(3,-3).replace(/^\w+\n/,'') + '</code></pre>');
+  // headings
+  h = h.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  h = h.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  h = h.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // bold
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // italic
+  h = h.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  // inline code
+  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // tables
+  h = h.replace(/((\|.+\|\n)+)/g, m => {
+    const rows = m.trim().split('\n');
+    let out = '<table>';
+    rows.forEach((row, i) => {
+      if (/^\|[-| ]+\|$/.test(row)) return;
+      const cells = row.replace(/^\||\|$/g,'').split('|');
+      const tag = i === 0 ? 'th' : 'td';
+      out += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+    });
+    return out + '</table>';
+  });
+  // hr
+  h = h.replace(/^---$/gm, '<hr>');
+  // bullet lists
+  h = h.replace(/^(- .+(\n- .+)*)/gm, m => {
+    const items = m.split('\n').map(l => '<li>' + l.slice(2) + '</li>').join('');
+    return '<ul>' + items + '</ul>';
+  });
+  // numbered lists
+  h = h.replace(/^(\d+\. .+(\n\d+\. .+)*)/gm, m => {
+    const items = m.split('\n').map(l => '<li>' + l.replace(/^\d+\. /,'') + '</li>').join('');
+    return '<ol>' + items + '</ol>';
+  });
+  // paragraphs: lines not already wrapped in a block tag
+  h = h.replace(/^(?!<[hultpo]).+$/gm, p => p.trim() ? '<p>' + p + '</p>' : '');
+  // clean double blank lines
+  h = h.replace(/\n{3,}/g, '\n\n');
+  return h;
+}
+
+/* ── Query / response data ──────────────────────────────────────────────── */
+const QUERIES = [
+  {
+    pattern: 0,
+    text: "What are the current top OT cybersecurity threats targeting industrial control systems in the chemical sector?",
+    processingLabel: "⟳ Analyzing OT threat intelligence...",
+    response: `# OT Threat Landscape: Chemical Sector ICS/SCADA Vulnerabilities
+
+## Top Active Threat Vectors (Q1 2026)
+
+Based on the FRENOS threat intelligence database [OT-ThreatDB-Q1-2026.md], the following threat categories are actively targeting chemical sector ICS:
+
+### 1. **Engineering Workstation Compromise** — CRITICAL
+- **FRENOS Risk Score:** 9.2/10
+- Adversaries targeting Siemens SIMATIC, Rockwell FactoryTalk, and Honeywell Experion HMI workstations
+- **Observed TTPs:** Spear-phishing → credential theft → lateral movement to OT network via historian bridge
+- **Notable campaign:** VOLT SPARROW (active since Q4 2025) — targeting chemical production scheduling systems
+- **NERC CIP impact:** CIP-003 and CIP-005 violations likely if workstation is unpatched
+
+### 2. **IT/OT Network Boundary Exploitation** — HIGH
+- **FRENOS Risk Score:** 8.7/10
+- Flat network architectures allowing IT-origin malware to reach Level 2/Level 3 Purdue Model layers
+- **IEC 62443 Zone & Conduit violations** most common in facilities with legacy DMZ configurations
+- 67% of chemical sector incidents in 2025 originated from IT network compromise propagating to OT
+
+### 3. **Vulnerable Remote Access Infrastructure** — HIGH
+- **FRENOS Risk Score:** 8.1/10
+- VPN concentrators, Citrix gateways, and Jump servers with unpatched CVEs
+- Remote access expanded significantly post-2020 without equivalent security hardening
+- **Recommended:** Zero-trust remote access architecture (IEC 62443-3-3 SR 1.13 compliance)
+
+### 4. **Firmware-Level Supply Chain Risk** — MEDIUM-HIGH
+- **FRENOS Risk Score:** 7.4/10
+- PLC and RTU firmware updates from compromised vendor channels
+- **Affected vendors:** Multiple unnamed vendors in FRENOS advisory database [FRENOS-SA-2026-014]
+- CFATS Appendix A (critical asset identification) does not currently account for firmware supply chain
+
+## Compliance Exposure Matrix
+
+| Standard | Unaddressed Gap | Regulatory Risk |
+|---------|----------------|----------------|
+| **NERC CIP-007-6** | Patch management for OT assets | Penalty: $1M+/day |
+| **IEC 62443-3-3** | Network segmentation (SR 5.1) | Customer contract risk |
+| **CFATS Tier 2** | Access control for critical assets | DHS enforcement |
+| **EPA RMP** | Process safety incident reporting | Federal enforcement |
+
+## Recommended Priority Actions
+
+1. Segment engineering workstations from Level 0/1 process networks (IEC 62443 Zone model)
+2. Deploy FRENOS OT Sensor on historian and HMI network segments
+3. Patch CVE-2025-38471 (Siemens SIMATIC S7 RCE) — CVSS 9.8, active exploitation confirmed
+4. Implement privileged access management (PAM) for all remote OT access sessions`,
+    sources: ['OT-ThreatDB-Q1-2026.md','FRENOS-SA-2026-014.md','IEC-62443-Reference.md','NERC-CIP-Framework.md'],
+    adr: 'ADR-20260325-001 | OT-ThreatDB | compliance namespace | 1.1s',
+    agentNote: "VOLT SPARROW campaign confirmed active. Cross-referencing against FRENOS advisory FRENOS-SA-2026-014 — 3 affected facilities identified in the chemical sector."
+  },
+  {
+    pattern: 1,
+    text: "Run a risk assessment for a Tier 2 chemical facility with legacy Rockwell DCS. What are the highest-priority vulnerabilities and estimated exposure?",
+    processingLabel: "⟳ Running FRENOS OTSRA risk model...",
+    response: `# OT Risk Assessment: Tier 2 Chemical Facility — Rockwell DCS Environment
+
+## Facility Risk Profile
+
+**Assessment basis:** FRENOS OTSRA (OT Security Risk Assessment) framework, IEC 62443-3-2 [FRENOS-OTSRA-Methodology.md]
+**Facility classification:** Tier 2 CFATS (High Risk Chemical Facility)
+**DCS platform:** Rockwell Automation PlantPAx 4.x
+
+---
+
+## Critical Vulnerabilities Identified
+
+### CVE-2025-38891 — Rockwell FactoryTalk Historian (CVSS 9.1)
+- **Type:** Unauthenticated remote code execution via OPC-UA interface
+- **Affected:** FactoryTalk Historian 7.0–9.x (unpatched)
+- **Exploitability:** Network-accessible from IT/OT boundary; active exploitation in wild
+- **Business impact:** Process historian compromise → loss of safety record data → OSHA recordkeeping violation
+- **FRENOS remediation priority:** P1 — patch within 72 hours
+
+### CVE-2025-41203 — Rockwell Studio 5000 Logix Designer (CVSS 8.4)
+- **Type:** Malicious project file execution → PLC ladder logic modification
+- **Affected:** Studio 5000 v32–v36
+- **Exploitability:** Requires engineering workstation access (phishing vector)
+- **Business impact:** Unauthorized logic modification → process deviation → potential OSHA PSM incident
+- **FRENOS remediation priority:** P1 — restrict Studio 5000 to isolated engineering segment
+
+### Legacy Protocol Exposure — EtherNet/IP without authentication
+- **Risk score:** 7.8/10
+- **Finding:** PlantPAx I/O modules communicating on flat plant network without authentication
+- **Reach:** 14 identified Level 1 devices reachable from Level 3 business network
+- **Compliance:** IEC 62443-3-3 SR 3.1 (Communication integrity) — NOT MET
+
+---
+
+## Financial Exposure Estimate
+
+| Risk Category | Probability (12-mo) | Estimated Impact | Expected Loss |
+|--------------|---------------------|-----------------|--------------|
+| **Process disruption (ransomware)** | 23% | $4.2M production loss | $966K |
+| **Safety system incident** | 8% | $12.8M regulatory + liability | $1.02M |
+| **Data theft / IP loss** | 31% | $2.1M | $651K |
+| **NERC/CFATS penalty** | 45% | $800K | $360K |
+| **Total annualized exposure** | — | — | **$2.997M** |
+
+---
+
+## FRENOS Recommended Deployment
+
+1. **OT Sensor deployment** on historian network segment (2-week implementation)
+2. **Zone & Conduit architecture** — isolate Level 1/2 from Level 3 (8-week program)
+3. **MAO governance layer** — AI-assisted threat correlation and compliance reporting (4-week integration)
+4. **Estimated risk reduction:** 67% reduction in annualized exposure = **$2.0M protected**`,
+    sources: ['FRENOS-OTSRA-Methodology.md','CVE-Database-2026.md','IEC-62443-Risk-Framework.md','CFATS-Tier2-Requirements.md'],
+    adr: 'ADR-20260325-002 | FRENOS-OTSRA | compliance namespace | 1.4s',
+    agentNote: "Risk model complete. CVE-2025-38891 is confirmed P1 — FactoryTalk Historian exploit code is publicly available. Recommend immediate patch cycle."
+  },
+  {
+    pattern: 2,
+    text: "What are the NERC CIP compliance gaps for this facility and what's the regulatory penalty exposure?",
+    processingLabel: "⟳ Running NERC CIP compliance engine...",
+    response: `# NERC CIP Compliance Gap Analysis
+
+## Assessment Summary
+
+**Standards evaluated:** NERC CIP-002 through CIP-014 (Version 6/7)
+**Facility classification:** Medium Impact BES Cyber System (MIBCS) — Tier 2 Chemical
+**Compliance status:** 6 active gaps identified across 4 CIP standards
+
+---
+
+## Active Compliance Gaps
+
+### CIP-005-7: Electronic Security Perimeters — GAP
+**Finding:** Engineering workstations communicating across ESP boundary without documented exception
+**Evidence:** Network scan identified 3 workstations with both IT and OT network interfaces active
+**Penalty range:** $25,000–$500,000 per violation per day
+**Remediation:** Firewall rule review + workstation re-imaging (est. 3 weeks)
+
+### CIP-007-6: Systems Security Management — GAP
+**Finding:** 23 OT assets not enrolled in patch management program (Rockwell PLCs, 14 HMI panels)
+**Evidence:** FRENOS OT asset inventory vs. approved patch list — 23 discrepancies
+**Penalty range:** $1,000–$1,000,000 per violation per day
+**Remediation:** Asset enrollment + vendor patch schedule (est. 6 weeks)
+
+### CIP-010-4: Configuration Change Management — PARTIAL GAP
+**Finding:** Baseline configuration not current for 8 of 47 identified BES Cyber Assets
+**Evidence:** Last baseline update: September 2024 (>15 months ago, exceeds 35-day requirement for patches)
+**Penalty range:** $1,000–$500,000 per violation per day
+**Remediation:** Baseline refresh program (est. 4 weeks)
+
+### CIP-011-3: Information Protection — GAP
+**Finding:** BES Cyber System Information (BCSI) stored on shared drive without access control log
+**Evidence:** 14 documents classified as BCSI on SharePoint without mandatory access logging
+**Penalty range:** $1,000–$250,000 per violation per day
+**Remediation:** DLP policy + access logging (est. 2 weeks)
+
+---
+
+## Total Regulatory Exposure
+
+| Standard | Active Days at Risk | Daily Max Penalty | Max Exposure |
+|---------|--------------------|--------------------|-------------|
+| CIP-005-7 | Est. 180 days | $500,000 | $90.0M |
+| CIP-007-6 | Est. 180 days | $1,000,000 | $180.0M |
+| CIP-010-4 | Est. 90 days | $500,000 | $45.0M |
+| CIP-011-3 | Est. 60 days | $250,000 | $15.0M |
+| **Total theoretical max** | — | — | **$330.0M** |
+| **FRENOS estimated realistic exposure** | — | — | **$3.2M–$8.4M** |
+
+*Note: NERC rarely imposes maximum penalties; settlement range reflects historical enforcement data.*
+
+## FRENOS + MAO Remediation Package
+
+The integrated FRENOS + AIXaaS compliance program addresses all 4 gaps:
+- **FRENOS OT Sensor:** Continuous CIP-005 and CIP-007 monitoring
+- **MAO Compliance Engine:** Zero-token automated gap detection across 23 frameworks including all NERC CIP standards
+- **ADR Audit Trail:** Every compliance check generates an immutable Architectural Decision Record
+- **Estimated time to compliance:** 8 weeks
+- **Estimated ongoing compliance cost reduction:** $38,000/year vs. manual audit programs`,
+    sources: ['NERC-CIP-Standards-V7.md','FRENOS-Compliance-Module.md','NERC-Enforcement-History.md'],
+    adr: 'ADR-20260325-003 | NERC-CIP-V7 | compliance namespace | 0.9s',
+    agentNote: "Compliance scan complete. 4 active CIP gaps confirmed. CIP-007-6 carries the highest daily penalty ceiling. Prioritize asset enrollment in patch management immediately."
+  }
+];
+
+/* ── Voiceover cues ─────────────────────────────────────────────────────── */
+// Each: [timeMs, text, cueId]
+const SPEECH_CUES = [
+  [0,       "FRENOS delivers OT threat intelligence for industrial enterprises. Behind their product — the AIXaaS platform handling AI orchestration and compliance governance. This is a real client scenario — a chemical plant running Rockwell DCS.", 'cue-0'],
+  [18000,   "The knowledge base holds 1,847 chunks of OT threat data, ICS vulnerability advisories, NERC CIP standards, and FRENOS's own assessment methodology.", 'cue-1'],
+  [25000,   "First question — what's the actual threat landscape for a chemical facility right now?", 'cue-2'],
+  [48000,   "VOLT SPARROW. Active campaign targeting chemical production scheduling. CVSS 9.8 RCE on Siemens SIMATIC. These are real threats, grounded in FRENOS's live threat database.", 'cue-3'],
+  [75000,   "IEC 62443. NERC CIP-007. CFATS Tier 2. The platform identified compliance exposure across four regulatory frameworks automatically — no manual framework mapping required.", 'cue-4'],
+  [90000,   "Now let's run a risk assessment for this specific facility — Tier 2 chemical, legacy Rockwell DCS.", 'cue-5'],
+  [112000,  "Three million dollars in annualized exposure. Two critical CVEs on the Rockwell historian and Studio 5000. Fourteen Level-1 devices reachable from the business network. This is what $2 million in risk reduction looks like.", 'cue-6'],
+  [148000,  "67% risk reduction from the integrated FRENOS plus AIXaaS deployment. That's the business case in one number.", 'cue-7'],
+  [160000,  "Last one — NERC CIP gaps. The stuff that keeps the CISO up at night.", 'cue-8'],
+  [180000,  "Four active gaps. $330 million in theoretical maximum penalty. Realistic exposure $3 to $8 million. Six weeks to remediation. The platform identified every gap automatically — zero manual audit hours.", 'cue-9'],
+  [200000,  "This is why FRENOS partnered with Inflexis. The threat intelligence is theirs. The governance layer, the compliance engine, the audit trail — that's MAO. Together, it's a complete OT security product.", 'cue-10'],
+];
+
+/* ── Cursor helper ──────────────────────────────────────────────────────── */
+const cursor = document.getElementById('demo-cursor');
+function moveCursor(el, cb) {
+  if (!el) { if (cb) cb(); return; }
+  const r = el.getBoundingClientRect();
+  const x = r.left + r.width/2;
+  const y = r.top + r.height/2;
+  cursor.style.left = x + 'px';
+  cursor.style.top = y + 'px';
+  cursor.classList.add('visible');
+  setTimeout(() => { if (cb) cb(); }, 700);
+}
+function clickEl(el, cb) {
+  moveCursor(el, () => {
+    cursor.classList.add('clicking');
+    setTimeout(() => {
+      cursor.classList.remove('clicking');
+      if (cb) cb();
+    }, 300);
+  });
+}
+
+/* ── Streaming ──────────────────────────────────────────────────────────── */
+let streamTimer = null;
+function streamHTML(html, targetEl, onDone) {
+  // We stream the raw HTML character-by-character into innerHTML
+  // But to avoid broken tags mid-stream we use a rendered approach:
+  // build a temp div, extract text nodes, stream text
+  let i = 0;
+  const CHARS_PER_TICK = 4;
+  const INTERVAL = 25;
+  targetEl.innerHTML = '';
+
+  function tick() {
+    if (!demoState.running) return;
+    i += CHARS_PER_TICK;
+    targetEl.innerHTML = html.substring(0, i);
+    targetEl.scrollTop = targetEl.scrollHeight;
+    if (i < html.length) {
+      streamTimer = setTimeout(tick, INTERVAL);
+    } else {
+      targetEl.innerHTML = html; // ensure complete
+      if (onDone) onDone();
+    }
+  }
+  tick();
+}
+
+/* ── Agent panel helper ─────────────────────────────────────────────────── */
+function addAgentMsg(text, type='assistant') {
+  const body = document.getElementById('agent-panel-body');
+  const div = document.createElement('div');
+  div.className = 'qp-agent-msg qp-agent-msg-' + type;
+  div.textContent = text;
+  div.style.opacity = '0';
+  div.style.transition = 'opacity 0.4s';
+  body.appendChild(div);
+  setTimeout(() => div.style.opacity = '1', 50);
+  body.scrollTop = body.scrollHeight;
+}
+
+/* ── Demo state machine ─────────────────────────────────────────────────── */
+const TOTAL_MS = 210000; // 3.5 min
+let demoState = { running: false, muted: false, startTime: null, pausedAt: null, elapsed: 0 };
+let allTimers = [];
+let speechQueue = [];
+let activeCue = null;
+
+function scheduleAt(ms, fn) {
+  allTimers.push(setTimeout(fn, ms));
+}
+
+function speak(text, cueId) {
+  if (demoState.muted || !window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9;
+  u.pitch = 1.0;
+  u.lang = 'en-US';
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+  // highlight cue
+  if (activeCue) document.getElementById(activeCue)?.classList.remove('active');
+  activeCue = cueId;
+  document.getElementById(cueId)?.classList.add('active');
+}
+
+function clearAllTimers() {
+  allTimers.forEach(clearTimeout);
+  allTimers = [];
+  if (streamTimer) clearTimeout(streamTimer);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+function runQuery(qIdx, onDone) {
+  const q = QUERIES[qIdx];
+  const input = document.getElementById('qp-query-input');
+  const runBtn = document.getElementById('qp-run-btn');
+  const placeholder = document.getElementById('qp-placeholder');
+  const responseContent = document.getElementById('qp-response-content');
+
+  // highlight pattern
+  document.querySelectorAll('.qp-pattern-item').forEach(p => p.classList.remove('active-pattern'));
+  document.getElementById('pat-' + q.pattern)?.classList.add('active-pattern');
+
+  // move cursor to input, type query
+  clickEl(input, () => {
+    input.value = '';
+    let ti = 0;
+    function typeChar() {
+      if (!demoState.running) return;
+      if (ti < q.text.length) {
+        input.value += q.text[ti++];
+        allTimers.push(setTimeout(typeChar, 28));
+      } else {
+        // click run button after short pause
+        allTimers.push(setTimeout(() => {
+          clickEl(runBtn, () => {
+            // show processing
+            placeholder.style.display = 'none';
+            responseContent.style.display = 'block';
+            responseContent.innerHTML = '<div class="processing-msg"><span class="spin">⟳</span> ' + q.processingLabel.replace('⟳ ','') + '</div>';
+
+            // after processing delay, stream
+            allTimers.push(setTimeout(() => {
+              if (!demoState.running) return;
+              const html = mdToHtml(q.response);
+              responseContent.innerHTML = '';
+              const contentDiv = document.createElement('div');
+              responseContent.appendChild(contentDiv);
+              streamHTML(html, contentDiv, () => {
+                if (!demoState.running) return;
+                // sources
+                const chips = document.createElement('div');
+                chips.className = 'source-chips';
+                q.sources.forEach(s => {
+                  const chip = document.createElement('span');
+                  chip.className = 'source-chip';
+                  chip.textContent = s;
+                  chips.appendChild(chip);
+                });
+                responseContent.appendChild(chips);
+                // ADR badge
+                const adr = document.createElement('div');
+                adr.className = 'adr-badge';
+                adr.innerHTML = '<span class="adr-dot"></span>' + q.adr;
+                responseContent.appendChild(adr);
+                // agent note
+                addAgentMsg(q.agentNote);
+                if (onDone) onDone();
+              });
+            }, 2200));
+          });
+        }, 400));
+      }
+    }
+    typeChar();
+  });
+}
+
+function startDemo() {
+  demoState.running = true;
+  demoState.startTime = Date.now();
+  cursor.classList.add('visible');
+
+  // progress bar
+  function updateProgress() {
+    if (!demoState.running) return;
+    const pct = Math.min(100, (Date.now() - demoState.startTime) / TOTAL_MS * 100);
+    document.getElementById('demo-progress-bar').style.width = pct + '%';
+    requestAnimationFrame(updateProgress);
+  }
+  requestAnimationFrame(updateProgress);
+
+  // speech cues
+  SPEECH_CUES.forEach(([ms, text, cueId]) => {
+    scheduleAt(ms, () => speak(text, cueId));
+  });
+
+  // Query 1 at 0:20 (20s)
+  scheduleAt(20000, () => {
+    if (!demoState.running) return;
+    runQuery(0, () => {});
+  });
+
+  // Query 2 at 1:30 (90s)
+  scheduleAt(90000, () => {
+    if (!demoState.running) return;
+    runQuery(1, () => {});
+  });
+
+  // Query 3 at 2:40 (160s)
+  scheduleAt(160000, () => {
+    if (!demoState.running) return;
+    runQuery(2, () => {});
+  });
+
+  // End at 3:30
+  scheduleAt(210000, () => {
+    demoState.running = false;
+    document.getElementById('btn-playpause').textContent = '▶ Play';
+    cursor.classList.remove('visible');
+    if (activeCue) document.getElementById(activeCue)?.classList.remove('active');
+  });
+}
+
+function pauseDemo() {
+  demoState.running = false;
+  demoState.pausedAt = Date.now();
+  clearAllTimers();
+  if (window.speechSynthesis) window.speechSynthesis.pause();
+  document.getElementById('btn-playpause').textContent = '▶ Resume';
+}
+
+function resumeDemo() {
+  // simple restart from current query state is cleanest for a demo
+  // for a true resume we'd need time-offset scheduling
+  restartDemo();
+}
+
+function restartDemo() {
+  clearAllTimers();
+  demoState.running = false;
+  demoState.startTime = null;
+  document.getElementById('qp-query-input').value = '';
+  document.getElementById('qp-placeholder').style.display = 'flex';
+  document.getElementById('qp-response-content').style.display = 'none';
+  document.getElementById('qp-response-content').innerHTML = '';
+  document.getElementById('agent-panel-body').querySelectorAll('.qp-agent-msg:not(.qp-agent-msg-system)').forEach(el => el.remove());
+  document.querySelectorAll('.qp-pattern-item').forEach(p => p.classList.remove('active-pattern'));
+  document.querySelectorAll('.script-cue').forEach(c => c.classList.remove('active'));
+  document.getElementById('demo-progress-bar').style.width = '0%';
+  cursor.classList.remove('visible');
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  document.getElementById('btn-playpause').textContent = '⏸ Pause';
+  setTimeout(() => startDemo(), 200);
+}
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+document.getElementById('btn-playpause').addEventListener('click', () => {
+  if (demoState.running) {
+    pauseDemo();
+  } else {
+    resumeDemo();
+  }
+});
+document.getElementById('btn-mute').addEventListener('click', () => {
+  demoState.muted = !demoState.muted;
+  document.getElementById('btn-mute').textContent = demoState.muted ? '🔊 Unmute' : '🔇 Mute';
+  if (demoState.muted && window.speechSynthesis) window.speechSynthesis.cancel();
+});
+document.getElementById('btn-restart').addEventListener('click', () => restartDemo());
+
+/* ── Auto-play on load ───────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  // Small delay to let CSS from real app load
+  setTimeout(() => startDemo(), 1200);
+});
+</script>
+
+<!-- ===== NARRATION IMPROVEMENTS (v2.1) ===== -->
+<style>
+#narration-bar { transition: height 0.2s ease, opacity 0.2s ease; overflow: hidden; }
+#narration-bar.narr-hidden { height: 0 !important; opacity: 0; border-top: none; }
+body.narr-collapsed #app-wrapper { bottom: var(--demo-bar-h) !important; }
+#narr-toggle-btn {
+  background: none; border: 1px solid rgba(34,211,238,.3);
+  color: #22d3ee; font-size: 11px; padding: 3px 9px;
+  border-radius: 12px; cursor: pointer; white-space: nowrap;
+  transition: background .15s; margin-right: 4px;
+}
+#narr-toggle-btn:hover { background: rgba(34,211,238,.12); }
+</style>
+<script>
+(function() {
+  var _synth = window.speechSynthesis;
+  var VOICE_PREF = [
+    function(v) { return v.name === "Google UK English Female"; },
+    function(v) { return v.name.indexOf("Aria Online") > -1 && v.name.indexOf("Natural") > -1; },
+    function(v) { return v.name.indexOf("Jenny Online") > -1; },
+    function(v) { return v.name === "Samantha"; },
+    function(v) { return v.name.indexOf("Natural") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.name === "Google US English"; },
+    function(v) { return v.name.indexOf("Google") > -1 && v.lang && v.lang.indexOf("en") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en-US") === 0; },
+    function(v) { return v.lang && v.lang.indexOf("en") === 0; }
+  ];
+  function pickVoice() {
+    var voices = _synth.getVoices();
+    for (var i = 0; i < VOICE_PREF.length; i++) {
+      for (var j = 0; j < voices.length; j++) {
+        if (VOICE_PREF[i](voices[j])) return voices[j];
+      }
+    }
+    return voices[0] || null;
+  }
+  function speakNatural(text, rm) {
+    if (!text) return;
+    _synth.cancel();
+    rm = rm || 1.0;
+    var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    var idx = 0;
+    function next() {
+      if (idx >= sentences.length) return;
+      var s = sentences[idx++].trim();
+      if (!s) { next(); return; }
+      var u = new SpeechSynthesisUtterance(s);
+      u.rate = 0.87 * rm;
+      u.pitch = 0.96;
+      u.volume = 1.0;
+      var v = pickVoice();
+      if (v) u.voice = v;
+      u.onend = function() { setTimeout(next, 100); };
+      _synth.speak(u);
+    }
+    next();
+  }
+  if (typeof window.speak === "function") {
+    window.speak = function(text, rate) {
+      var isMuted = (typeof muted !== "undefined" && muted);
+      var isDisabled = (typeof speechEnabled !== "undefined" && !speechEnabled);
+      if (isMuted || isDisabled) return;
+      var sm = (typeof speedMultiplier !== "undefined" ? speedMultiplier : 1.0);
+      speakNatural(text, (rate || 1.0) * sm);
+    };
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    var bar = document.getElementById("narration-bar");
+    var demoBar = document.getElementById("demo-bar");
+    var narr_visible = false;
+    if (bar) bar.classList.add("narr-hidden");
+    document.body.classList.add("narr-collapsed");
+    var btn = document.createElement("button");
+    btn.id = "narr-toggle-btn";
+    btn.title = "Show/hide narration text bar";
+    btn.textContent = "Captions: Off";
+    btn.onclick = function() {
+      narr_visible = !narr_visible;
+      if (bar) bar.classList.toggle("narr-hidden", !narr_visible);
+      document.body.classList.toggle("narr-collapsed", !narr_visible);
+      btn.textContent = narr_visible ? "Captions: On" : "Captions: Off";
+    };
+    if (demoBar) {
+      var muteBtn = demoBar.querySelector("#mute-btn");
+      if (muteBtn) { demoBar.insertBefore(btn, muteBtn); }
+      else { demoBar.appendChild(btn); }
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
