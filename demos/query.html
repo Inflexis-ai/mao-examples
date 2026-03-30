@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIXaaS™ Query Panel — Preview</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/query_panel.css">
+    <script>
+        window.MAO_AUTH = "";
+        window.MAO_USER = "bryan";
+        window.MAO_ROLE = "founder";
+        // Override fetch for preview mode — simulate responses
+        window.PREVIEW_MODE = true;
+    </script>
+</head>
+<body>
+
+<nav class="qp-nav">
+    <div class="qp-nav-brand">
+        <span class="qp-logo-mark">I</span>
+        <div class="qp-brand-text">
+            <span class="qp-brand-name">INFLEXIS</span>
+            <span class="qp-brand-tagline">AIXaaS™ Query Panel</span>
+        </div>
+    </div>
+    <div class="qp-nav-center">
+        <span class="qp-status-dot ready"></span>
+        <span class="qp-status-text">KB ready &middot; 171,498 chunks &middot; azure+keyword</span>
+    </div>
+    <div class="qp-nav-right">
+        <a href="#" class="qp-nav-link">&#8592; Dashboard</a>
+        <span class="qp-user-chip">
+            <span class="qp-user-icon">&#9711;</span>
+            bryan <span class="qp-role-badge">founder</span>
+        </span>
+        <a href="#" class="qp-nav-link qp-nav-logout">Sign Out</a>
+    </div>
+</nav>
+
+<div class="qp-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="qp-sidebar">
+        <section class="qp-sidebar-section">
+            <div class="qp-section-header">
+                <span class="qp-section-icon">&#127758;</span>
+                <h3 class="qp-section-title">Knowledge Domains</h3>
+            </div>
+            <p class="qp-section-hint">Select the data context for your query</p>
+            <div class="qp-domain-list">
+                <button class="qp-domain-btn active" data-ns="demo">
+                    <span class="qp-domain-icon">&#9672;</span>
+                    <span class="qp-domain-label">Foundation Demo</span>
+                    <span class="qp-domain-badge">Live</span>
+                </button>
+                <button class="qp-domain-btn" data-ns="compliance">
+                    <span class="qp-domain-icon">&#9673;</span>
+                    <span class="qp-domain-label">Operations &amp; Compliance</span>
+                </button>
+                <button class="qp-domain-btn" data-ns="documents">
+                    <span class="qp-domain-icon">&#9673;</span>
+                    <span class="qp-domain-label">Document Intelligence</span>
+                </button>
+                <button class="qp-domain-btn" data-ns="base">
+                    <span class="qp-domain-icon">&#9673;</span>
+                    <span class="qp-domain-label">Business Intelligence</span>
+                </button>
+                <button class="qp-domain-btn" data-ns="structured_data">
+                    <span class="qp-domain-icon">&#9673;</span>
+                    <span class="qp-domain-label">Financial Analysis</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="qp-sidebar-section" style="margin-top:1.25rem">
+            <div class="qp-section-header">
+                <span class="qp-section-icon">&#9889;</span>
+                <h3 class="qp-section-title">Pattern Library</h3>
+            </div>
+            <p class="qp-section-hint">One-click query templates</p>
+            <div class="qp-pattern-list">
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#128200;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Cost Variance Analysis</span>
+                        <span class="qp-pattern-desc">Cross-location cost comparison with dollar impact</span>
+                    </span>
+                </button>
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#9878;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Compliance Gap Scan</span>
+                        <span class="qp-pattern-desc">Auto-detect regulatory obligations + gaps</span>
+                    </span>
+                </button>
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#9888;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Anomaly Detection</span>
+                        <span class="qp-pattern-desc">Statistical outlier scan with impact estimate</span>
+                    </span>
+                </button>
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#128101;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Workforce Intelligence</span>
+                        <span class="qp-pattern-desc">Staffing efficiency + overtime cost reduction</span>
+                    </span>
+                </button>
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#128202;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Executive Summary</span>
+                        <span class="qp-pattern-desc">Top insights formatted for leadership</span>
+                    </span>
+                </button>
+                <button class="qp-pattern-btn">
+                    <span class="qp-pattern-icon">&#128196;</span>
+                    <span class="qp-pattern-content">
+                        <span class="qp-pattern-name">Knowledge Inventory</span>
+                        <span class="qp-pattern-desc">What data is loaded &amp; what MAO can do with it</span>
+                    </span>
+                </button>
+            </div>
+        </section>
+    </aside>
+
+    <!-- CENTER: QUERY BUILDER + RESPONSE -->
+    <main class="qp-main">
+        <section class="qp-card qp-query-card">
+            <div class="qp-card-header">
+                <div>
+                    <h2 class="qp-card-title">Query Builder</h2>
+                    <p class="qp-card-subtitle">
+                        Domain: <strong>Foundation Demo</strong>
+                        &nbsp;&bull;&nbsp; Select a pattern or compose your own query below
+                    </p>
+                </div>
+                <div class="qp-query-controls">
+                    <label class="qp-toggle-label">
+                        <input type="checkbox" checked>
+                        <span>Stream</span>
+                    </label>
+                    <button class="qp-btn qp-btn-ghost">&#10005; Clear</button>
+                </div>
+            </div>
+            <div class="qp-query-input-wrap">
+                <textarea class="qp-query-textarea" rows="5">What are the cost variances across locations? Identify which locations are paying more than the average for the same supplies or services, and quantify the dollar impact of the top 3 variances.</textarea>
+                <div class="qp-query-footer">
+                    <span class="qp-char-count">186 chars</span>
+                    <div class="qp-query-actions">
+                        <button class="qp-btn qp-btn-secondary">&#8679; Upload Data</button>
+                        <button class="qp-btn qp-btn-primary">&#9654; Run Query</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Response — showing a simulated result -->
+        <section class="qp-card qp-response-card">
+            <div class="qp-card-header">
+                <div>
+                    <h2 class="qp-card-title">Response</h2>
+                    <p class="qp-card-subtitle">Foundation Demo &middot; 2.3s</p>
+                </div>
+                <div class="qp-response-meta" style="display:flex">
+                    <span class="qp-meta-chip">~142 words</span>
+                    <span class="qp-meta-chip">2.3s</span>
+                    <button class="qp-btn qp-btn-ghost qp-btn-sm">&#128203; Copy</button>
+                </div>
+            </div>
+            <div class="qp-response-content" style="display:block">
+                <div class="qp-response-text">
+                    <h2>Cost Variance Analysis — Foundation Demo</h2>
+                    <p>Based on the uploaded operational data, the following cost variances were identified across locations:</p>
+                    <h3>Top 3 Cost Variances by Dollar Impact</h3>
+                    <ul>
+                        <li><strong>Location 23 — Supply Costs:</strong> Paying <span class="qp-dollar">$47,200/year</span> more than chain average for the same SKUs. Primary driver: local vendor contract not aligned to preferred supplier pricing.</li>
+                        <li><strong>Location 07 — Labor Overtime:</strong> Overtime costs running <span class="qp-dollar">$28,500/year</span> above baseline. Scheduling gap on weekend shifts identified as root cause.</li>
+                        <li><strong>Location 31 — Utilities:</strong> Energy costs <span class="qp-dollar">$12,800/year</span> above peer locations of equivalent size. HVAC system flagged for maintenance review.</li>
+                    </ul>
+                    <p><strong>Total recoverable variance: <span class="qp-dollar">$88,500/year</span></strong> across the top 3 findings. Recommended action: initiate vendor renegotiation for Location 23 immediately — highest ROI item.</p>
+                    <blockquote>Zero LLM tokens used for variance detection. Statistical analysis only.</blockquote>
+                </div>
+                <div class="qp-response-footer" style="display:flex">
+                    <div class="qp-adr-pill">&#9632; ADR Logged &bull; a3f82b1c&hellip;</div>
+                    <div class="qp-compliance-badges">
+                        <span class="qp-compliance-badge">SOX</span>
+                        <span class="qp-compliance-badge">GDPR</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="qp-card qp-adr-card">
+            <div class="qp-card-header">
+                <div>
+                    <h2 class="qp-card-title">&#9632; Audit Trail — ADR</h2>
+                    <p class="qp-card-subtitle">Every query decision is logged as an Architectural Decision Record</p>
+                </div>
+                <button class="qp-btn qp-btn-ghost qp-btn-sm">Show Details</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- RIGHT: KNOWLEDGE AGENT -->
+    <aside class="qp-agent-panel">
+        <div class="qp-agent-header">
+            <span class="qp-agent-icon">&#129302;</span>
+            <div>
+                <h3 class="qp-agent-title">Knowledge Agent</h3>
+                <p class="qp-agent-subtitle">Ask follow-up questions</p>
+            </div>
+        </div>
+        <div class="qp-agent-domain-bar">
+            <span class="qp-agent-domain-label">Context:</span>
+            <span class="qp-agent-domain-name">Foundation Demo</span>
+        </div>
+        <div class="qp-agent-messages">
+            <div class="qp-agent-msg qp-agent-system">
+                <span class="qp-agent-msg-icon">&#129302;</span>
+                <div class="qp-agent-msg-body">
+                    <p>Hello! I'm the MAO Knowledge Agent. I can answer questions about your uploaded data and help you explore insights.</p>
+                    <p style="margin-top:.5rem;font-size:.8rem;opacity:.7">Try: "What are the top 3 findings?" or "Explain the compliance gaps in plain English."</p>
+                </div>
+            </div>
+            <div class="qp-agent-msg qp-agent-user">
+                <span class="qp-agent-msg-icon">&#128100;</span>
+                <div class="qp-agent-msg-body">Which location has the biggest cost problem?</div>
+            </div>
+            <div class="qp-agent-msg qp-agent-ai">
+                <span class="qp-agent-msg-icon">&#129302;</span>
+                <div class="qp-agent-msg-body">Location 23 has the largest single variance at <strong>$47,200/year</strong> in supply costs — 18% above chain average for identical SKUs. This is actionable immediately via vendor renegotiation and would be the highest-ROI first step.</div>
+            </div>
+        </div>
+        <div class="qp-agent-input-wrap">
+            <textarea class="qp-agent-input" rows="2" placeholder="Ask a follow-up question…"></textarea>
+            <button class="qp-agent-send">&#10148;</button>
+        </div>
+        <div class="qp-agent-footer">
+            <span class="qp-agent-footer-text">Powered by MAO &middot; AIXaaS™ v6C</span>
+            <button class="qp-btn qp-btn-ghost qp-btn-sm">Clear</button>
+        </div>
+    </aside>
+
+</div>
+
+<!-- Domain switching (preview only) -->
+<script>
+document.querySelectorAll('.qp-domain-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.qp-domain-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+document.querySelectorAll('.qp-pattern-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.style.background = '#eff6ff';
+        btn.style.borderColor = '#2563eb';
+        setTimeout(() => { btn.style.background = ''; btn.style.borderColor = ''; }, 600);
+    });
+});
+</script>
+</body>
+</html>

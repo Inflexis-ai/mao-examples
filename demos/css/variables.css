@@ -1,0 +1,53 @@
+/* Design Tokens (from MAOP proven patterns) */
+:root {
+  /* Colors - Compliance Status */
+  --clr-primary: #3b82f6;           /* AIXaaS electric blue */
+  --clr-success: #10b981;           /* Green for approved */
+  --clr-danger: #ef4444;            /* Red for rejected */
+  --clr-warning: #f59e0b;           /* Amber for deferred */
+  --clr-info: #8b5cf6;              /* Purple for open */
+
+  /* Background Colors — dark space palette (mirrors query panel) */
+  --clr-success-bg: rgba(16,185,129,0.15);
+  --clr-danger-bg:  rgba(239,68,68,0.15);
+  --clr-warning-bg: rgba(245,158,11,0.15);
+  --clr-info-bg:    rgba(139,92,246,0.15);
+
+  /* Neutral Colors — dark space */
+  --clr-void:    #040b1a;           /* Deepest background */
+  --clr-deep:    #070f24;
+  --clr-navy:    #0a1630;
+  --clr-surface: #0e1e3a;           /* Page / card background */
+  --clr-card:    #0e1e3a;           /* Card background */
+  --clr-card-hover: #112244;
+  --clr-text:    #dde8f8;           /* Primary text */
+  --clr-muted:   #7a9bc8;           /* Secondary text */
+  --clr-border:  rgba(59,130,246,0.22);
+  --clr-border-glow: rgba(59,130,246,0.5);
+  --clr-blue:        #3b82f6;
+  --clr-blue-dark:   #1d4ed8;
+  --clr-blue-light:  #60a5fa;
+  --clr-cyan:        #22d3ee;
+  --clr-purple:      #8b5cf6;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}

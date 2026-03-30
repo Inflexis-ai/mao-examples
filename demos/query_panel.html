@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIXaaS&#8482; Query Panel &#8212; Inflexis</title>
+    <link rel="stylesheet" href="/static/css/query_panel.css">
+    <script>
+        window.MAO_AUTH = "{{ auth_b64 }}";
+        window.MAO_USER = "{{ username }}";
+        window.MAO_ROLE = "{{ user_role }}";
+    </script>
+</head>
+<body>
+
+<!-- Brand hero overlay (Inflexis surfboard image) -->
+<div class="qp-brand-hero" aria-hidden="true"></div>
+
+<!-- ======= TOP NAVIGATION ======= -->
+<nav class="qp-nav">
+    <div class="qp-nav-brand">
+        <!-- AIXaaS | Inflexis Technologies badge — drop aixaas-badge.png into /static/img/ to activate -->
+        <img src="/static/img/aixaas-badge.png"
+             class="qp-brand-badge"
+             alt="Powered by AIXaaS | Inflexis Technologies"
+             onerror="this.style.display='none'; document.getElementById('qpBrandFallback').style.display='flex';">
+        <div class="qp-brand-text" id="qpBrandFallback" style="display:none">
+            <span class="qp-brand-name">INFLEXIS</span>
+            <span class="qp-brand-tagline">Powered by AIXaaS™</span>
+        </div>
+    </div>
+
+    <div class="qp-nav-center">
+        <div class="qp-domain-select-wrap">
+            <span class="qp-domain-select-label">Knowledge Domain</span>
+            <select id="domainSelect" class="qp-domain-select">
+                {% if user_workspace %}
+                <option value="{{ user_workspace }}" data-label="{{ user_workspace_label }}" selected>{{ user_workspace_label }}</option>
+                {% endif %}
+                <option value="demo"            data-label="Foundation Demo"      {% if not user_workspace %}selected{% endif %}>Foundation Demo</option>
+                <option value="documents"       data-label="Document Library">Document Library</option>
+                <option value="structured_data" data-label="Finance Knowledge Base">Finance Knowledge Base</option>
+                <option value="compliance"      data-label="Compliance &amp; Risk">Compliance &amp; Risk</option>
+                <option value="base"            data-label="Business Intelligence">Business Intelligence</option>
+                <option value="audio"           data-label="Audio &amp; Video">Audio &amp; Video</option>
+                <option value="web"             data-label="Web Intelligence">Web Intelligence</option>
+            </select>
+        </div>
+        <div class="qp-status-indicator">
+            <span class="qp-status-dot" id="statusDot"></span>
+            <span class="qp-status-text" id="statusText">Connecting to Knowledge Base&#8230;</span>
+        </div>
+    </div>
+
+    <div class="qp-nav-right">
+        <a href="/" class="qp-nav-link">&#8592; Dashboard</a>
+        <span class="qp-user-chip">
+            {{ username | capitalize }} <span class="qp-role-badge">{{ user_role }}</span>
+        </span>
+        {% if user_role in ['admin', 'founder'] %}
+        <div class="qp-switcher-wrap" id="switcherWrap">
+            <button class="qp-nav-link qp-switcher-btn" onclick="toggleSwitcher()" title="Switch to another account for testing">
+                &#x21C4; Switch
+            </button>
+            <div class="qp-switcher-panel" id="switcherPanel" style="display:none">
+                <div class="qp-switcher-header">
+                    <span>&#128100; Test as User</span>
+                    <button onclick="toggleSwitcher()" class="qp-switcher-close">&#10005;</button>
+                </div>
+                <div class="qp-switcher-list" id="switcherList">
+                    <div class="qp-switcher-loading">Loading users&#8230;</div>
+                </div>
+                <div class="qp-switcher-footer">
+                    <a href="/auth/logout" class="qp-switcher-signout">&#8617; Sign Out Completely</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <a href="/auth/logout" class="qp-nav-link qp-nav-logout">Sign Out</a>
+        {% endif %}
+    </div>
+</nav>
+
+<style>
+.qp-switcher-wrap { position: relative; }
+.qp-switcher-btn  { cursor: pointer; border: none; background: none; font-size: 13px; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(59,130,246,.35); color: #7ab8ff; transition: background .15s; }
+.qp-switcher-btn:hover { background: rgba(59,130,246,.12); }
+.qp-switcher-panel {
+    position: absolute; right: 0; top: calc(100% + 8px);
+    background: #0b1a30; border: 1px solid #1e3a5f; border-radius: 10px;
+    width: 230px; z-index: 500; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+.qp-switcher-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px 8px; border-bottom: 1px solid #162a47;
+    font-size: 12px; font-weight: 600; color: #7a9bc8; letter-spacing: .04em;
+}
+.qp-switcher-close { background: none; border: none; color: #4a6a8c; cursor: pointer; font-size: 14px; padding: 0 2px; }
+.qp-switcher-close:hover { color: #ef4444; }
+.qp-switcher-list { padding: 6px 0; max-height: 260px; overflow-y: auto; }
+.qp-switcher-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 14px; cursor: pointer; transition: background .12s;
+    text-decoration: none; color: #dde8f8;
+}
+.qp-switcher-row:hover { background: rgba(59,130,246,.1); }
+.qp-switcher-row.current { opacity: .45; cursor: default; pointer-events: none; }
+.qp-switcher-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: rgba(59,130,246,.2);
+    border: 1px solid rgba(59,130,246,.3); display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 700; color: #7ab8ff; flex-shrink: 0;
+    text-transform: uppercase;
+}
+.qp-switcher-name { font-size: 13px; font-weight: 500; }
+.qp-switcher-role { font-size: 10px; color: #4a7aa8; letter-spacing: .04em; text-transform: uppercase; }
+.qp-switcher-loading { padding: 12px 14px; font-size: 12px; color: #4a6a8c; }
+.qp-switcher-footer { border-top: 1px solid #162a47; padding: 8px 14px; }
+.qp-switcher-signout { font-size: 12px; color: #ef6464; text-decoration: none; }
+.qp-switcher-signout:hover { text-decoration: underline; }
+</style>
+<script>
+(function() {
+    var _loaded = false;
+    window.toggleSwitcher = function() {
+        var panel = document.getElementById('switcherPanel');
+        if (!panel) return;
+        var open = panel.style.display !== 'none';
+        panel.style.display = open ? 'none' : 'block';
+        if (!open && !_loaded) { _loadSwitcherUsers(); }
+    };
+    function _loadSwitcherUsers() {
+        _loaded = true;
+        fetch('/auth/users').then(r => r.json()).then(data => {
+            var list = document.getElementById('switcherList');
+            var current = data.current || window.MAO_USER;
+            var html = '';
+            (data.users || []).forEach(function(u) {
+                var isCurrent = u.username === current;
+                var initials = u.username.slice(0,2).toUpperCase();
+                html += '<a href="/auth/impersonate/' + encodeURIComponent(u.username) + '"' +
+                    ' class="qp-switcher-row' + (isCurrent ? ' current' : '') + '">' +
+                    '<div class="qp-switcher-avatar">' + initials + '</div>' +
+                    '<div><div class="qp-switcher-name">' + u.username + (isCurrent ? ' ✓' : '') + '</div>' +
+                    '<div class="qp-switcher-role">' + u.role + '</div></div>' +
+                    '</a>';
+            });
+            list.innerHTML = html || '<div class="qp-switcher-loading">No users found</div>';
+        }).catch(function() {
+            document.getElementById('switcherList').innerHTML =
+                '<div class="qp-switcher-loading">Error loading users</div>';
+        });
+    }
+    // Close switcher when clicking outside
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('switcherWrap');
+        if (wrap && !wrap.contains(e.target)) {
+            var panel = document.getElementById('switcherPanel');
+            if (panel) panel.style.display = 'none';
+        }
+    });
+})();
+</script>
+
+<!-- ======= PARTNER BAR ======= -->
+<div class="qp-partner-bar" id="partnerBar">
+    <div class="qp-partner-left">
+        <div class="qp-partner-avatar">JW</div>
+        <div class="qp-partner-info">
+            <span class="qp-partner-name">Josh Williams</span>
+            <span class="qp-partner-org">FedShark &#183; Government Contracting &amp; AI Partner</span>
+        </div>
+    </div>
+    <div class="qp-partner-right">
+        <div class="qp-kb-status-panel" id="kbStatusPanel">
+            <span class="qp-kb-status-label">&#128218; Knowledge Base</span>
+            <div class="qp-kb-status-list" id="kbStatusList">
+                <span class="qp-kb-status-item">Connecting&#8230;</span>
+            </div>
+        </div>
+        <button class="qp-partner-collapse-btn" onclick="togglePartnerBar()" id="partnerCollapseBtn" title="Collapse">&#9650;</button>
+    </div>
+</div>
+
+<!-- ======= MAIN LAYOUT ======= -->
+<div class="qp-layout" id="qpLayout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="qp-sidebar">
+        <div class="qp-sidebar-inner">
+
+            <div class="qp-sidebar-header">
+                <span class="qp-sidebar-icon">&#9889;</span>
+                <span class="qp-sidebar-title">Pattern Library</span>
+            </div>
+            <div class="qp-pattern-search-wrap">
+                <input type="text" id="patternSearch" class="qp-pattern-search" placeholder="&#128269; Search patterns&#8230;" oninput="filterPatterns(this.value)">
+            </div>
+            <p class="qp-section-hint">Click any pattern to load it into the query builder</p>
+
+            <!-- Foundation Demo — UKI Pre-Tested Queries -->
+            <div class="qp-pattern-category" id="cat-foundation">
+                <button class="qp-category-header" onclick="toggleCategory('cat-foundation')">
+                    <span class="qp-category-icon">&#127891;</span>
+                    <span class="qp-category-label">Foundation Demo</span>
+                    <span class="qp-category-chevron" id="chev-cat-foundation">&#9660;</span>
+                </button>
+                <div class="qp-category-patterns" id="patterns-cat-foundation">
+                    <button class="qp-pattern-btn qp-pattern-active" data-query="What does the UKI spend analysis show? Break down the top spending categories by dollar amount and percentage, and identify the biggest opportunities to reduce cost.">
+                        <span class="qp-pattern-dot" style="background:#22c55e"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Spend Analysis</span>
+                            <span class="qp-pattern-desc">UKI Q1 2026 budget breakdown</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn qp-pattern-active" data-query="What are the UKI pain points with AI governance and ungoverned faculty AI usage? What is the estimated annual cost and risk exposure?">
+                        <span class="qp-pattern-dot" style="background:#ef4444"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">AI Governance Pain Points</span>
+                            <span class="qp-pattern-desc">Ungoverned AI risk &amp; cost exposure</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn qp-pattern-active" data-query="What is the AIXaaS value proposition for UKI? How does the platform directly address UKI's top pain points around compliance, cost, and governance?">
+                        <span class="qp-pattern-dot" style="background:#3b82f6"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">AIXaaS Value for UKI</span>
+                            <span class="qp-pattern-desc">ROI &amp; platform fit for higher ed</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="What is the UKI strategic plan for 2026? List the 5 priorities, their objectives, and targets.">
+                        <span class="qp-pattern-dot" style="background:#8b5cf6"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">2026 Strategic Plan</span>
+                            <span class="qp-pattern-desc">UKI 5-priority roadmap &amp; targets</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="What compliance frameworks apply to UKI? List the frameworks, which regulatory authority governs each, and which UKI department is responsible.">
+                        <span class="qp-pattern-dot" style="background:#f59e0b"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Compliance Framework Map</span>
+                            <span class="qp-pattern-desc">Regulatory obligations by department</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="What technology does UKI currently use? List the core systems, their vendors, and annual costs. Where are the biggest gaps or redundancies?">
+                        <span class="qp-pattern-dot" style="background:#22d3ee"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Technology Stack Audit</span>
+                            <span class="qp-pattern-desc">Current systems, vendors &amp; costs</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Financial Analysis -->
+            <div class="qp-pattern-category" id="cat-financial">
+                <button class="qp-category-header" onclick="toggleCategory('cat-financial')">
+                    <span class="qp-category-icon">&#128200;</span>
+                    <span class="qp-category-label">Financial Analysis</span>
+                    <span class="qp-category-chevron" id="chev-cat-financial">&#9660;</span>
+                </button>
+                <div class="qp-category-patterns" id="patterns-cat-financial">
+                    <button class="qp-pattern-btn" data-query="Analyze revenue trends across all uploaded data. Identify growth patterns, seasonal variations, and flag any months with revenue below the 3-month rolling average. Quantify the delta in dollars.">
+                        <span class="qp-pattern-dot" style="background:#22c55e"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Revenue Trend Analysis</span>
+                            <span class="qp-pattern-desc">Growth patterns &amp; seasonal variance</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="What are the cost variances across locations? Identify which locations are paying more than average for the same supplies or services, and quantify the dollar impact of the top 3 variances.">
+                        <span class="qp-pattern-dot" style="background:#22c55e"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Cost Optimization</span>
+                            <span class="qp-pattern-desc">Cross-location cost comparison</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="Generate an executive summary of the top 5 insights from the uploaded data. For each insight include: the finding, the business impact in dollars, and the recommended action. Format as a briefing for a CEO or investor.">
+                        <span class="qp-pattern-dot" style="background:#a78bfa"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Executive Summary</span>
+                            <span class="qp-pattern-desc">Top insights for investor briefing</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Risk & Compliance -->
+            <div class="qp-pattern-category" id="cat-risk">
+                <button class="qp-category-header" onclick="toggleCategory('cat-risk')">
+                    <span class="qp-category-icon">&#9878;</span>
+                    <span class="qp-category-label">Risk &amp; Compliance</span>
+                    <span class="qp-category-chevron" id="chev-cat-risk">&#9660;</span>
+                </button>
+                <div class="qp-category-patterns" id="patterns-cat-risk">
+                    <button class="qp-pattern-btn" data-query="What compliance obligations apply to our operations based on the uploaded documents? List the top 3 compliance gaps that need immediate attention with a recommended action for each.">
+                        <span class="qp-pattern-dot" style="background:#ef4444"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Compliance Gap Scan</span>
+                            <span class="qp-pattern-desc">Regulatory obligations &amp; gaps</span>
+                        </span>
+                    </button>
+                    <button class="qp-pattern-btn" data-query="Are there any operational anomalies or statistical outliers in the uploaded data? Flag records that deviate significantly from expected ranges and estimate the financial or operational impact.">
+                        <span class="qp-pattern-dot" style="background:#f59e0b"></span>
+                        <span class="qp-pattern-content">
+                            <span class="qp-pattern-name">Anomaly Detection</span>
+                            <span class="qp-pattern-desc">Statistical outlier &amp; risk scan</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload button -->
+            <div class="qp-sidebar-upload">
+                <button class="qp-btn-upload-sidebar" id="uploadBtn">
+                    &#8679; Upload Data to Domain
+                </button>
+            </div>
+
+            <!-- Pattern actions -->
+            <div class="qp-sidebar-pattern-actions">
+                <button class="qp-btn-new-pattern" onclick="showNewPatternFromSidebar()">
+                    &#43; New Pattern
+                </button>
+                <button class="qp-btn-convert-chat" onclick="convertFromChat()">
+                    &#8635; Convert from Chat
+                </button>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- CENTER: QUERY BUILDER + RESPONSE -->
+    <main class="qp-main">
+
+        <!-- Query Builder -->
+        <section class="qp-card qp-query-card">
+            <div class="qp-card-header">
+                <div>
+                    <h2 class="qp-card-title">Query Builder</h2>
+                    <p class="qp-card-subtitle">
+                        Domain: <strong id="activeDomainLabel">Foundation Demo</strong>
+                        &#183; Select a pattern or compose your own query
+                    </p>
+                </div>
+                <div class="qp-query-controls">
+                    <label class="qp-toggle-label">
+                        <input type="checkbox" id="streamToggle" checked>
+                        <span>Stream</span>
+                    </label>
+                    <button class="qp-btn qp-btn-ghost" id="clearBtn">&#10005; Clear</button>
+                </div>
+            </div>
+
+            <div class="qp-query-input-wrap">
+                <textarea
+                    id="queryInput"
+                    class="qp-query-textarea"
+                    placeholder="Type your query here, or select a pattern from the library on the left&#8230;&#10;&#10;Examples:&#10;&#8226; What are the top cost variances across our locations?&#10;&#8226; Are there compliance gaps in our uploaded documents?&#10;&#8226; Identify invoice anomalies with dollar impact"
+                    rows="4"
+                ></textarea>
+                <div class="qp-query-footer">
+                    <span class="qp-char-count" id="charCount">0 chars</span>
+                    <div class="qp-query-actions">
+                        <button class="qp-btn qp-btn-primary" id="submitBtn">
+                            <span id="submitLabel">&#9654; Run Query</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Response Area -->
+        <section class="qp-card qp-response-card" id="responseCard">
+            <div class="qp-card-header">
+                <div>
+                    <h2 class="qp-card-title">Response</h2>
+                    <p class="qp-card-subtitle" id="responseSubtitle">Results will appear here after you run a query</p>
+                </div>
+                <div class="qp-response-meta" id="responseMeta" style="display:none">
+                    <span class="qp-meta-chip" id="metaTokens"></span>
+                    <span class="qp-meta-chip" id="metaTime"></span>
+                    <button class="qp-btn qp-btn-ghost qp-btn-sm" id="copyBtn">&#128203; Copy</button>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="qp-response-empty" id="responseEmpty">
+                <div class="qp-empty-icon">&#127758;</div>
+                <p class="qp-empty-title">Ready for your query</p>
+                <p class="qp-empty-hint">Select a domain, choose a pattern or type a query, then click <strong>Run Query</strong></p>
+                <div class="qp-empty-steps">
+                    <div class="qp-empty-step"><span class="qp-step-num">1</span><span>Select Domain</span></div>
+                    <div class="qp-empty-arrow">&#8594;</div>
+                    <div class="qp-empty-step"><span class="qp-step-num">2</span><span>Choose Pattern</span></div>
+                    <div class="qp-empty-arrow">&#8594;</div>
+                    <div class="qp-empty-step"><span class="qp-step-num">3</span><span>Run Query</span></div>
+                    <div class="qp-empty-arrow">&#8594;</div>
+                    <div class="qp-empty-step"><span class="qp-step-num">4</span><span>Get Insight</span></div>
+                </div>
+            </div>
+
+            <!-- Loading state -->
+            <div class="qp-response-loading" id="responseLoading" style="display:none">
+                <div class="qp-loading-dots"><span></span><span></span><span></span></div>
+                <p class="qp-loading-text">MAO agents processing your query&#8230;</p>
+                <div class="qp-pipeline-stages">
+                    <span class="qp-stage" id="stage1">&#8635; Routing</span>
+                    <span class="qp-stage-arrow">&#8594;</span>
+                    <span class="qp-stage" id="stage2">&#9906; Retrieving</span>
+                    <span class="qp-stage-arrow">&#8594;</span>
+                    <span class="qp-stage" id="stage3">&#9881; Analyzing</span>
+                    <span class="qp-stage-arrow">&#8594;</span>
+                    <span class="qp-stage" id="stage4">&#10003; Synthesizing</span>
+                </div>
+            </div>
+
+            <!-- Response content -->
+            <div class="qp-response-content" id="responseContent" style="display:none">
+
+                <div class="qp-response-text" id="responseText"></div>
+
+                <!-- Key Metrics Grid -->
+                <div class="qp-metrics-grid" id="metricsGrid" style="display:none">
+                    <div class="qp-metrics-header">
+                        <span class="qp-metrics-icon">&#9656;</span> Key Metrics
+                    </div>
+                    <div class="qp-metrics-cells" id="metricsCells"></div>
+                </div>
+
+                <!-- Sources -->
+                <div class="qp-sources-section" id="sourcesSection" style="display:none">
+                    <div class="qp-sources-header">
+                        <span>&#128206; Sources</span>
+                        <span class="qp-sources-count" id="sourcesCount"></span>
+                    </div>
+                    <div class="qp-sources-list" id="sourcesList"></div>
+                </div>
+
+                <!-- Hidden ADR refs (internal tracking only, not shown) -->
+                <span id="adrPill" style="display:none"><span id="adrId"></span></span>
+
+                <!-- Compliance badges (only shown when frameworks detected) -->
+                <div class="qp-compliance-badges" id="complianceBadges" style="margin-top:.5rem"></div>
+                <div id="responseFooter" style="display:none"></div>
+
+                <!-- Action Bar -->
+                <div class="qp-action-bar" id="actionBar" style="display:none">
+                    <button class="qp-action-btn" id="savePatternBtn" title="Save this query as a reusable pattern">
+                        &#128204; Save as Pattern
+                    </button>
+                    <button class="qp-action-btn" id="refineBtn" title="Ask MAO to refine and improve this response">
+                        &#8635; Refine
+                    </button>
+                    <button class="qp-action-btn" id="sendAtlasBtn" title="Send this response to the AI Navigator for deeper analysis">
+                        &#10148; Send to Navigator
+                    </button>
+                    <button class="qp-action-btn qp-action-flag" id="flagBtn" title="Flag this response for human review">
+                        &#128681; Flag for Review
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR Audit Trail (hidden — internal use only, accessible via /api/ingest/adr) -->
+        <div id="adrCard" style="display:none" aria-hidden="true">
+            <div id="adrDetails" style="display:none">
+                <pre id="adrJson"></pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RIGHT: INFLEXIS AI NAVIGATOR -->
+    <aside class="qp-agent-panel">
+
+        <div class="qp-agent-header">
+            <div class="qp-navigator-star">&#10022;</div>
+            <div>
+                <h3 class="qp-agent-title">Inflexis AI Navigator</h3>
+                <p class="qp-agent-subtitle">Powered by MAO &#183; AIXaaS&#8482; v6C</p>
+            </div>
+        </div>
+
+        <div class="qp-agent-domain-bar">
+            <span class="qp-agent-domain-pill" id="agentDomainName">Foundation Demo</span>
+        </div>
+
+        <!-- Navigator Mode Tabs -->
+        <div class="qp-nav-tabs">
+            <button class="qp-nav-tab active" onclick="setNavTab(this, 'explore')" id="tab-explore">Explore</button>
+            <button class="qp-nav-tab" onclick="setNavTab(this, 'analyst')" id="tab-analyst">Analyst</button>
+            <button class="qp-nav-tab" onclick="setNavTab(this, 'execute')" id="tab-execute">Execute</button>
+            <button class="qp-nav-tab" onclick="setNavTab(this, 'govern')" id="tab-govern">Govern</button>
+        </div>
+
+        <!-- Suggested Actions -->
+        <div class="qp-suggested-actions">
+            <div class="qp-sa-title">Suggested Actions</div>
+            <button class="qp-sa-btn" data-action="Show me the key trends in this data across all time periods. Highlight patterns and what they mean for the business with specific examples.">
+                &#128200; Show me trends
+            </button>
+            <button class="qp-sa-btn" data-action="Convert the key findings from my last query into a numbered workflow with clear action steps that a team can execute immediately.">
+                &#9889; Convert to workflow
+            </button>
+            <button class="qp-sa-btn" data-action="Highlight all anomalies, outliers, and unusual patterns in the data. For each one, give a specific example from the documents and estimate the business impact in dollars.">
+                &#9888; Highlight anomalies
+            </button>
+            <button class="qp-sa-btn" data-action="Create a concise executive summary of the top 5 insights formatted for a CEO or investor presentation. Include dollar amounts, business impact, and clear action items.">
+                &#128202; Create executive summary
+            </button>
+            <button class="qp-sa-btn qp-sa-new" id="newSessionBtn">
+                &#8635; Start New Session
+            </button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="qp-agent-messages" id="agentMessages">
+            <div class="qp-agent-msg qp-agent-system">
+                <span class="qp-agent-msg-icon">&#10022;</span>
+                <div class="qp-agent-msg-body">
+                    <p>Hello! I'm the Inflexis AI Navigator. I can answer follow-up questions about your data and help you explore any finding in depth.</p>
+                    <p style="margin-top:.5rem;font-size:.78rem;opacity:.7">Try a Suggested Action above, or ask me anything about your loaded knowledge base.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="qp-agent-input-wrap">
+            <textarea
+                id="agentInput"
+                class="qp-agent-input"
+                placeholder="Ask a follow-up question&#8230;"
+                rows="2"
+            ></textarea>
+            <button class="qp-agent-send" id="agentSend" title="Send">&#10148;</button>
+        </div>
+
+        <div class="qp-agent-footer">
+            <span class="qp-agent-footer-text">AIXaaS&#8482; &#183; Inflexis Platform</span>
+            <button class="qp-btn qp-btn-ghost qp-btn-sm" id="agentClear">Clear Chat</button>
+        </div>
+
+    </aside>
+
+</div>
+
+<!-- FILE UPLOAD MODAL -->
+<div class="qp-modal" id="uploadModal" style="display:none">
+    <div class="qp-modal-backdrop" id="modalBackdrop"></div>
+    <div class="qp-modal-box">
+        <div class="qp-modal-header">
+            <h3>Upload Data to <span id="modalDomainName">Foundation Demo</span></h3>
+            <button class="qp-modal-close" id="modalClose">&#10005;</button>
+        </div>
+        <div class="qp-modal-body">
+            <div class="qp-modal-drop" id="modalDrop">
+                <span class="qp-upload-icon">&#8659;</span>
+                <p>Drag &amp; drop files here</p>
+                <p class="qp-upload-hint">PDF &#183; DOCX &#183; PPTX &#183; XLSX &#183; CSV &#183; TXT &#183; MP3 &#183; MP4 &#183; YouTube URL</p>
+                <button class="qp-btn qp-btn-secondary" onclick="document.getElementById('modalFileInput').click()">Browse Files</button>
+                <input type="file" id="modalFileInput" multiple style="display:none">
+            </div>
+            <div class="qp-url-input-wrap">
+                <input type="text" id="urlInput" class="qp-url-input" placeholder="Or paste a URL (YouTube, web page&#8230;)">
+                <button class="qp-btn qp-btn-primary" id="urlIngestBtn">Ingest URL</button>
+            </div>
+            <div id="modalProgress" style="display:none">
+                <div class="qp-progress-bar" style="margin-top:1rem">
+                    <div class="qp-progress-fill" id="modalProgressFill"></div>
+                </div>
+                <p id="modalStatus" style="margin-top:.5rem;font-size:.85rem;color:#7a9bc8"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flag for Review Modal -->
+<div class="qp-modal" id="flagModal" style="display:none">
+    <div class="qp-modal-backdrop" id="flagModalBackdrop"></div>
+    <div class="qp-modal-box">
+        <div class="qp-modal-header">
+            <h3>&#128681; Flag Response for Review</h3>
+            <button class="qp-modal-close" id="flagModalClose">&#10005;</button>
+        </div>
+        <div class="qp-modal-body">
+            <p style="font-size:.85rem;color:#7a9bc8;margin-bottom:.75rem">Describe what was incorrect or missing in the response. This will be logged as an ADR and Bryan will be notified.</p>
+            <textarea id="flagText" class="qp-url-input" style="width:100%;height:120px;resize:vertical;padding:.65rem" placeholder="What was wrong with the response? What should it have said instead?"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem">
+                <button class="qp-btn qp-btn-ghost" id="flagCancelBtn">Cancel</button>
+                <button class="qp-btn qp-btn-primary" id="flagSubmitBtn">Submit Correction</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Pattern Modal -->
+<div class="qp-modal" id="savePatternModal" style="display:none">
+    <div class="qp-modal-backdrop" id="savePatternModalBackdrop"></div>
+    <div class="qp-modal-box">
+        <div class="qp-modal-header">
+            <h3>&#128204; Save as Pattern</h3>
+            <button class="qp-modal-close" id="savePatternModalClose">&#10005;</button>
+        </div>
+        <div class="qp-modal-body">
+            <p style="font-size:.85rem;color:#7a9bc8;margin-bottom:.75rem">Give this query a name so you can reuse it quickly.</p>
+            <input type="text" id="patternName" class="qp-url-input" style="width:100%" placeholder="e.g. Q1 Invoice Anomaly Scan" maxlength="60">
+            <p style="font-size:.75rem;color:#7a9bc8;margin-top:.5rem">Query: <em id="patternQueryPreview" style="color:#94a3b8"></em></p>
+            <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem">
+                <button class="qp-btn qp-btn-ghost" id="savePatternCancelBtn">Cancel</button>
+                <button class="qp-btn qp-btn-primary" id="savePatternConfirmBtn">Save Pattern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="qp-toast" id="qpToast"></div>
+
+<script src="/static/js/query_panel.js"></script>
+</body>
+</html>
